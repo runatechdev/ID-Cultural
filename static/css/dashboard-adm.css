@@ -1,0 +1,69 @@
+/* ============================================= */
+/* ESTILOS PARA PANEL DE GESTIÓN                 */
+/* ============================================= */
+
+.panel-gestion-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.panel-gestion-container h1 {
+  text-align: center;
+  color: var(--color-primario);
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+}
+
+.dashboard-menu {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  /* Crea una grilla de 2 columnas, o 1 en pantallas pequeñas */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.dashboard-item a {
+  display: flex;
+  align-items: center;
+  padding: 25px 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  text-decoration: none;
+  color: var(--color-texto-oscuro);
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-left: 5px solid var(--color-primario);
+}
+
+.dashboard-item a:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  background-color: #fcfdff;
+}
+
+.dashboard-icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 15px;
+  opacity: 0.8;
+}
+
+/* Pega esto al principio o en la sección del body de tu main.css */
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex-grow: 1;
+}
