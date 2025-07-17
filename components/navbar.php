@@ -5,7 +5,7 @@
   <h1 class="title">ID Cultural</h1>
   <nav class="animate__animated animate__fadeInDown">
     <ul>
-      <li><a class="menu" href="/Index.php" class="menu">
+      <li><a class="menu" href="/index.php" class="menu">
         <i data-lucide="house"></i> Inicio
       </a>
     </li>
