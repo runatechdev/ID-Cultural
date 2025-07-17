@@ -1,11 +1,19 @@
 <?php
-// Define la ruta base de tu proyecto.
-// Si tu proyecto está en http://localhost/ID-Cultural/, la base es /ID-Cultural/
-// Si está en la raíz, la base es /
-define('BASE_URL', '/ID-Cultural/');
+/**
+ * Archivo de Configuración Principal
+ */
 
-// Otras configuraciones futuras podrían ir aquí...
+// 1. Inicia la sesión de forma segura
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
-} // Buen lugar para iniciar sesiones
-?>
+}
+
+// 2. Define la URL base para todos los enlaces públicos (CSS, JS, <a>, <img>)
+// Esto hace que funcione tanto en XAMPP como en cualquier otro servidor.
+define('BASE_URL', '/ID-Cultural/');
+
+// 3. Define la ruta raíz del servidor para los 'include' y 'require' de PHP.
+// Esto nos dará la ruta absoluta al directorio del proyecto.
+if (!defined('ROOT_PATH')) {
+    define('ROOT_PATH', realpath(__DIR__));
+}
