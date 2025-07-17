@@ -13,7 +13,7 @@
 
 <body>
   
-<?php include __DIR__ . '/ID-Cultural/components/navbar.php'; ?>
+<?php include __DIR__ . '/components/navbar.php'; ?>
 
   <main>
     <section class="hero">
@@ -55,7 +55,7 @@
     </section>
   </main>
 
-  <?php include __DIR__ . '/ID-Cultural/components/footer.php'; ?>
+  <?php include __DIR__ . '/components/footer.php'; ?>
 
   <script src="/ID-Cultural/static/js/main.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
