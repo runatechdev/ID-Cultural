@@ -33,7 +33,7 @@ $page_title = "Panel de Gestión - ID Cultural";
 
         <ul class="dashboard-menu">
             <li class="dashboard-item">
-                <a href="<?php echo BASE_URL; ?>src/views/pages/admin/abm_usuarios.php">
+                <a href="/ID-Cultural/src/views/pages/admin/abm_usuarios.php">
                     <img src="<?php echo BASE_URL; ?>static/img/perfil-del-usuario.png" alt="Icono Usuarios" class="dashboard-icon">
                     Gestionar Usuarios
                 </a>
