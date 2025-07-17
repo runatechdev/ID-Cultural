@@ -35,31 +35,31 @@ $page_title = "Panel de Gestión - ID Cultural";
             <li class="dashboard-item">
                 <a href="<?php echo BASE_URL; ?>src/views/pages/admin/abm_usuarios.php">
                     <img src="<?php echo BASE_URL; ?>static/img/perfil-del-usuario.png" alt="Icono Usuarios" class="dashboard-icon">
-                    ABM de Usuarios
+                    Gestionar Usuarios
                 </a>
             </li>
             <li class="dashboard-item">
                 <a href="<?php echo BASE_URL; ?>src/views/pages/admin/abm_artistas.php">
                     <img src="<?php echo BASE_URL; ?>static/img/paleta-de-pintura.png" alt="Icono Artistas" class="dashboard-icon">
-                    ABM de Artistas
+                 Gestionar Artistas
                 </a>
             </li>
             <li class="dashboard-item">
                 <a href="<?php echo BASE_URL; ?>src/views/pages/admin/blanqueo_clave_admin.php">
                     <img src="<?php echo BASE_URL; ?>static/img/candado.png" alt="Icono Blanqueo" class="dashboard-icon">
-                    Blanqueo de Clave (Admin)
+                    Reiniciar Clave 
                 </a>
             </li>
             <li class="dashboard-item">
                 <a href="<?php echo BASE_URL; ?>src/views/pages/admin/cambiar_clave.php">
                     <img src="<?php echo BASE_URL; ?>static/img/correo-electronico.png" alt="Icono Cambiar Clave" class="dashboard-icon">
-                    Cambiar Clave con Correo
+                    Cambiar Clave por Correo
                 </a>
             </li>
             <li class="dashboard-item">
                 <a href="<?php echo BASE_URL; ?>src/views/pages/admin/estado_solicitud.php">
                     <img src="<?php echo BASE_URL; ?>static/img/lectura.png" alt="Icono Estado Solicitud" class="dashboard-icon">
-                    Ver Estado de Solicitud del Artista
+                    Ver  Solicitud 
                 </a>
             </li>
         </ul>

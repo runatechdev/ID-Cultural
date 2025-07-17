@@ -29,6 +29,7 @@ $page_title = "Gestión de Usuarios - ID Cultural";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?></title>
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/main.css" />
+  <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/dashboard.css" />
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/abm_usuarios.css" />
 </head>
 <body>

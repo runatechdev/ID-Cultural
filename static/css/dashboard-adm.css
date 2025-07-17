@@ -16,12 +16,18 @@
 }
 
 .dashboard-menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
   list-style: none;
   padding: 0;
-  display: grid;
-  /* Crea una grilla de 2 columnas, o 1 en pantallas pequeñas */
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 25px;
+  margin-top: 2rem;
+}
+
+.dashboard-item {
+  flex: 1 1 220px; /* Crece, encoge, y mínimo 220px */
+  max-width: 700px; /* Evita que se estire demasiado */
 }
 
 .dashboard-item a {
@@ -51,6 +57,7 @@
   margin-right: 15px;
   opacity: 0.8;
 }
+
 
 /* Pega esto al principio o en la sección del body de tu main.css */
 
