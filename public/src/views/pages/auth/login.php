@@ -1,3 +1,9 @@
+<?php
+session_start();
+require_once __DIR__ . '/../../../../../config.php';
+$page_title = "Login - DNI Cultural";
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -21,7 +27,9 @@
 
 <body>
 
-    <?php include("../../../../components/navbar.php"); ?>
+  <?php
+  include(__DIR__ . '/../../../../../components/navbar.php');
+  ?>
 
   <main>
     <section class="login-box">

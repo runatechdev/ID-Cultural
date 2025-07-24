@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/../../../../../config.php';
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -148,7 +152,9 @@
     </section>
   </main>
 
-  <?php include("../../../../components/footer.php"); ?>
+  <?php
+  include(__DIR__ . '/../../../../../components/footer.php');
+  ?>
 
   <!-- Scripts -->
   <script src="/ID-Cultural/static/js/main.js"></script>

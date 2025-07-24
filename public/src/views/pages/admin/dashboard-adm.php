@@ -1,16 +1,9 @@
 <?php
-// 1. Definimos la ruta raíz y cargamos la configuración
-define('ROOT_PATH', realpath(__DIR__ . '/../../../../'));
-require_once(ROOT_PATH . '/config.php');
-
-// Lógica de seguridad: verificar que solo un admin pueda ver esta página
-// if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-//     header('Location: ' . BASE_URL . 'index.php');
-//     exit();
-// }
-
+session_start();
+require_once __DIR__ . "../../../../../../config.php";  
 $page_title = "Panel de Gestión - ID Cultural";
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -23,17 +16,16 @@ $page_title = "Panel de Gestión - ID Cultural";
 </head>
 <body>
 
-<?php
-  // 3. Incluimos el navbar desde su ubicación REAL
-  include(ROOT_PATH . '/components/navbar.php');
-  ?>
+<?php 
+include __DIR__ . "/../../../../../components/navbar.php"; 
+?>
 
     <main class="panel-gestion-container">
         <h1>Panel de Gestión</h1>
 
         <ul class="dashboard-menu">
             <li class="dashboard-item">
-                <a href="/ID-Cultural/src/views/pages/admin/abm_usuarios.php">
+                <a href="<?php echo BASE_URL; ?>src/views/pages/admin/abm_usuarios.php">
                     <img src="<?php echo BASE_URL; ?>static/img/perfil-del-usuario.png" alt="Icono Usuarios" class="dashboard-icon">
                     Gestionar Usuarios
                 </a>
@@ -65,10 +57,9 @@ $page_title = "Panel de Gestión - ID Cultural";
         </ul>
     </main>
 
-    <?php
-  // 4. Incluimos el footer desde su ubicación REAL
-  include(ROOT_PATH . '/components/footer.php');
-  ?>
+<?php 
+include __DIR__ . "/../../../../../components/footer.php"; 
+?>
 
 </body>
 </html>
