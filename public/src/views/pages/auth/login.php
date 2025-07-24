@@ -1,17 +1,25 @@
+<?php
+session_start();
+require_once __DIR__ . '/../../../../../config.php';
+$page_title = "Login - DNI Cultural";
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
   <meta charset="UTF-8" />
   <title>Login - DNI Cultural</title>
-  <link rel="stylesheet" href="/ID-Cultural/static/css/main.css">
-  <link rel="stylesheet" href="/ID-Cultural/static/css/login.css">
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="stylesheet" href="/static/css/login.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 
 <body>
 
-    <?php include("../../../../components/navbar.php"); ?>
+  <?php
+  include(__DIR__ . '/../../../../../components/navbar.php');
+  ?>
 
   <main>
     <section class="login-box">
@@ -36,11 +44,12 @@
     </section>
   </main>
 
-<?php include("../../../../components/footer.php"); ?>
+  <?php
+  include(__DIR__ . '/../../../../../components/footer.php');
+  ?>
 
-  <script src="/ID-Cultural/static/js/main.js"></script>
-  <script src="/ID-Cultural/static/js/navbar.js"></script>
-  <script src="/ID-Cultural/static/js/login.js"></script>
+  <script src="/static/js/main.js"></script>
+  <script src="/static/js/login.js"></script>
 
 </body>
 

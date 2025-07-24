@@ -1,19 +1,31 @@
+
+<?php
+// ¡ESTO ES LO PRIMERO!
+require_once __DIR__ . "/../config.php";  
+// Asegúrate de que config.php esté en la raíz de tu proyecto, 
+// un nivel arriba de 'public/' donde ahora está index.php
+
+// A partir de aquí, el resto del código HTML y PHP de tu index.php
+?>
+
 <!DOCTYPE html>
 <html lang="es">
   
   <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="shortcut icon" href="/ID-Cultural/static/img/favicon/id.png" />
+  <link rel="shortcut icon" href="/static/img/favicon/id.png" /> 
   <title>DNI Cultural</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-  <link rel="stylesheet" href="/ID-Cultural/static/css/main.css" />
+  <link rel="stylesheet" href="/static/css/main.css" /> 
 
 </head>
 
 <body>
   
-<?php include __DIR__ . '/ID-Cultural/components/navbar.php'; ?>
+<?php 
+include __DIR__ . '/../components/navbar.php'; 
+?>
 
   <main>
     <section class="hero">
@@ -37,29 +49,26 @@
           culturales y proyectarlas hacia el futuro.</p>
 
         <p><em>ID Cultural — La identidad de un pueblo, en un solo lugar.</em></p>
-<!--------------------------------------------------------------NOTICIAS!----->
-  <section id="noticias-recientes" class="noticias-home">
+<section id="noticias-recientes" class="noticias-home">
   <h2>Últimas Noticias</h2>
   <div id="contenedor-noticias"></div>
 </section>
 
-<!---------------------------------------------------------------------------->
-
-      </div>
+</div>
       <div class="hero-image">
         <picture>
-          <source srcset="/ID-Cultural/static/img/logo.jpg" type="image">
-          <img src="/ID-Cultural/static/img/logo.jpg" alt="Casa Castro" loading="lazy" />
+          <source srcset="/static/img/logo.jpg" type="image"> 
+          <img src="/static/img/logo.jpg" alt="Casa Castro" loading="lazy" /> 
         </picture>
       </div>
     </section>
   </main>
 
-  <?php include __DIR__ . '/ID-Cultural/components/footer.php'; ?>
+  <?php include __DIR__ . '/../components/footer.php'; ?>
 
-  <script src="/ID-Cultural/static/js/main.js"></script>
+  <script src="/static/js/main.js"></script> 
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="/ID-Cultural/static/js/navbar.js"></script>
+  <script src="/static/js/navbar.js"></script> 
   
 
 </body>
