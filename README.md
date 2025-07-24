@@ -51,7 +51,7 @@ ID_Cultural/
 └── docs/
 ├── manual-usuario.pdf # Guía para usuarios finales
 └── informe-tecnico.docx # Documentación técnica del proyecto
-
+```
 ---
 
 ## ⚙️ Tecnologías Utilizadas
@@ -77,7 +77,7 @@ ID_Cultural/
 - **Carga de Contenido Multimedia:** Soporte para incluir obras, eventos, biografías, documentos y otros materiales asociados a los artistas.
 - **Buscador Avanzado:** Filtros por género, localidad, tipo de expresión artística y año.
 - **Panel Administrativo:** Gestión completa de usuarios (artistas, validadores, editores, administradores) y contenidos.
-```
+
 ---
 
 ## 👥 Equipo de Desarrollo
