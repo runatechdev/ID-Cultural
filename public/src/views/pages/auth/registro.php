@@ -9,16 +9,22 @@ require_once __DIR__ . '/../../../../../config.php';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registro del Artista</title>
-  <link rel="stylesheet" href="/static/css/main.css">
-  <link rel="stylesheet" href="/static/css/registro.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <!-- Bootstrap Core -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootswatch Theme -->
+<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/quartz/bootstrap.min.css" rel="stylesheet">
+
+<!-- SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="/ID-Cultural/static/css/main.css">
+  <link rel="stylesheet" href="/ID-Cultural/static/css/registro.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 </head>
 
 <body>
-
-  <?php
-  include(__DIR__ . '/../../../../../components/navbar.php');
-  ?>
+    <?php include("../../../../components/navbar.php"); ?>
 
   <main>
     <section class="registro-wizard">
@@ -49,7 +55,7 @@ require_once __DIR__ . '/../../../../../config.php';
           <label for="apellido">Apellido</label>
           <input type="text" id="apellido" name="apellido" placeholder="Ej: Pérez" autocomplete="family-name" required>
         </div>
-
+        
         <div class="input-group">
           <label for="fechaNacimiento">Fecha de nacimiento</label>
           <input type="date" id="fechaNacimiento" name="fechaNacimiento" autocomplete="bday" required>
@@ -72,7 +78,7 @@ require_once __DIR__ . '/../../../../../config.php';
             <option value="Argentina">Argentina</option>
           </select>
         </div>
-
+        
         <div class="input-group">
           <label for="provincia">Provincia</label>
           <select id="provincia" name="provincia" required disabled>
@@ -86,7 +92,7 @@ require_once __DIR__ . '/../../../../../config.php';
             <option value="" disabled selected>Seleccioná un municipio</option>
           </select>
         </div>
-
+        
         <!-- Credenciales -->
         <div class="input-group">
           <label for="email">Correo electrónico</label>
@@ -151,8 +157,11 @@ require_once __DIR__ . '/../../../../../config.php';
   ?>
 
   <!-- Scripts -->
-  <script src="/static/js/main.js"></script>
-  <script src="/static/js/registro.js"></script>
+  <script src="/ID-Cultural/static/js/main.js"></script>
+  <script src="/ID-Cultural/static/js/navbar.js"></script>
+  <script src="/ID-Cultural/static/js/registro.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
   <!-- Modal -->
   <div id="modalTerminos" class="modal">
