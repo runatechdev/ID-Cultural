@@ -166,7 +166,6 @@ body {
 .hero-text {
   flex: 1;
   margin-right: 20px;
-  animation: slideInLeft 1.5s ease;
 }
 
 .hero-text h1 {

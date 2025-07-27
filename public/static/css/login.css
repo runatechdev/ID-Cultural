@@ -38,10 +38,6 @@ p {
   margin: 5px 0 15px;
 }
 
-main {
-  animation: fadeInDown 1s ease-in-out;
-}
-
 label {
   font-weight: bold;
   color: #444;

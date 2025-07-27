@@ -9,75 +9,75 @@ require_once __DIR__ . '/../config.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca Digital - DNI Cultural</title>
-    
-<!-- Bootstrap Core -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- Bootswatch Theme -->
-<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/quartz/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Core -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- SweetAlert2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- Bootswatch Theme -->
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/quartz/bootstrap.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="/ID-Cultural/static/css/main.css" />
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/main.css" />
     <!-- Asegúrate de que este archivo exista y contenga el estilo base -->
-    <link rel="stylesheet" href="/ID-Cultural/static/css/wiki.css" /> <!-- Estilo específico de la Biblioteca Digital -->
+    <link rel="stylesheet" href="/static/css/wiki.css" /> <!-- Estilo específico de la Biblioteca Digital -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
 </head>
 
 <body>
 
-       <?php 
-       // navbar.php está en ID-Cultural/components/
-       // wiki.php está en ID-Cultural/public/
-       // Desde wiki.php, necesitas subir a ID-Cultural/ (../) y luego entrar a components/
-       include("../components/navbar.php"); 
-       ?>
+    <?php
+    // navbar.php está en/components/
+    // wiki.php está en/public/
+    // Desde wiki.php, necesitas subir a/ (../) y luego entrar a components/
+    include("../components/navbar.php");
+    ?>
 
     <!-- Contenido Principal -->
     <main>
         <img src="/static/img/portada.png" alt="Logo Santiago del Estero">
 
         <!-- Búsqueda -->
-<div class="search">
-    <h2>Buscar en la Biblioteca</h2>
-    <form id="form-busqueda" action="#" method="get">
-        <input type="text" placeholder="Buscar por nombre o palabra clave..." name="search" id="search" required>
+        <div class="search">
+            <h2>Buscar en la Biblioteca</h2>
+            <form id="form-busqueda" action="#" method="get">
+                <input type="text" placeholder="Buscar por nombre o palabra clave..." name="search" id="search" required>
 
-        <select name="categoria" id="categoria">
-            <option value="">Todas las categorías</option>
-            <option value="Artesania">Artesania</option>
-            <option value="Audiovisual">Audiovisual</option>
-            <option value="Danza">Danza</option>
-            <option value="Teatro">Teatro</option>
-            <option value="Musica">Musica</option>
-            <option value="Literatura">Literatura</option>
-            <option value="Escultura">Escultura</option>
-            <!-- Podés agregar más categorías según los datos que tengas -->
-        </select>
+                <select name="categoria" id="categoria">
+                    <option value="">Todas las categorías</option>
+                    <option value="Artesania">Artesania</option>
+                    <option value="Audiovisual">Audiovisual</option>
+                    <option value="Danza">Danza</option>
+                    <option value="Teatro">Teatro</option>
+                    <option value="Musica">Musica</option>
+                    <option value="Literatura">Literatura</option>
+                    <option value="Escultura">Escultura</option>
+                    <!-- Podés agregar más categorías según los datos que tengas -->
+                </select>
 
-        <button type="submit">Buscar</button>
-    </form>
-</div>
+                <button type="submit">Buscar</button>
+            </form>
+        </div>
 
 
         <div class="container">
-    <aside class="sidebar">
-        <h2>🎨 Artistas Famosos</h2>
+            <aside class="sidebar">
+                <h2>🎨 Artistas Famosos</h2>
 
-        <div class="famoso">
-            <img src="/static/img/merce.jpg" alt="Mercedes Sosa">
-            <h4>Mercedes Sosa</h4>
-            <p>Cantante y referente del folklore argentino.</p>
-        </div>
+                <div class="famoso">
+                    <img src="/static/img/merce.jpg" alt="Mercedes Sosa">
+                    <h4>Mercedes Sosa</h4>
+                    <p>Cantante y referente del folklore argentino.</p>
+                </div>
 
-        <div class="famoso">
-            <img src="/static/img/berni.jpg" alt="Antonio Berni">
-            <h4>Antonio Berni</h4>
-            <p>Pintor y grabador destacado por su arte social.</p>
-        </div>
-    </aside>
+                <div class="famoso">
+                    <img src="/static/img/berni.jpg" alt="Antonio Berni">
+                    <h4>Antonio Berni</h4>
+                    <p>Pintor y grabador destacado por su arte social.</p>
+                </div>
+            </aside>
 
             <!-- Sección Dinámica por Categorías -->
             <section class="main-content" id="biografias">
@@ -112,11 +112,11 @@ require_once __DIR__ . '/../config.php';
     </div>
 
     <!-- Footer -->
-       <?php include("../components/footer.php"); ?>
+    <?php include("../components/footer.php"); ?>
 
 
-    <script src="/ID-Cultural/static/js/main.js"></script>
-    <script src="/ID-Cultural/static/js/navbar.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/navbar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 

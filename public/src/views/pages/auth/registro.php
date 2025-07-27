@@ -18,13 +18,13 @@ require_once __DIR__ . '/../../../../../config.php';
 <!-- SweetAlert2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="/ID-Cultural/static/css/main.css">
-  <link rel="stylesheet" href="/ID-Cultural/static/css/registro.css">
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="stylesheet" href="/static/css/registro.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 </head>
 
 <body>
-    <?php include("../../../../components/navbar.php"); ?>
+    <?php include("../../../../../components/navbar.php"); ?>
 
   <main>
     <section class="registro-wizard">
@@ -41,7 +41,7 @@ require_once __DIR__ . '/../../../../../config.php';
       </div>
     </section>
 
-    <section id="paso1" class="formulario-paso1 active animate__animated animate__fadeInDown">
+    <section id="paso1" class="formulario-paso1 active animate__animated animate__fadeInLeft">
       <h2>Creá tu cuenta</h2>
       <form id="registroForm" novalidate>
 
@@ -157,9 +157,9 @@ require_once __DIR__ . '/../../../../../config.php';
   ?>
 
   <!-- Scripts -->
-  <script src="/ID-Cultural/static/js/main.js"></script>
-  <script src="/ID-Cultural/static/js/navbar.js"></script>
-  <script src="/ID-Cultural/static/js/registro.js"></script>
+  <script src="/static/js/main.js"></script>
+  <script src="/static/js/navbar.js"></script>
+  <script src="/static/js/registro.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
