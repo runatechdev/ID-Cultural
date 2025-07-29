@@ -56,9 +56,9 @@ $page_title = "Login - DNI Cultural";
   
 <?php include("../../../../../components/footer.php"); ?>
 
-  <script src="/ID-Cultural/static/js/main.js"></script>
-  <script src="/ID-Cultural/static/js/navbar.js"></script>
-  <script src="/ID-Cultural/static/js/login.js"></script>
+  <script src="/static/js/main.js"></script>
+  <script src="/static/js/navbar.js"></script>
+  <script src="/static/js/login.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 

@@ -19,9 +19,9 @@ require_once __DIR__ . '/../config.php';
 <!-- SweetAlert2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="/ID-Cultural/static/css/main.css" />
+    <link rel="stylesheet" href="/static/css/main.css" />
     <!-- Asegúrate de que este archivo exista y contenga el estilo base -->
-    <link rel="stylesheet" href="/ID-Cultural/static/css/wiki.css" /> <!-- Estilo específico de la Biblioteca Digital -->
+    <link rel="stylesheet" href="/static/css/wiki.css" /> <!-- Estilo específico de la Biblioteca Digital -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
 </head>
@@ -115,8 +115,8 @@ require_once __DIR__ . '/../config.php';
        <?php include("../components/footer.php"); ?>
 
 
-    <script src="/ID-Cultural/static/js/main.js"></script>
-    <script src="/ID-Cultural/static/js/navbar.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/navbar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
