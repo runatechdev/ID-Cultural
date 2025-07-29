@@ -14,7 +14,6 @@ require_once __DIR__ . "/../config.php";
   <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<<<<<<<< HEAD:index_para_pegar_htcdoc.php
 
 <!-- Bootstrap Core -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -25,9 +24,7 @@ require_once __DIR__ . "/../config.php";
 <!-- SweetAlert2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet">
 
-========
   <link rel="shortcut icon" href="/static/img/favicon/id.png" /> 
->>>>>>>> main:public/index.php
   <title>DNI Cultural</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <link rel="stylesheet" href="/static/css/main.css" /> 
@@ -84,15 +81,11 @@ include __DIR__ . '/../components/navbar.php';
 
   <script src="/static/js/main.js"></script> 
   <script src="https://unpkg.com/lucide@latest"></script>
-<<<<<<<< HEAD:index_para_pegar_htcdoc.php
   <script src="/ID-Cultural/static/js/navbar.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
-
-========
   <script src="/static/js/navbar.js"></script> 
   
->>>>>>>> main:public/index.php
 
 </body>
 

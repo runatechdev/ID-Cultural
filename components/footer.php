@@ -9,6 +9,6 @@
     <a href="/src/views/pages/public/terminos_condiciones.html" target="_blank">Términos de Uso</a>
   </div>
     <p class="copyright">
-    <img src="/ID-Cultural/static/img/logos/Itse.png" alt="ItseLogo" height="30">
+    <img src="/static/img/logos/Itse.png" alt="ItseLogo" height="30">
       © 2025 ID Cultural | Todos los derechos reservados</p>
 </footer>
