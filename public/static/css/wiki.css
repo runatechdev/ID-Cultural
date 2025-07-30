@@ -1,178 +1,163 @@
-#wiki {
-  margin: 0;
-  padding: 0;
-  font-family: 'Orbitron', sans-serif;
-  background: linear-gradient(to right, #000428, #004e92);
-  color: wheat;
-  animation: enterFromTop 1s ease-out forwards;
+/* Este es el contenedor que crea las 2 columnas */
+.wiki-layout {
+    display: flex;
+    gap: 30px; /* Espacio entre las columnas */
+    margin-top: 30px;
 }
 
-/* 🧩 Animaciones direccionales suaves */
-@keyframes enterFromTop {
-  0% { opacity: 0; transform: translateY(-60px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes enterFromBottom {
-  0% { opacity: 0; transform: translateY(60px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes enterFromLeft {
-  0% { opacity: 0; transform: translateX(-60px); }
-  100% { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes enterFromRight {
-  0% { opacity: 0; transform: translateX(60px); }
-  100% { opacity: 1; transform: translateX(0); }
-}
-
-/* 🧩 Estructura principal */
-main.full-width {
-  width: 100%;
-  padding: 2rem;
-  box-sizing: border-box;
-  animation: enterFromTop 0.8s ease-out forwards;
-}
-
-h2, h3, h4 {
-  font-weight: 600;
-  color: #ff3c3c;
-  text-shadow: 0 0 8px #ff3c3c60;
-  animation: enterFromTop 0.8s ease-out forwards;
-}
-
-.search {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1.5rem;
-  border-radius: 10px;
-  margin-bottom: 2rem;
-  box-shadow: 0 0 10px rgba(255, 60, 60, 0.3);
-  animation: enterFromTop 0.8s ease-out forwards;
-}
-
-.search input,
-.search select,
-.search button {
-  display: inline-block;
-  margin: 0.5rem 0;
-  padding: 0.8rem;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  width: 30%;
-}
-
-.search input,
-.search select {
-  background-color: #001f3f;
-  color: #ffffff;
-}
-
-.search button {
-  background-color: #d36b81;
-  color: #ffffff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.search button:hover {
-  background-color: #cc2c2c;
-}
-
-/* 🧱 Contenido tipo rompecabezas */
-.content-wrapper {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  animation: enterFromBottom 1s ease-in-out forwards;
-}
-
-.sidebar {
-  flex: 1 1 30%;
-  background-color: #001f3f;
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-  color: wheat;
-  animation: enterFromLeft 0.8s ease-out forwards;
-}
-
-.famoso-container {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-.famoso {
-  background-color: #273d5c;
-  padding: 1rem;
-  border-radius: 8px;
-  transition: transform 0.3s ease;
-  text-align: center;
-  animation: enterFromBottom 0.7s ease-out forwards;
-}
-
-.famoso:hover {
-  transform: scale(1.05);
-}
-
-.famoso img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 10px;
-  border: 4px solid #d36b81;
-  box-shadow: 0 0 8px #ff3c3c60;
-}
-
+/* La columna de contenido principal (ocupa más espacio) */
 .main-content {
-  flex: 1 1 65%;
-  background-color: #0d2747;
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 0 10px #ff3c3c30;
-  color: wheat;
-  animation: enterFromRight 0.8s ease-out forwards;
+    flex: 3; /* Ocupa 3 partes del espacio disponible */
 }
 
+/* La columna de la barra lateral (ocupa menos) */
+.sidebar {
+    flex: 1; /* Ocupa 1 parte del espacio disponible */
+    min-width: 250px; /* Para que no se encoja demasiado */
+}
+
+/* Estilo de la barra de búsqueda */
+.search {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f7f9fc;
+    border-radius: 8px;
+}
+
+.search form {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.search input, .search select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.search input { flex-grow: 1; } /* El input de texto ocupa más espacio */
+
+.search button {
+    padding: 10px 20px;
+    background-color: var(--color-primario);
+    color: white;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Sección de cada categoría (Música, Literatura, etc.) */
+.categoria {
+    margin-bottom: 40px;
+}
+
+.categoria h3 {
+    font-size: 1.8rem;
+    color: var(--color-primario);
+    border-bottom: 2px solid var(--color-acento);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Contenedor de las tarjetas de artistas (¡ESTO FALTABA!) */
+.cards-container {
+    display: grid;
+    /* Crea una grilla flexible */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* Estilo de las tarjetas (cards) de artistas */
 .card {
-  display: flex;
-  background-color: #112;
-  margin-bottom: 1.5rem;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 6px rgba(100, 23, 23, 0.067);
-  animation: enterFromBottom 0.6s ease-out forwards;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden; /* Para que la imagen no se salga de los bordes redondeados */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .card img {
-  width: 150px;
-  height: auto;
-  object-fit: cover;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
 }
 
 .card-info {
-  padding: 1rem;
-  color: #ffffff;
+    padding: 15px;
+}
+
+.card-info h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+}
+
+.card-info p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 15px;
 }
 
 .btn-biografia {
-  display: inline-block;
-  margin-top: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: #d36b81;
-  color: #fff;
-  border-radius: 5px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: transform 0.2s ease;
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: var(--color-primario);
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
 }
 
-.btn-biografia:hover {
-  transform: translateY(-2px);
-  background-color: #cc2c2c;
+/* Sidebar de artistas famosos */
+.sidebar h2 {
+    font-size: 1.2rem;
+    color: #444;
+    margin-bottom: 15px;
+}
+
+.famoso {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.famoso:last-child {
+    border-bottom: none;
+}
+
+.famoso img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.famoso h4 {
+    margin: 0;
+    font-weight: bold;
+}
+
+.famoso p {
+    margin: 2px 0 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Mensaje de no resultados */
+.no-results {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888;
+    padding: 40px;
 }
