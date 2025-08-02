@@ -79,8 +79,10 @@ nav ul li a.menu {
 nav ul li a.menu:hover {
   background-color: #b02a37;
   color: #fff;
-  animation: pulse; /* referring directly to the animation's @keyframe declaration */
-  animation-duration: 2s; /* don't forget to set a duration! */
+  animation: pulse;
+  /* referring directly to the animation's @keyframe declaration */
+  animation-duration: 2s;
+  /* don't forget to set a duration! */
 }
 
 .btn {
@@ -102,8 +104,10 @@ nav ul li a.menu:hover {
 
 .btn:hover {
   background-color: #e6b23c;
-  animation: rubberBand; /* referring directly to the animation's @keyframe declaration */
-  animation-duration: 1s; /* don't forget to set a duration! */
+  animation: rubberBand;
+  /* referring directly to the animation's @keyframe declaration */
+  animation-duration: 1s;
+  /* don't forget to set a duration! */
 }
 
 
@@ -141,12 +145,27 @@ body {
   padding: 0 20px;
 }
 
+/* Animación de la frase en Quichua */
+.quichua-hover:hover::before {
+  content: "¿Qué puedes hacer";
+}
+
+.quichua-hover::before {
+  content: "¿Imatataq ruwayta atinki ";
+  color: red;
+  transition: all 0.3s ease;
+}
+
+.quichua-hover:hover::before {
+  content: "¿Qué puedes hacer ";
+  color: black;
+  font-style: italic;
+}
 
 /* Text Styling */
 .hero-text {
   flex: 1;
   margin-right: 20px;
-  animation: slideInLeft 1.5s ease;
 }
 
 .hero-text h1 {
@@ -299,6 +318,7 @@ footer p {
     padding: 0 40px;
   }
 }
+
 /*NOTICAS DESTACADAS*/
 .noticias-home {
   max-width: 900px;
@@ -335,6 +355,7 @@ footer p {
 .noticia-card small {
   color: #555;
 }
+
 /*noticias mostrar*/
 #contenedor-noticias {
   display: flex;
@@ -358,3 +379,4 @@ footer p {
   border-radius: 8px;
   margin-bottom: 15px;
 }
+

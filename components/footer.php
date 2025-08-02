@@ -8,5 +8,7 @@
     <a href="/src/views/pages/public/components/privacidad.html" target="_blank">Política de Privacidad</a>
     <a href="/src/views/pages/public/terminos_condiciones.html" target="_blank">Términos de Uso</a>
   </div>
-    <p class="copyright">© 2025 ID Cultural | Todos los derechos reservados</p>
+    <p class="copyright">
+    <img src="/static/img/logos/Itse.png" alt="ItseLogo" height="30">
+      © 2025 ID Cultural | Todos los derechos reservados</p>
 </footer>
