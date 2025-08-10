@@ -1,11 +1,21 @@
 <?php
 session_start();
-require_once __DIR__ . "../../../../../../config.php";  
+// --- INICIO DEL BLOQUE DE SEGURIDAD ---
+// 1. Verificar si el usuario está logueado Y si su rol es 'admin'.
+if (!isset($_SESSION['user_data']) || $_SESSION['user_data']['role'] !== 'admin') {
+    // 2. Si no cumple, lo redirigimos a la página de login.
+    header('Location: ' . BASE_URL . 'src/views/pages/auth/login.php');
+    // 3. Detenemos la ejecución del script para que no se muestre nada más.
+    exit();
+}
+// --- FIN DEL BLOQUE DE SEGURIDAD ---
+require_once __DIR__ . "../../../../../../config.php";
 $page_title = "Panel de Gestión - ID Cultural";
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,12 +23,15 @@ $page_title = "Panel de Gestión - ID Cultural";
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/main.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/dashboard.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/dashboard-adm.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/quartz/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
 
-<?php 
-include __DIR__ . "/../../../../../components/navbar.php"; 
-?>
+    <?php
+    include __DIR__ . "/../../../../../components/navbar.php";
+    ?>
 
     <main class="panel-gestion-container">
         <h1>Panel de Gestión</h1>
@@ -33,13 +46,13 @@ include __DIR__ . "/../../../../../components/navbar.php";
             <li class="dashboard-item">
                 <a href="<?php echo BASE_URL; ?>src/views/pages/admin/abm_artistas.php">
                     <img src="<?php echo BASE_URL; ?>static/img/paleta-de-pintura.png" alt="Icono Artistas" class="dashboard-icon">
-                 Gestionar Artistas
+                    Gestionar Artistas
                 </a>
             </li>
             <li class="dashboard-item">
                 <a href="<?php echo BASE_URL; ?>src/views/pages/admin/blanqueo_clave_admin.php">
                     <img src="<?php echo BASE_URL; ?>static/img/candado.png" alt="Icono Blanqueo" class="dashboard-icon">
-                    Reiniciar Clave 
+                    Reiniciar Clave
                 </a>
             </li>
             <li class="dashboard-item">
@@ -51,15 +64,16 @@ include __DIR__ . "/../../../../../components/navbar.php";
             <li class="dashboard-item">
                 <a href="<?php echo BASE_URL; ?>src/views/pages/admin/estado_solicitud.php">
                     <img src="<?php echo BASE_URL; ?>static/img/lectura.png" alt="Icono Estado Solicitud" class="dashboard-icon">
-                    Ver  Solicitud 
+                    Ver Solicitud
                 </a>
             </li>
         </ul>
     </main>
 
-<?php 
-include __DIR__ . "/../../../../../components/footer.php"; 
-?>
+    <?php
+    include __DIR__ . "/../../../../../components/footer.php";
+    ?>
 
 </body>
+
 </html>

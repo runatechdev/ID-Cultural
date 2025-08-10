@@ -1,29 +1,29 @@
 <?php
 // public/api/login.php
-// Este es el único archivo PHP que el login.js debe llamar directamente.
-
-session_start(); // Inicia la sesión al principio, antes de cualquier salida.
+session_start();
 
 header('Content-Type: application/json');
 
-// Incluir el archivo de lógica que contiene la función `checkUserCredentials`.
-// La ruta es relativa: public/api/ -> public/ -> ID-CULTURAL/ -> backend/controllers/
 require_once __DIR__ . '/../../backend/controllers/verificar_usuario.php';
 
-// Obtener los datos del POST
 $email = strtolower(trim($_POST['email'] ?? ''));
 $password = trim($_POST['password'] ?? '');
 
-// Llamar a la función de verificación de credenciales
 $result = checkUserCredentials($email, $password);
 
-// Si el login fue exitoso, guarda los datos del usuario en la sesión
 if ($result['status'] === 'ok') {
-    $_SESSION['user_id'] = $result['user_data']['id']; // Guarda solo el ID
-    $_SESSION['user_role'] = $result['user_data']['role']; // Guarda el rol
-    // Puedes guardar más datos si los `user_data` devueltos por la función son más completos.
+    // 1. Regenerar el ID de sesión para prevenir ataques de Session Fixation
+    session_regenerate_id(true);
+
+    // 2. Guardar los datos del usuario en una sola variable de sesión, como un array.
+    //    Esto mantiene la sesión más limpia y es consistente con nuestro navbar.
+    $_SESSION['user_data'] = [
+        'id' => $result['user_data']['id'],
+        'role' => $result['user_data']['role']
+        // Aquí puedes añadir más datos si los necesitas, como el nombre o email.
+        // 'email' => $email
+    ];
 }
 
-// Devuelve la respuesta JSON al frontend (login.js)
 echo json_encode($result);
 ?>

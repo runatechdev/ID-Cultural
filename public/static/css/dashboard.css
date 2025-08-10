@@ -1,29 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-/* Fuente general */
-body {
-    font-family: 'Poppins', sans-serif;
-}
-
-.borrador-form label,
-.borrador-form input,
-.borrador-form select,
-.borrador-form textarea {
-    font-family: 'Poppins', sans-serif;
-}
-
-/* Efecto al seleccionar un campo */
-.borrador-form input:focus,
-.borrador-form textarea:focus,
-.borrador-form select:focus {
-    outline: none;
-    border-color: #367789; 
-    box-shadow: 0 0 0 3px rgba(54, 119, 137, 0.15);
-}
-
 /* ============================================= */
-/* ESTILOS PARA DASHBOARDS Y FORMULARIOS INTERNOS */
+/* ESTILOS PARA PANELES Y FORMULARIOS (dashboard.css) */
 /* ============================================= */
+
+
+/* --------------------------------------------- */
+/* Contenedor Principal para Páginas Internas    */
+/* --------------------------------------------- */
 
 .dashboard-container {
     max-width: 800px;
@@ -42,6 +24,10 @@ body {
     font-size: 2rem;
 }
 
+/* --------------------------------------------- */
+/* Estilos Generales para Formularios            */
+/* --------------------------------------------- */
+
 .borrador-form {
     display: flex;
     flex-direction: column;
@@ -57,6 +43,8 @@ body {
 
 .borrador-form input[type="text"],
 .borrador-form input[type="url"],
+.borrador-form input[type="email"],
+.borrador-form input[type="password"],
 .borrador-form textarea,
 .borrador-form select {
     width: 100%;
@@ -64,10 +52,42 @@ body {
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1rem;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Poppins', sans-serif; /* Usamos Poppins para la legibilidad en formularios */
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+.borrador-form input:focus,
+.borrador-form textarea:focus,
+.borrador-form select:focus {
+    outline: none;
+    border-color: var(--color-primario); 
+    box-shadow: 0 0 0 3px rgba(54, 119, 137, 0.15);
+}
+
+/* Estilos para Botones de Acción en Formularios */
+.btn-guardar, .btn-enviar, .btn-primario {
+    padding: 15px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--color-primario);
+    color: var(--color-texto-claro);
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 15px;
+}
+
+.btn-guardar:hover, .btn-enviar:hover, .btn-primario:hover {
+    background-color: #2a5a69;
+    transform: translateY(-2px);
+}
+
+/* --------------------------------------------- */
+/* Componentes Específicos de Formularios        */
+/* --------------------------------------------- */
+
+/* Input para subir archivos */
 .borrador-form input[type="file"] {
     padding: 10px;
     background-color: #f9f9f9;
@@ -91,45 +111,7 @@ body {
     background-color: #90a4ae;
 }
 
-.btn-guardar {
-    padding: 15px 20px;
-    border: none;
-    border-radius: 8px;
-    background-color: var(--color-primario);
-    color: var(--color-texto-claro);
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-top: 15px;
-}
-
-.btn-guardar:hover {
-    background-color: #2a5a69;
-    transform: translateY(-2px);
-}
-
-.btn-enviar {
-    padding: 15px 20px;
-    border: none;
-    border-radius: 8px;
-    background-color: #2a5a69;
-    color: var(--color-texto-claro);
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 15px;
-}
-
-.btn-enviar:hover {
-    background-color: #ff0000;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-/* INPUTS DINÁMICOS DE ENLACES */
-
+/* Inputs dinámicos para añadir/quitar enlaces */
 #multimedia-container {
     display: flex;
     flex-direction: column;
@@ -162,27 +144,18 @@ body {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.btn-link-action i {
-    font-size: 1.5rem;
-}
+.btn-add-link { background-color: var(--color-primario); }
+.btn-remove-link { background-color: #e63946; }
 
 .btn-link-action:hover {
     transform: scale(1.1);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.btn-add-link {
-    background-color: #367789;
-    margin-top: -10px;
-    width: 50px;
-}
 
-.btn-remove-link {
-    background-color: #e63946;
-    font-size: 2.2rem;
-}
-
-/* BLOQUE DE INFORMACIÓN */
+/* --------------------------------------------- */
+/* Bloques de Información y Mensajes             */
+/* --------------------------------------------- */
 
 .info-proceso {
     background-color: #f7f9fc;
@@ -190,7 +163,7 @@ body {
     margin-bottom: 35px;
     border-radius: 12px;
     border: 1px solid #e0e0e0;
-    border-left: 5px solid #367789;
+    border-left: 5px solid var(--color-primario);
 }
 
 .info-proceso h2 {
@@ -198,168 +171,33 @@ body {
     font-size: 1.8rem;
 }
 
-.info-proceso p {
+.info-proceso p, .info-proceso li {
     line-height: 1.6;
     color: #555;
 }
 
-.info-proceso ol {
-    list-style: none;
-    counter-reset: steps-counter;
-    padding-left: 0;
-    margin-top: 20px;
-}
-
-.info-proceso li {
-    counter-increment: steps-counter;
-    position: relative;
-    padding-left: 50px;
-    margin-bottom: 20px;
-    line-height: 1.6;
-}
-
-.info-proceso li::before {
-    content: counter(steps-counter);
-    position: absolute;
-    left: 0;
-    top: -2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 35px;
-    height: 35px;
-    background-color: #367789;
-    color: #ffffff;
-    border-radius: 50%;
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.info-proceso strong {
-    color: #2a5a69;
-}
-
-/* CAMPOS EXTRAS */
-
-.campos-extra {
-    display: none;
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.campos-extra[style*="block"] {
-    display: flex;
-}
-
-/* FORMULARIO BLANQUEO */
-
-.blanqueo-container {
-    max-width: 500px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    text-align: center;
-}
-
-#blanqueoForm input[type="email"] {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-}
-
-#blanqueoForm input[type="submit"] {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    background-color: var(--color-primario);
-    color: white;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#blanqueoForm input[type="submit"]:hover {
-    background-color: #2a5a69;
-}
-
+/* Mensajes de feedback (éxito, error) */
 .mensaje {
     margin-top: 20px;
     font-weight: bold;
     padding: 15px;
     border-radius: 8px;
-    display: none;
+    display: none; /* Se activan con JS añadiendo la clase 'exito' o 'error' */
+}
+
+.mensaje.exito,
+.mensaje.error {
+    display: block;
 }
 
 .mensaje.exito {
     background-color: #e8f5e9;
     color: #388e3c;
-    display: block;
+    border-left: 5px solid #388e3c;
 }
 
 .mensaje.error {
     background-color: #ffebee;
     color: #d32f2f;
-    display: block;
-}
-/* ----- Estilos para formularios ----- */
-
-.form-container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 2rem;
-  background-color: var(--color-secundario);
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.form-vertical {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-input[type="email"] {
-  padding: 12px;
-  font-size: 1rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.btn-primario {
-  padding: 12px 20px;
-  font-size: 1rem;
-  background-color: var(--color-primario);
-  color: white;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.btn-primario:hover {
-  background-color: #2a5a69;
-}
-
-.mensaje {
-  margin-top: 1rem;
-  padding: 1rem;
-  background-color: #e0f7fa;
-  border-left: 5px solid #0075c4;
-  border-radius: 6px;
-  font-weight: bold;
-  color: #003c51;
+    border-left: 5px solid #d32f2f;
 }
