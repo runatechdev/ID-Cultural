@@ -1,39 +1,16 @@
 <?php
+session_start();
 require_once __DIR__ . '/../config.php';
+$page_title = "Wiki - ID Cultural";
+$specific_css_files = ['wiki.css'];
+include(__DIR__ . '/../components/header.php');
 ?>
-
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca Digital - DNI Cultural</title>
-
-    <!-- Bootstrap Core -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootswatch Theme -->
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/quartz/bootstrap.min.css" rel="stylesheet">
-
-    <!-- SweetAlert2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="/static/css/main.css" />
-    <!-- Asegúrate de que este archivo exista y contenga el estilo base -->
-    <link rel="stylesheet" href="/static/css/wiki.css" /> <!-- Estilo específico de la Biblioteca Digital -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
-</head>
 
 <body>
 
-    <?php
-    // navbar.php está en/components/
-    // wiki.php está en/public/
-    // Desde wiki.php, necesitas subir a/ (../) y luego entrar a components/
-    include("../components/navbar.php");
-    ?>
+  <?php
+  include __DIR__ . '/../components/navbar.php';
+  ?>
 
     <!-- Contenido Principal -->
     <main>

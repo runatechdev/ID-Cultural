@@ -1,41 +1,19 @@
-
 <?php
-// ¡ESTO ES LO PRIMERO!
-require_once __DIR__ . "/../config.php";  
-// Asegúrate de que config.php esté en la raíz de tu proyecto, 
-// un nivel arriba de 'public/' donde ahora está index.php
+// 1. Inicia la sesión y define el título de la página
+session_start();
+require_once __DIR__ . '/../config.php';
+$page_title = "Inicio - ID Cultural";
 
-// A partir de aquí, el resto del código HTML y PHP de tu index.php
+// 2. Incluye el componente del header (que contiene <!DOCTYPE>, <head>, etc.)
+// ¡AQUÍ ESTÁ LA LÍNEA QUE PREGUNTAS!
+include(__DIR__ . '/../components/header.php');
 ?>
-
-<!DOCTYPE html>
-<html lang="es">
-  
-  <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-<!-- Bootstrap Core -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Bootswatch Theme -->
-<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/quartz/bootstrap.min.css" rel="stylesheet">
-
-<!-- SweetAlert2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet">
-
-  <link rel="shortcut icon" href="/static/img/favicon/id.png" /> 
-  <title>DNI Cultural</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-  <link rel="stylesheet" href="/static/css/main.css" /> 
-
-</head>
 
 <body>
-  
-<?php 
-include __DIR__ . '/../components/navbar.php'; 
-?>
+
+  <?php
+  include __DIR__ . '/../components/navbar.php';
+  ?>
 
   <main>
     <section class="hero">
@@ -62,16 +40,16 @@ include __DIR__ . '/../components/navbar.php';
           culturales y proyectarlas hacia el futuro.</p>
 
         <p><em>ID Cultural — La identidad de un pueblo, en un solo lugar.</em></p>
-<section id="noticias-recientes" class="noticias-home">
-  <h2>Últimas Noticias</h2>
-  <div id="contenedor-noticias"></div>
-</section>
+        <section id="noticias-recientes" class="noticias-home">
+          <h2>Últimas Noticias</h2>
+          <div id="contenedor-noticias"></div>
+        </section>
 
-</div>
+      </div>
       <div class="hero-image">
         <picture>
-          <source srcset="/static/img/logo.jpg" type="image"> 
-          <img src="/static/img/logo.jpg" alt="Casa Castro" loading="lazy" /> 
+          <source srcset="/static/img/logo.jpg" type="image">
+          <img src="/static/img/logo.jpg" alt="Casa Castro" loading="lazy" />
         </picture>
       </div>
     </section>
@@ -79,7 +57,7 @@ include __DIR__ . '/../components/navbar.php';
 
   <?php include __DIR__ . '/../components/footer.php'; ?>
 
-  <script src="/static/js/main.js"></script> 
+  <script src="/static/js/main.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
