@@ -37,29 +37,30 @@ require_once __DIR__ . '/../config.php';
 
     <!-- Contenido Principal -->
     <main>
-        <img src="/static/img/portada.png" alt="Logo Santiago del Estero">
+        <!-- <img src="/static/img/portada.png" alt="Logo Santiago del Estero"> -->
 
-        <!-- Búsqueda -->
-<div class="search">
-    <h2>Buscar en la Biblioteca</h2>
-    <form id="form-busqueda" action="#" method="get">
-        <input type="text" placeholder="Buscar por nombre o palabra clave..." name="search" id="search" required>
-
-        <select name="categoria" id="categoria">
-            <option value="">Todas las categorías</option>
-            <option value="Artesania">Artesania</option>
-            <option value="Audiovisual">Audiovisual</option>
-            <option value="Danza">Danza</option>
-            <option value="Teatro">Teatro</option>
-            <option value="Musica">Musica</option>
-            <option value="Literatura">Literatura</option>
-            <option value="Escultura">Escultura</option>
-            <!-- Podés agregar más categorías según los datos que tengas -->
-        </select>
-
-        <button type="submit">Buscar</button>
-    </form>
-</div>
+        <!-- Búsqueda 
+        <div class="search">
+            <h2>Buscar en la Biblioteca</h2>
+            <form id="form-busqueda" action="#" method="get">
+                <input type="text" placeholder="Buscar por nombre o palabra clave..." name="search" id="search" required>
+                
+                <select name="categoria" id="categoria">
+                    <option value="">Todas las categorías</option>
+                    <option value="Artesania">Artesania</option>
+                    <option value="Audiovisual">Audiovisual</option>
+                    <option value="Danza">Danza</option>
+                    <option value="Teatro">Teatro</option>
+                    <option value="Musica">Musica</option>
+                    <option value="Literatura">Literatura</option>
+                    <option value="Escultura">Escultura</option>
+                    
+                </select>
+                
+                <button type="submit">Buscar</button>
+            </form>
+        </div>
+            -->
 
 
         <div class="container">
