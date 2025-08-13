@@ -25,12 +25,27 @@
   <?php include("../components/navbar.php"); ?>
 
   <main class="container py-4">
-    <!-- 🎨 Sidebar como offcanvas -->
-    <button class="btn btn-secondary mb-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarArtistas">
-      Ver Artistas Famosos
-    </button>
 
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarArtistas">
+    <!-- 🔘 Botones para abrir cada offcanvas -->
+    <!-- 🔘 Botones para abrir cada offcanvas con estilo uniforme -->
+<div class="d-flex flex-wrap gap-3 mb-4">
+  <button class="btn btn-outline-dark" data-bs-toggle="offcanvas" data-bs-target="#sidebarFamosos">
+    🎨 Artistas Famosos
+  </button>
+  <button class="btn btn-outline-dark" data-bs-toggle="offcanvas" data-bs-target="#sidebarMes">
+    🌟 Artista del Mes
+  </button>
+  <button class="btn btn-outline-dark" data-bs-toggle="offcanvas" data-bs-target="#sidebarConsagrados">
+    🏆 Artistas Consagrados
+  </button>
+  <button class="btn btn-outline-dark" data-bs-toggle="offcanvas" data-bs-target="#sidebarRevelacion">
+    🚀 Artista Revelación
+  </button>
+</div>
+
+
+    <!-- 🎨 Artistas Famosos -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarFamosos">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title">🎨 Artistas Famosos</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
@@ -55,12 +70,67 @@
       </div>
     </div>
 
+    <!-- 🌟 Artista del Mes -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMes">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">🌟 Artista del Mes</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div class="d-flex flex-column gap-3">
+          <div class="card">
+            <img src="/static/img/arte/artista3.jpeg" class="card-img-top" alt="Artista del Mes" />
+            <div class="card-body">
+              <h5 class="card-title">FMaxi Padilla</h5>
+              <p class="card-text">Reconocimiento especial por su impacto cultural reciente.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🏆 Artistas Consagrados -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarConsagrados">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">🏆 Artistas Consagrados</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div class="d-flex flex-column gap-3">
+          <div class="card">
+            <img src="/static/img/artesania/10.jpeg" class="card-img-top" alt="Artista Consagrado" />
+            <div class="card-body">
+              <h5 class="card-title">Marcos Romano</h5>
+              <p class="card-text">Trayectoria destacada y legado artístico reconocido.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🚀 Artista Revelación -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarRevelacion">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">🚀 Artista Revelación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div class="d-flex flex-column gap-3">
+          <div class="card">
+            <img src="/static/img/audiovisual/13.jpeg" class="card-img-top" alt="Artista Revelación" />
+            <div class="card-body">
+              <h5 class="card-title">Sebastian Ruiz</h5>
+              <p class="card-text">Talento emergente que está revolucionando la escena.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 📚 Sección principal -->
     <section id="biografias">
       <h2 class="mb-4">Artistas Registrados</h2>
-
       <div class="row g-4">
-        <!-- Música -->
         <div class="col-md-6">
           <div class="card h-100">
             <img src="/static/img/juanperez.jpg" class="card-img-top" alt="Juan Pérez" />
@@ -71,8 +141,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Literatura -->
         <div class="col-md-6">
           <div class="card h-100">
             <img src="/static/img/dem.jpg" class="card-img-top" alt="María González" />
