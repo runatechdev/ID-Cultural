@@ -26,7 +26,9 @@ include(__DIR__ . '/../components/header.php');
           históricos.</p>
 
         <h3>
-          <span class="quichua-hover"></span> en ID Cultural?
+          <span class="quichua-hover">
+            <br>
+          </span> en ID Cultural?
         </h3>
 
         <ul>
