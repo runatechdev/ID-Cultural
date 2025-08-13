@@ -25,6 +25,7 @@ $page_title = $page_title ?? 'ID Cultural';
     <!-- Favicon y CSS principal (siempre se carga) -->
     <link rel="shortcut icon" href="<?php echo BASE_URL; ?>static/img/favicon/id.png" />
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/main.css" />
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/seach.css" />
 
     <!-- =================================================================== -->
     <!-- Carga de CSS específicos para cada página (si se definen) -->
