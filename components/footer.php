@@ -1,3 +1,4 @@
+<script src="<?php echo BASE_URL; ?>static/js/search.js"></script>
 <footer class="footer">
   <div class="footer-content">
     <h2>ID Cultural</h2>

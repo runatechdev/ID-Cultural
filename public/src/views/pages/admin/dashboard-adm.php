@@ -85,7 +85,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                             <i class="bi bi-person-badge dashboard-icon"></i> Gestionar Personal
                         </a>
                         <a href="<?php echo BASE_URL; ?>src/views/pages/admin/estado_solicitud.php" class="dashboard-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Revisar y aprobar o rechazar las cuentas del rol 'Artista'.">
-                            <i class="bi bi-person-check-fill dashboard-icon"></i> Validar Artistas
+                            <i class="bi bi-person-check-fill dashboard-icon"></i> Gestion de Artistas
                         </a>
                         <a href="<?php echo BASE_URL; ?>src/views/pages/admin/log_sistema.php" class="dashboard-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver un registro de todas las modificaciones importantes realizadas en el sistema.">
                             <i class="bi bi-file-earmark-text-fill dashboard-icon"></i> Ver Log del Sistema
