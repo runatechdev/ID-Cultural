@@ -4,7 +4,6 @@ require_once __DIR__ . '/../../../../../config.php';
 $page_title = "Login - ID Cultural";
 $specific_css_files = ['login.css']; // <-- ¡LA MAGIA ESTÁ AQUÍ!
 // 2. Incluye el componente del header (que contiene <!DOCTYPE>, <head>, etc.)
-// ¡AQUÍ ESTÁ LA LÍNEA QUE PREGUNTAS!
 include(__DIR__ . '/../../../../../components/header.php');
 ?>
 

@@ -15,6 +15,7 @@ $page_title = $page_title ?? 'ID Cultural';
     <!-- Bootstrap y Tema 'Cosmo' -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/cosmo/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
     <!-- Otras librerías CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet">
@@ -25,6 +26,7 @@ $page_title = $page_title ?? 'ID Cultural';
     <!-- Favicon y CSS principal (siempre se carga) -->
     <link rel="shortcut icon" href="<?php echo BASE_URL; ?>static/img/favicon/id.png" />
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/main.css" />
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/search.css" />
 
     <!-- =================================================================== -->
     <!-- Carga de CSS específicos para cada página (si se definen) -->
