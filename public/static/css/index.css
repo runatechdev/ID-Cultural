@@ -6,7 +6,7 @@
 }
 
 .hero-carousel .carousel-item {
-  max-height: 450px; /* Más bajo y panorámico */
+  max-height: 250px; /* Más bajo y panorámico */
 }
 
 .hero-carousel .carousel-item img {

@@ -1,16 +1,34 @@
 <?php
 session_start();
 require_once __DIR__ . '/../config.php';
+// --- 1. CONECTAR A LA BASE DE DATOS ---
+require_once __DIR__ . '/../backend/config/connection.php';
+
+// --- 2. OBTENER EL CONTENIDO DEL SITIO DESDE LA BD ---
+try {
+    $stmt = $pdo->prepare("SELECT content_key, content_value FROM site_content");
+    $stmt->execute();
+    // Guardamos todo el contenido en un array asociativo
+    $site_content = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+} catch (PDOException $e) {
+    // Si hay un error, usamos valores por defecto para que la página no se rompa
+    $site_content = [];
+    // Opcional: registrar el error
+    error_log("Error al cargar el contenido del sitio: " . $e->getMessage());
+}
+
+// --- Variables para el header ---
 $page_title = "Inicio - ID Cultural";
 $specific_css_files = ['index.css'];
+
 include(__DIR__ . '/../components/header.php');
 ?>
+
 <body>
 
   <?php include __DIR__ . '/../components/navbar.php'; ?>
 
   <main>
-    <!-- ===== INICIO: CARRUSEL DENTRO DEL CONTENIDO PRINCIPAL ===== -->
     <div class="container my-5">
       <header class="hero-carousel">
         <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
@@ -20,22 +38,23 @@ include(__DIR__ . '/../components/header.php');
             <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
           </div>
           <div class="carousel-inner">
+            <!-- --- 3. USAR DATOS DINÁMICOS EN EL CARRUSEL --- -->
             <div class="carousel-item active">
-              <img src="https://placehold.co/1200x450/367789/FFFFFF?text=Cultura+Santiagueña" class="d-block w-100" alt="Cultura de Santiago del Estero">
+              <img src="<?php echo htmlspecialchars($site_content['carousel_image_1'] ?? ''); ?>" class="d-block w-100" alt="Cultura de Santiago del Estero">
               <div class="carousel-caption d-none d-md-block">
                 <h5>Visibilizar y Preservar</h5>
                 <p>Un espacio para la identidad artística y cultural de Santiago del Estero.</p>
               </div>
             </div>
             <div class="carousel-item">
-              <img src="https://placehold.co/1200x450/C30135/FFFFFF?text=Nuestros+Artistas" class="d-block w-100" alt="Artistas locales">
+              <img src="<?php echo htmlspecialchars($site_content['carousel_image_2'] ?? ''); ?>" class="d-block w-100" alt="Artistas locales">
               <div class="carousel-caption d-none d-md-block">
                 <h5>Conoce a Nuestros Artistas</h5>
                 <p>Explora la trayectoria de talentos locales, tanto actuales como históricos.</p>
               </div>
             </div>
             <div class="carousel-item">
-              <img src="https://placehold.co/1200x450/efc892/333333?text=Biblioteca+Digital" class="d-block w-100" alt="Biblioteca digital">
+              <img src="<?php echo htmlspecialchars($site_content['carousel_image_3'] ?? ''); ?>" class="d-block w-100" alt="Biblioteca digital">
               <div class="carousel-caption d-none d-md-block">
                 <h5>Biblioteca Digital</h5>
                 <p>Accede a un archivo único con material exclusivo de nuestra región.</p>
@@ -45,26 +64,22 @@ include(__DIR__ . '/../components/header.php');
         </div>
       </header>
     </div>
-    <!-- ===== FIN: CARRUSEL ===== -->
 
-    <!-- ===== INICIO: SECCIÓN DE BIENVENIDA ===== -->
+    <!-- --- 4. USAR DATOS DINÁMICOS EN LA BIENVENIDA --- -->
     <section class="container text-center welcome-section">
-      <h1 class="display-4">Bienvenidos a ID Cultural</h1>
-      <p class="lead col-lg-8 mx-auto">
-        <strong>ID Cultural</strong> es una plataforma digital dedicada a visibilizar, preservar y promover la identidad artística y cultural de Santiago del Estero. Te invitamos a explorar, descubrir y formar parte de este espacio pensado para fortalecer nuestras raíces.
-      </p>
-      <p class="h5"><em>La identidad de un pueblo, en un solo lugar.</em></p>
+      <h1 class="display-4"><?php echo htmlspecialchars($site_content['welcome_title'] ?? 'Bienvenidos a ID Cultural'); ?></h1>
+      <div class="lead col-lg-8 mx-auto">
+        <?php echo $site_content['welcome_paragraph'] ?? ''; // No usamos htmlspecialchars para permitir <strong>, etc. ?>
+      </div>
+      <p class="h5 mt-3"><em><?php echo htmlspecialchars($site_content['welcome_slogan'] ?? 'La identidad de un pueblo, en un solo lugar.'); ?></em></p>
     </section>
-    <!-- ===== FIN: BIENVENIDA ===== -->
 
-    <!-- ===== INICIO: SECCIÓN DE NOTICIAS ===== -->
     <section class="container my-5">
       <h2 class="text-center display-5 mb-4">Últimas Noticias</h2>
       <div id="contenedor-noticias" class="row g-4">
-        <!-- Tarjetas de noticias se insertarán aquí -->
+        <!-- Las noticias se cargan dinámicamente con JS, esto no cambia -->
       </div>
     </section>
-    <!-- ===== FIN: NOTICIAS ===== -->
   </main>
 
   <?php include __DIR__ . '/../components/footer.php'; ?>
