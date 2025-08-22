@@ -1,0 +1,104 @@
+[
+  {
+    "nombre": "Juan Pérez",
+    "categoria": "Música",
+    "imagen": "/static/img/artistas/juanperez.jpg",
+    "descripcion": "Guitarrista y compositor de música folclórica."
+  },
+  {
+    "nombre": "Diego Méndez",
+    "categoria": "Música",
+    "imagen": "/static/img/artistas/diegomendez.jpeg",
+    "descripcion": "Productor y DJ de música electrónica experimental."
+  },
+  {
+    "nombre": "Sofía Torres",
+    "categoria": "Música",
+    "imagen": "/static/img/artistas/sofiatorres.jpeg",
+    "descripcion": "Soprano lírica en ópera contemporánea."
+  },
+  {
+    "nombre": "Ricardo Vargas",
+    "categoria": "Música",
+    "imagen": "/static/img/artistas/ricardovargas.jpeg",
+    "descripcion": "Percusionista de ritmos afrolatinos."
+  },
+  {
+    "nombre": "María González",
+    "categoria": "Literatura",
+    "imagen": "/static/img/artistas/dem.jpg",
+    "descripcion": "Escritora y poeta contemporánea."
+  },
+  {
+    "nombre": "Tomás Acuña",
+    "categoria": "Literatura",
+    "imagen": "/static/img/artistas/tomasacuna.jpeg",
+    "descripcion": "Novelista histórico con enfoque en culturas indígenas."
+  },
+  {
+    "nombre": "Lucía Ramírez",
+    "categoria": "Literatura",
+    "imagen": "/static/img/artistas/luciaramirez.jpeg",
+    "descripcion": "Autora de cuentos infantiles inclusivos."
+  },
+  {
+    "nombre": "Valentina Cruz",
+    "categoria": "Escritores",
+    "imagen": "/static/img/artistas/valentinacruz.jpeg",
+    "descripcion": "Ensayista especializada en temas de género."
+  },
+  {
+    "nombre": "Federico Salas",
+    "categoria": "Escultura",
+    "imagen": "/static/img/artistas/federicosalas.jpeg",
+    "descripcion": "Poeta experimental con obras en formato multimedia."
+  },
+  {
+    "nombre": "Ana Pintora",
+    "categoria": "Arte",
+    "imagen": "/static/img/artistas/arte1.jpeg",
+    "descripcion": "Artista plástica especializada en acuarela urbana."
+  },
+  {
+    "nombre": "Mateo Rocha",
+    "categoria": "Arte",
+    "imagen": "/static/img/artistas/mateorocha.jpeg",
+    "descripcion": "Escultor contemporáneo con materiales reciclados."
+  },
+  {
+    "nombre": "Camila Vidal",
+    "categoria": "Arte",
+    "imagen": "/static/img/artistas/camilavidal.jpeg",
+    "descripcion": "Ilustradora de libros y revistas culturales."
+  },
+  {
+    "nombre": "Julián Herrera",
+    "categoria": "Arte",
+    "imagen": "/static/img/artistas/julianherrera.jpeg",
+    "descripcion": "Muralista urbano con enfoque social."
+  },
+  {
+    "nombre": "Natalia Ríos",
+    "categoria": "Arte",
+    "imagen": "/static/img/artistas/nataliarios.jpeg",
+    "descripcion": "Fotógrafa documental centrada en pueblos originarios."
+  },
+  {
+    "nombre": "Carlos Luna",
+    "categoria": "Danza",
+    "imagen": "/static/img/artistas/danza1.jpeg",
+    "descripcion": "Bailarín clásico y coreógrafo de espectáculos contemporáneos."
+  },
+  {
+    "nombre": "Elena Bravo",
+    "categoria": "Danza",
+    "imagen": "/static/img/artistas/elenabravo.jpeg",
+    "descripcion": "Bailarina de flamenco y profesora de expresión corporal."
+  },
+  {
+    "nombre": "Sebastián Núñez",
+    "categoria": "Danza",
+    "imagen": "/static/img/artistas/sebastiannunez.jpeg",
+    "descripcion": "Investigador y creador de performances interdisciplinarias."
+  }
+]
