@@ -27,18 +27,26 @@
 
           <?php if (isset($_SESSION['user_data'])): ?>
             <?php
-              // --- INICIO: LÓGICA DE ROLES ---
-              // 1. Obtenemos el rol del usuario desde la sesión.
+              // --- INICIO: LÓGICA DE ROLES MEJORADA ---
               $user_role = $_SESSION['user_data']['role'];
-              
-              // 2. Comprobamos si el rol es parte del personal del sitio.
-              $is_staff = in_array($user_role, ['admin', 'editor', 'validador']);
-              
-              // 3. Definimos el texto y el enlace del botón según el rol.
-              $profile_text = $is_staff ? 'Panel de Control' : 'Mi Perfil';
-              $profile_link = $is_staff 
-                ? '/src/views/pages/admin/dashboard-adm.php' 
-                : '/src/views/pages/artista/dashboard-artista.php'; // Enlace para artistas
+              $profile_link = '';
+              $profile_text = '';
+
+              if ($user_role === 'admin') {
+                  $profile_text = 'Panel de Control';
+                  $profile_link = '/src/views/pages/admin/dashboard-adm.php';
+              } elseif ($user_role === 'editor') {
+                  $profile_text = 'Panel de Control';
+                  $profile_link = '/src/views/pages/editor/panel_editor.php';
+              } elseif ($user_role === 'validador') {
+                  // Asumimos que el validador va a la página de solicitudes
+                  $profile_text = 'Panel de Control';
+                  $profile_link = '/src/views/pages/admin/estado_solicitud.php';
+              } else {
+                  // Esto se aplica para el rol 'artista' y cualquier otro
+                  $profile_text = 'Mi Perfil';
+                  $profile_link = '/src/views/pages/artista/dashboard-artista.php'; // Enlace para artistas
+              }
             ?>
             <!-- Se muestra si el usuario INICIÓ SESIÓN -->
             <li class="nav-item"><a class="nav-link" href="<?php echo $profile_link; ?>"><?php echo $profile_text; ?></a></li>

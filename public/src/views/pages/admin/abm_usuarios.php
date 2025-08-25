@@ -114,7 +114,7 @@ include(__DIR__ . '/../../../../../components/header.php');
 
             </div>
         </div>
-        <!-- ===== FIN DEL CONTENEDOR PRINCIPAL UNIFICADO ===== -->
+         <!-- ===== FIN DEL CONTENEDOR PRINCIPAL UNIFICADO ===== -->
 
     </main>
 
@@ -161,174 +161,171 @@ include(__DIR__ . '/../../../../../components/header.php');
     </div>
 
     <?php include(__DIR__ . '/../../../../../components/footer.php'); ?>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+    
+    <!-- ===== INICIO DEL SCRIPT DE GESTIÓN (ABM) ===== -->
     <script>
-        const BASE_URL = '<?php echo BASE_URL; ?>';
-    </script>
-
-    <!-- Script para ABM y Tooltips -->
-    <script>
-        // Variable global para guardar la lista de personal
-        let listaPersonal = [];
-
-        // Función para inicializar los tooltips de Bootstrap
-        function inicializarTooltips() {
-            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-        }
-
-        // Función para renderizar la tabla
-        function renderizarTabla(personal) {
-            const tbody = document.getElementById('tabla-usuarios-body');
-            tbody.innerHTML = '';
-
-            if (personal.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No hay personal registrado.</td></tr>';
-                return;
-            }
-
-            personal.forEach(usuario => {
-                let badgeClass = 'bg-secondary';
-                if (usuario.role === 'admin') badgeClass = 'bg-primary';
-                if (usuario.role === 'editor') badgeClass = 'bg-info';
-                if (usuario.role === 'validador') badgeClass = 'bg-success';
-
-                const fila = `
-              <tr id="user-row-${usuario.id}">
-                <td><strong>${usuario.nombre}</strong></td>
-                <td>${usuario.email}</td>
-                <td><span class="badge ${badgeClass}">${usuario.role}</span></td>
-                <td class="text-end">
-                  <button class="btn btn-sm btn-outline-secondary btn-edit" data-id="${usuario.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar"><i class="bi bi-pencil-fill"></i></button>
-                  <button class="btn btn-sm btn-outline-danger btn-delete" data-id="${usuario.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar"><i class="bi bi-trash-fill"></i></button>
-                </td>
-              </tr>
-            `;
-                tbody.innerHTML += fila;
-            });
-
-            inicializarTooltips();
-        }
-
-        // Función para obtener y mostrar el personal
-        async function cargarPersonal() {
-            try {
-                const response = await fetch('<?php echo BASE_URL; ?>api/get_personal.php');
-                if (!response.ok) throw new Error('Error en la respuesta de la red.');
-                listaPersonal = await response.json();
-                renderizarTabla(listaPersonal);
-            } catch (error) {
-                document.getElementById('tabla-usuarios-body').innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error al cargar los datos.</td></tr>`;
-            }
-        }
-
-        // Lógica para añadir un nuevo usuario
-        document.getElementById('form-add-usuario').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData();
-            formData.append('nombre', document.getElementById('add-nombre').value);
-            formData.append('email', document.getElementById('add-email').value);
-            formData.append('password', document.getElementById('add-password').value);
-            formData.append('rol', document.getElementById('add-rol').value);
-
-            try {
-                const response = await fetch('<?php echo BASE_URL; ?>api/add_personal.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await response.json();
-
-                if (response.ok && result.status === 'ok') {
-                    Swal.fire('¡Éxito!', result.message, 'success');
-                    document.getElementById('form-add-usuario').reset();
-                    const accordion = bootstrap.Collapse.getInstance(document.getElementById('collapseOne'));
-                    if (accordion) accordion.hide();
-                    cargarPersonal();
-                } else {
-                    Swal.fire('Error', result.message, 'error');
-                }
-            } catch (error) {
-                Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
-            }
-        });
-
-        // Lógica para el buscador
-        document.getElementById('buscador').addEventListener('keyup', (e) => {
-            const texto = e.target.value.toLowerCase();
-            const personalFiltrado = listaPersonal.filter(usuario => {
-                return usuario.nombre.toLowerCase().includes(texto) || usuario.email.toLowerCase().includes(texto);
-            });
-            renderizarTabla(personalFiltrado);
-        });
-
-        // Lógica para eliminar y editar (usando delegación de eventos)
-        document.getElementById('tabla-usuarios-body').addEventListener('click', async (e) => {
-            const deleteBtn = e.target.closest('.btn-delete');
-            const editBtn = e.target.closest('.btn-edit');
-
-            if (deleteBtn) {
-                const userId = deleteBtn.dataset.id;
-                Swal.fire({
-                    title: '¿Estás seguro?',
-                    text: "¡No podrás revertir esta acción!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Sí, ¡eliminar!',
-                    cancelButtonText: 'Cancelar'
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        const formData = new FormData();
-                        formData.append('id', userId);
-                        const response = await fetch('<?php echo BASE_URL; ?>api/delete_personal.php', {
-                            method: 'POST',
-                            body: formData
-                        });
-                        const res = await response.json();
-                        if (response.ok && res.status === 'ok') {
-                            Swal.fire('¡Eliminado!', res.message, 'success');
-                            cargarPersonal();
-                        } else {
-                            Swal.fire('Error', res.message, 'error');
-                        }
-                    }
-                });
-            }
-
-            if (editBtn) {
-                const userId = editBtn.dataset.id;
-                const usuario = listaPersonal.find(u => u.id == userId);
-                if (usuario) {
-                    document.getElementById('edit-id').value = usuario.id;
-                    document.getElementById('edit-nombre').value = usuario.nombre;
-                    document.getElementById('edit-email').value = usuario.email;
-                    document.getElementById('edit-rol').value = usuario.role;
-                    document.getElementById('edit-password').value = '';
-
-                    const editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
-                    editModal.show();
-                }
-            }
-        });
-
-        // Lógica para guardar los cambios del modal de edición
-        document.getElementById('save-edit-button').addEventListener('click', async () => {
-            // Aquí irá la lógica para llamar a una API 'update_personal.php'
-            // Por ahora, solo cerramos el modal y mostramos un mensaje.
-            const editModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
-            editModal.hide();
-            Swal.fire('¡Guardado!', 'Los cambios se han guardado (simulación).', 'success');
-            // En una implementación real, aquí llamarías a cargarPersonal() después de la respuesta exitosa de la API.
-        });
-
-        // Ejecutar las funciones cuando la página haya cargado
         document.addEventListener('DOMContentLoaded', () => {
+            let listaPersonal = [];
+            const tbody = document.getElementById('tabla-usuarios-body');
+            const formAdd = document.getElementById('form-add-usuario');
+
+            function inicializarTooltips() {
+                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                [...tooltipTriggerList].forEach(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            }
+
+            function renderizarTabla(personal) {
+                tbody.innerHTML = '';
+
+                if (personal.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">No se encontraron resultados.</td></tr>';
+                    return;
+                }
+
+                personal.forEach(usuario => {
+                    let badgeClass = 'bg-secondary';
+                    if (usuario.role === 'admin') badgeClass = 'bg-primary';
+                    if (usuario.role === 'editor') badgeClass = 'bg-info';
+                    if (usuario.role === 'validador') badgeClass = 'bg-success';
+
+                    const fila = `
+                        <tr id="user-row-${usuario.id}">
+                            <td class="ps-3"><strong>${usuario.nombre}</strong></td>
+                            <td>${usuario.email}</td>
+                            <td><span class="badge ${badgeClass}">${usuario.role}</span></td>
+                            <td class="text-end pe-3">
+                                <button class="btn btn-sm btn-outline-secondary btn-edit" data-id="${usuario.id}" data-bs-toggle="tooltip" title="Editar"><i class="bi bi-pencil-fill"></i></button>
+                                <button class="btn btn-sm btn-outline-danger btn-delete" data-id="${usuario.id}" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash-fill"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += fila;
+                });
+
+                inicializarTooltips();
+            }
+
+            async function cargarPersonal() {
+                try {
+                    const response = await fetch('<?php echo BASE_URL; ?>api/get_personal.php');
+                    if (!response.ok) throw new Error('Error en la respuesta de la red.');
+                    listaPersonal = await response.json();
+                    renderizarTabla(listaPersonal);
+                } catch (error) {
+                    document.getElementById('tabla-usuarios-body').innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error al cargar los datos.</td></tr>`;
+                }
+            }
+
+            formAdd.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData();
+                formData.append('nombre', document.getElementById('add-nombre').value);
+                formData.append('email', document.getElementById('add-email').value);
+                formData.append('password', document.getElementById('add-password').value);
+                formData.append('rol', document.getElementById('add-rol').value);
+
+                try {
+                    const response = await fetch('<?php echo BASE_URL; ?>api/add_personal.php', { method: 'POST', body: formData });
+                    const result = await response.json();
+
+                    if (response.ok && result.status === 'ok') {
+                        Swal.fire('¡Éxito!', result.message, 'success');
+                        formAdd.reset();
+                        const accordion = bootstrap.Collapse.getInstance(document.getElementById('collapseOne'));
+                        if (accordion) accordion.hide();
+                        cargarPersonal();
+                    } else {
+                        Swal.fire('Error', result.message, 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+                }
+            });
+
+            document.getElementById('buscador').addEventListener('keyup', (e) => {
+                const texto = e.target.value.toLowerCase();
+                const personalFiltrado = listaPersonal.filter(usuario => 
+                    usuario.nombre.toLowerCase().includes(texto) || usuario.email.toLowerCase().includes(texto)
+                );
+                renderizarTabla(personalFiltrado);
+            });
+
+            tbody.addEventListener('click', async (e) => {
+                const deleteBtn = e.target.closest('.btn-delete');
+                const editBtn = e.target.closest('.btn-edit');
+
+                if (deleteBtn) {
+                    const userId = deleteBtn.dataset.id;
+                    Swal.fire({
+                        title: '¿Estás seguro?', text: "¡No podrás revertir esta acción!", icon: 'warning',
+                        showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, ¡eliminar!', cancelButtonText: 'Cancelar'
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            const formData = new FormData();
+                            formData.append('id', userId);
+                            const response = await fetch('<?php echo BASE_URL; ?>api/delete_personal.php', { method: 'POST', body: formData });
+                            const res = await response.json();
+                            if (response.ok && res.status === 'ok') {
+                                Swal.fire('¡Eliminado!', res.message, 'success');
+                                cargarPersonal();
+                            } else {
+                                Swal.fire('Error', res.message, 'error');
+                            }
+                        }
+                    });
+                }
+                
+                if (editBtn) {
+                    const userId = editBtn.dataset.id;
+                    const usuario = listaPersonal.find(u => u.id == userId);
+                    if (usuario) {
+                        document.getElementById('edit-id').value = usuario.id;
+                        document.getElementById('edit-nombre').value = usuario.nombre;
+                        document.getElementById('edit-email').value = usuario.email;
+                        document.getElementById('edit-rol').value = usuario.role;
+                        document.getElementById('edit-password').value = '';
+                        
+                        const editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                        editModal.show();
+                    }
+                }
+            });
+
+            document.getElementById('save-edit-button').addEventListener('click', async () => {
+                const formData = new FormData();
+                formData.append('id', document.getElementById('edit-id').value);
+                formData.append('nombre', document.getElementById('edit-nombre').value);
+                formData.append('email', document.getElementById('edit-email').value);
+                formData.append('role', document.getElementById('edit-rol').value);
+                
+                const newPassword = document.getElementById('edit-password').value;
+                if (newPassword) {
+                    formData.append('password', newPassword);
+                }
+
+                try {
+                    const response = await fetch('<?php echo BASE_URL; ?>api/update_personal.php', { method: 'POST', body: formData });
+                    const result = await response.json();
+                    
+                    if (response.ok && result.status === 'ok') {
+                        const editModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+                        editModal.hide();
+                        Swal.fire('¡Guardado!', result.message, 'success');
+                        cargarPersonal();
+                    } else {
+                        Swal.fire('Error', result.message, 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+                }
+            });
+
             cargarPersonal();
         });
     </script>
 </body>
-
 </html>

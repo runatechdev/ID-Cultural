@@ -1,66 +1,93 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Panel del Validador - ID Cultural</title>
-  <link rel="stylesheet" href="/ID-Cultural/static/css/main.css" />
-  <link rel="stylesheet" href="./panel_validador.css" />
-</head>
-<body>
+<?php
+session_start();
+require_once __DIR__ . '/../../../../../config.php';
 
-  <?php include "../../../../components/navbar.php"; ?>
-  <header>
- 
-</header>
+// --- Bloque de seguridad para Validador o Admin ---
+if (!isset($_SESSION['user_data']) || !in_array($_SESSION['user_data']['role'], ['validador', 'admin'])) {
+    header('Location: ' . BASE_URL . 'src/views/pages/auth/login.php');
+    exit();
+}
 
+// --- Variables para el header ---
+$page_title = "Panel de Validador";
+$specific_css_files = ['dashboard.css', 'abm_usuarios.css', 'dashboard-adm.css'];
 
+// --- Incluir la cabecera ---
+include(__DIR__ . '/../../../../../components/header.php');
+?>
+<body class="dashboard-body">
 
-  <main class="container">
-    <h1>Artistas Pendientes de Aprobación</h1>
-    <table id="tabla-artistas">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Disciplina</th>
-          <th>Localidad</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-          <th>Motivo del Rechazo</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Contenido dinámico con JS -->
-      </tbody>
-    </table>
-  </main>
+    <?php include(__DIR__ . '/../../../../../components/navbar.php'); ?>
 
-  <!-- Modal de Rechazo -->
-  <div id="modal-rechazo" class="modal hidden">
-    <div class="modal-content">
-      <h2>Motivo del rechazo</h2>
-      <textarea id="input-motivo" placeholder="Escriba el motivo aquí..."></textarea>
-      <div class="modal-buttons">
-        <button id="btn-cancelar" class="btn cancel">Cancelar</button>
-        <button id="btn-confirmar" class="btn confirm">Confirmar</button>
-      </div>
-    </div>
-  </div>
+    <main class="container my-5">
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="mb-0">Panel de Validador</h1>
+                        <p class="lead">Revisa las solicitudes pendientes y gestiona el estado de los artistas.</p>
+                    </div>
+                </div>
 
-  <!-- <?php include "../../../../components/footer.php"; ?> -->
+                <!-- Fila de Tarjetas de Estadísticas -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="stat-card h-100">
+                            <div class="stat-card-icon icon-requests"><i class="bi bi-hourglass-split"></i></div>
+                            <div class="stat-card-info">
+                                <p class="stat-card-title">Artistas Pendientes</p>
+                                <h3 class="stat-card-number" id="stat-pendientes">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="stat-card h-100">
+                            <div class="stat-card-icon icon-artists"><i class="bi bi-patch-check-fill"></i></div>
+                            <div class="stat-card-info">
+                                <p class="stat-card-title">Artistas Validados</p>
+                                <h3 class="stat-card-number" id="stat-validados">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="stat-card h-100">
+                            <div class="stat-card-icon icon-users"><i class="bi bi-x-circle-fill"></i></div>
+                            <div class="stat-card-info">
+                                <p class="stat-card-title">Artistas Rechazados</p>
+                                <h3 class="stat-card-number" id="stat-rechazados">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-  <footer>
-  <div class="footer-content">
-    <h2>ID Cultural</h2>
-    <div class="footer-links">
-      <a href="index.html">Inicio</a>
-      <a href="contacto.html">Contacto</a>
-      <a href="creditos.html">Créditos</a>
-    </div>
-    <p>&copy; 2025 ID Cultural. Todos los derechos reservados.</p>
-  </div>
-</footer>
+                <!-- Menú de Acciones del Validador -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Listas de Gestión</h4>
+                        <p class="mb-0 text-muted small">Accede a las listas de artistas según su estado de validación.</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="dashboard-menu">
+                            <a href="<?php echo BASE_URL; ?>src/views/pages/validador/gestion_pendientes.php" class="dashboard-item" data-bs-toggle="tooltip" title="Revisar y procesar los artistas que esperan validación.">
+                                <i class="bi bi-person-exclamation dashboard-icon"></i> Ver Artistas Pendientes
+                            </a>
+                            <a href="<?php echo BASE_URL; ?>src/views/pages/validador/log_validaciones.php" class="dashboard-item" data-bs-toggle="tooltip" title="Consultar el historial de artistas ya validados o rechazados.">
+                                <i class="bi bi-file-earmark-text-fill dashboard-icon"></i> Historial de Validaciones
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
-  <script src="./panel_validador.js"></script>
+    <?php include(__DIR__ . '/../../../../../components/footer.php'); ?>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+    <script>
+        const BASE_URL = '<?php echo BASE_URL; ?>';
+    </script>
+    <script src="<?php echo BASE_URL; ?>static/js/panel_validador.js"></script>
 </body>
 </html>
