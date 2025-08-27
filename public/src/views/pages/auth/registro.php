@@ -1,175 +1,177 @@
 <?php
+session_start();
 require_once __DIR__ . '/../../../../../config.php';
+$page_title = "Registro de Artista - ID Cultural";
+// Cargamos un CSS específico para el registro
+$specific_css_files = ['registro.css'];
+include(__DIR__ . '/../../../../../components/header.php');
 ?>
+<body class="dashboard-body">
 
-<!DOCTYPE html>
-<html lang="es">
+  <?php include(__DIR__ . '/../../../../../components/navbar.php'); ?>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registro del Artista</title>
-  <!-- Bootstrap Core -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <main class="container my-5">
+    <div class="card col-lg-8 mx-auto">
+        <div class="card-body p-4 p-md-5">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-plus-fill display-1 text-primary"></i>
+                <h1 class="mb-2">Crear Cuenta de Artista</h1>
+                <p class="lead">Completa tus datos para formar parte de la comunidad.</p>
+            </div>
 
-<!-- Bootswatch Theme -->
-<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/quartz/bootstrap.min.css" rel="stylesheet">
+            <form id="registroForm" novalidate>
+                <!-- Datos Personales -->
+                <h5 class="mb-3">Datos Personales</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nombre" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="apellido" class="form-label">Apellido <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="apellido" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                        <input type="date" class="form-control" id="fecha_nacimiento">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="genero" class="form-label">Género</label>
+                        <select id="genero" class="form-select">
+                            <option value="" selected>Prefiero no decirlo</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
 
-<!-- SweetAlert2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet">
+                <hr class="my-4">
 
-  <link rel="stylesheet" href="/static/css/main.css">
-  <link rel="stylesheet" href="/static/css/registro.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-</head>
+                <!-- Datos de Ubicación -->
+                <h5 class="mb-3">Ubicación</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="pais" class="form-label">País</label>
+                        <select id="pais" class="form-select">
+                            <option value="Argentina" selected>Argentina</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="provincia" class="form-label">Provincia</label>
+                        <select id="provincia" class="form-select">
+                            <option value="Santiago del Estero" selected>Santiago del Estero</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="municipio" class="form-label">Municipio</label>
+                        <select id="municipio" class="form-select">
+                            <option value="" selected disabled>Seleccionar...</option>
+                            <option value="Añatuya">Añatuya</option>
+                            <option value="Campo Gallo">Campo Gallo</option>
+                            <option value="Clodomira">Clodomira</option>
+                            <option value="Colonia Dora">Colonia Dora</option>
+                            <option value="Fernández">Fernández</option>
+                            <option value="Frías">Frías</option>
+                            <option value="La Banda">La Banda</option>
+                            <option value="Loreto">Loreto</option>
+                            <option value="Monte Quemado">Monte Quemado</option>
+                            <option value="Pampa de los Guanacos">Pampa de los Guanacos</option>
+                            <option value="Quimilí">Quimilí</option>
+                            <option value="Santiago del Estero">Santiago del Estero (Capital)</option>
+                            <option value="Sumampa">Sumampa</option>
+                            <option value="Suncho Corral">Suncho Corral</option>
+                            <option value="Termas de Río Hondo">Termas de Río Hondo</option>
+                            <option value="Tintina">Tintina</option>
+                            <option value="Villa Ojo de Agua">Villa Ojo de Agua</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
 
-<body>
-    <?php include("../../../../../components/navbar.php"); ?>
+                <hr class="my-4">
 
-  <main>
-    <section class="registro-wizard">
-      <div class="wizard-pasos">
-        <div class="paso activo">
-          <div class="circulo">1</div>
-          <p><strong>Creá tu cuenta</strong></p>
+                <!-- Datos de Cuenta -->
+                <h5 class="mb-3">Datos de la Cuenta</h5>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="confirm_password" class="form-label">Confirmar Contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="confirm_password" required>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Intereses -->
+                <h5 class="mb-3">¿Cuáles son tus áreas de interés?</h5>
+                <div class="interest-container">
+                    <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" id="interes-musica" value="musica" name="intereses"><label class="form-check-label" for="interes-musica"><i class="bi bi-music-note-beamed"></i> Música</label></div>
+                    <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" id="interes-artes-visuales" value="artes_visuales" name="intereses"><label class="form-check-label" for="interes-artes-visuales"><i class="bi bi-palette-fill"></i> Artes Visuales</label></div>
+                    <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" id="interes-letras" value="letras" name="intereses"><label class="form-check-label" for="interes-letras"><i class="bi bi-book-half"></i> Letras</label></div>
+                    <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" id="interes-danza" value="danza" name="intereses"><label class="form-check-label" for="interes-danza"><i class="bi bi-person-walking"></i> Danza</label></div>
+                    <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" id="interes-teatro" value="teatro" name="intereses"><label class="form-check-label" for="interes-teatro"><i class="bi bi-mask"></i> Teatro</label></div>
+                    <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" id="interes-cine" value="cine" name="intereses"><label class="form-check-label" for="interes-cine"><i class="bi bi-film"></i> Cine</label></div>
+                    <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" id="interes-artesanias" value="artesanias" name="intereses"><label class="form-check-label" for="interes-artesanias"><i class="bi bi-gem"></i> Artesanías</label></div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Checkbox de Términos y Condiciones -->
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="acceptTerms" required>
+                    <label class="form-check-label" for="acceptTerms">
+                        Acepto los <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Términos y Condiciones</a>
+                    </label>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" id="submit-button" class="btn btn-primary btn-lg" disabled>Registrarse</button>
+                </div>
+                
+                <p class="text-center mt-3">¿Ya tienes una cuenta? <a href="/src/views/pages/auth/login.php">Inicia sesión aquí</a></p>
+            </form>
         </div>
-        <div class="linea"></div>
-        <div class="paso">
-          <div class="circulo">2</div>
-          <p>Áreas artísticas</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="paso1" class="formulario-paso1 active animate__animated animate__fadeInLeft">
-      <h2>Creá tu cuenta</h2>
-      <form id="registroForm" novalidate>
-
-        <!-- Datos personales -->
-        <div class="input-group">
-          <label for="nombre">Nombre</label>
-          <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan" autocomplete="given-name" required>
-        </div>
-
-        <div class="input-group">
-          <label for="apellido">Apellido</label>
-          <input type="text" id="apellido" name="apellido" placeholder="Ej: Pérez" autocomplete="family-name" required>
-        </div>
-        
-        <div class="input-group">
-          <label for="fechaNacimiento">Fecha de nacimiento</label>
-          <input type="date" id="fechaNacimiento" name="fechaNacimiento" autocomplete="bday" required>
-        </div>
-
-        <div class="input-group">
-          <label for="genero">Género</label>
-          <select id="genero" name="genero" required>
-            <option value="" disabled selected>Seleccioná una opción</option>
-            <option value="masculino">Masculino</option>
-            <option value="femenino">Femenino</option>
-            <option value="otro">Otro</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label for="pais">País</label>
-          <select id="pais" name="pais" required>
-            <option value="" disabled selected>Seleccioná un país</option>
-            <option value="Argentina">Argentina</option>
-          </select>
-        </div>
-        
-        <div class="input-group">
-          <label for="provincia">Provincia</label>
-          <select id="provincia" name="provincia" required disabled>
-            <option value="" disabled selected>Seleccioná una provincia</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label for="municipio">Municipio/Departamento</label>
-          <select id="municipio" name="municipio" required disabled>
-            <option value="" disabled selected>Seleccioná un municipio</option>
-          </select>
-        </div>
-        
-        <!-- Credenciales -->
-        <div class="input-group">
-          <label for="email">Correo electrónico</label>
-          <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" autocomplete="email" required>
-        </div>
-
-        <div class="input-group">
-          <label for="confirmarEmail">Confirmar correo electrónico</label>
-          <input type="email" id="confirmarEmail" name="confirmarEmail" placeholder="Repetí tu correo" required>
-        </div>
-
-        <div class="input-group">
-          <label for="password">Contraseña</label>
-          <input type="password" id="password" name="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" required>
-        </div>
-
-        <div class="input-group">
-          <label for="confirmarPassword">Confirmar contraseña</label>
-          <input type="password" id="confirmarPassword" name="confirmarPassword" placeholder="Repetí tu contraseña" required>
-        </div>
-
-        <div class="checkbox-group">
-          <input type="checkbox" id="terminos" required>
-          <label for="terminos">Acepto los <a href="/src/views/pages/public/terminos_condiciones.html" target="_blank">Términos y condiciones</a></label>
-        </div>
-
-        <button type="submit" class="btn-principal">Registrarme</button>
-        <p class="login-link">¿Ya tenés una cuenta? <a href="#">Ingresá</a></p>
-      </form>
-    </section>
-
-    <section id="paso2" class="formulario-paso2">
-      <h2>Intereses culturales</h2>
-      <p>¿En qué categoría artística te desarrollás actualmente? Seleccioná una o más áreas que mejor representen tu producción.</p>
-
-      <form id="interesesForm">
-        <input type="hidden" id="email_oculto" name="email">
-        <div class="checkbox-grid">
-          <div>
-            <label><input type="checkbox" name="intereses" value="Artesanía"> Artesanía</label><br>
-            <label><input type="checkbox" name="intereses" value="Audiovisual"> Audiovisual</label><br>
-            <label><input type="checkbox" name="intereses" value="Danza"> Danza</label><br>
-            <label><input type="checkbox" name="intereses" value="Teatro"> Teatro</label><br>
-          </div>
-          <div>
-            <label><input type="checkbox" name="intereses" value="Música"> Música</label><br>
-            <label><input type="checkbox" name="intereses" value="Literatura"> Literatura</label><br>
-            <label><input type="checkbox" name="intereses" value="Escultura"> Escultura</label><br>
-          </div>
-        </div>
-
-        <div class="botones-navegacion">
-          <button type="button" onclick="volverPaso1()" class="btn-secundario" id="btn-anterior">Anterior</button>
-          <button type="submit" class="btn-principal" id="btnSiguiente" disabled>Siguiente</button>
-        </div>
-      </form>
-    </section>
+    </div>
   </main>
 
-  <?php
-  include(__DIR__ . '/../../../../../components/footer.php');
-  ?>
-
-  <!-- Scripts -->
-  <script src="/static/js/main.js"></script>
-  <script src="/static/js/navbar.js"></script>
-  <script src="/static/js/registro.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
-
-  <!-- Modal -->
-  <div id="modalTerminos" class="modal">
-    <div class="modal-contenido">
-      <span class="cerrar" onclick="cerrarModal()">&times;</span>
-      <iframe src="/src/views/pages/public/terminos_condiciones.html" frameborder="0"></iframe>
+<!-- Modal de Términos y Condiciones -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="termsModalLabel">Términos y Condiciones de Uso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <?php
+          // Esta línea incluye el contenido del archivo que ya tienes abierto.
+          // Asegúrate de que la ruta sea correcta desde tu archivo registro.php
+          include(__DIR__ . '/../terminos_condiciones_content.php'); 
+        ?>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendido</button>
+      </div>
     </div>
   </div>
-</body>
+</div>
 
+  <?php include("../../../../../components/footer.php"); ?>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  <script>
+      const BASE_URL = '<?php echo BASE_URL; ?>';
+  </script>
+  <script src="<?php echo BASE_URL; ?>static/js/registro.js"></script>
+
+</body>
 </html>

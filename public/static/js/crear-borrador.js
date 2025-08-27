@@ -1,100 +1,69 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById("form-borrador");
-  const categoriaSelect = document.getElementById('categoria');
-  const camposExtraContainer = document.querySelectorAll('.campos-extra');
-  const multimediaContainer = document.getElementById("multimedia-container");
+    const categoriaSelect = document.getElementById('categoria');
+    const camposContainer = document.getElementById('campos-condicionales-container');
+    const form = document.getElementById('form-borrador');
 
-  // 1. Mostrar campos condicionales por categoría
-  categoriaSelect.addEventListener('change', function () {
-    camposExtraContainer.forEach((div) => {
-      div.style.display = 'none';
+    const camposPorCategoria = {
+        musica: `
+            <div class="row">
+                <div class="col-md-6 mb-3"><label for="plataformas" class="form-label">Plataformas Digitales</label><input type="text" id="plataformas" class="form-control"></div>
+                <div class="col-md-6 mb-3"><label for="sello" class="form-label">Sello Discográfico</label><input type="text" id="sello" class="form-control"></div>
+            </div>`,
+        literatura: `
+            <div class="row">
+                <div class="col-md-6 mb-3"><label for="genero-lit" class="form-label">Género Literario</label><input type="text" id="genero-lit" class="form-control"></div>
+                <div class="col-md-6 mb-3"><label for="editorial" class="form-label">Editorial</label><input type="text" id="editorial" class="form-control"></div>
+            </div>`,
+        artes_visuales: `
+            <div class="row">
+                <div class="col-md-4 mb-3"><label for="tecnica" class="form-label">Técnica/Soporte</label><input type="text" id="tecnica" class="form-control"></div>
+                <div class="col-md-4 mb-3"><label for="dimensiones_av" class="form-label">Dimensiones</label><input type="text" id="dimensiones_av" class="form-control"></div>
+                <div class="col-md-4 mb-3"><label for="ano_creacion" class="form-label">Año de Creación</label><input type="number" id="ano_creacion" class="form-control"></div>
+            </div>`,
+        // Añade aquí las plantillas para las otras categorías (escultura, danza, etc.)
+    };
+
+    categoriaSelect.addEventListener('change', () => {
+        const categoria = categoriaSelect.value;
+        camposContainer.innerHTML = camposPorCategoria[categoria] || '';
     });
 
-    const categoriaSeleccionada = this.value;
-    const idCampo = 'campos-' + categoriaSeleccionada;
-    const divMostrar = document.getElementById(idCampo);
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const estado = e.submitter.id === 'btn-enviar-validacion' ? 'pendiente_validacion' : 'borrador';
+        
+        const formData = new FormData();
+        formData.append('titulo', document.getElementById('titulo').value);
+        formData.append('descripcion', document.getElementById('descripcion').value);
+        formData.append('categoria', document.getElementById('categoria').value);
+        formData.append('estado', estado);
 
-    if (divMostrar) {
-      divMostrar.style.display = 'block';
-    }
-  });
+        // Recolectar campos extra
+        const extraFields = camposContainer.querySelectorAll('input, select, textarea');
+        extraFields.forEach(field => {
+            formData.append(field.id, field.value);
+        });
 
-  // 2. Agregar al menos un input multimedia si no hay ninguno
-  if (multimediaContainer.children.length === 0) {
-    const multimediaInput = document.createElement("input");
-    multimediaInput.type = "text";
-    multimediaInput.name = "multimedia";
-    multimediaInput.placeholder = "Ej: https://youtu.be/...";
-    multimediaContainer.appendChild(multimediaInput);
-  }
+        try {
+            const response = await fetch(`${BASE_URL}api/save_borrador.php`, {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
 
-  // 3. Envío del formulario
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const saveIcon = form.querySelector(".fa-save");
-    saveIcon.classList.add('animate__animated', 'animate__rotateIn');
-
-    const formData = new FormData(form);
-
-    try {
-      const res = await fetch("/ID-Cultural/backend/controllers/guardar_borrador.php", {
-        method: "POST",
-        body: formData
-      });
-
-      const resultado = await res.json();
-      console.log("📥 Respuesta del servidor:", resultado);
-
-      if (resultado.status === "ok") {
-        setTimeout(() => {
-          alert("✅ Borrador guardado correctamente.");
-          form.reset();
-          camposExtraContainer.forEach((div) => {
-            div.style.display = 'none';
-          });
-
-          // Reiniciar multimedia con un solo input
-          multimediaContainer.innerHTML = '';
-          const nuevoInput = document.createElement("input");
-          nuevoInput.type = "text";
-          nuevoInput.name = "multimedia";
-          nuevoInput.placeholder = "Ej: https://youtu.be/...";
-          multimediaContainer.appendChild(nuevoInput);
-        }, 500);
-      } else {
-        alert("⚠️ Error al guardar:\n" + resultado.message);
-      }
-
-    } catch (error) {
-      console.error("❌ Error de conexión:", error);
-      alert("No se pudo guardar el borrador.\nVer consola para detalles.");
-    }
-
-    saveIcon.addEventListener('animationend', () => {
-      saveIcon.classList.remove('animate__animated', 'animate__rotateIn');
+            if (response.ok && result.status === 'ok') {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    text: result.message,
+                    icon: 'success',
+                }).then(() => {
+                    window.location.href = `${BASE_URL}src/views/pages/artista/dashboard-artista.php`;
+                });
+            } else {
+                Swal.fire('Error', result.message, 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+        }
     });
-  });
-
-const validarBtn = document.getElementById("btn-enviar-validacion");
-if (validarBtn) {
-  validarBtn.addEventListener("click", async () => {
-    try {
-      const res = await fetch("/ID-Cultural/backend/controllers/enviar_validacion.php", {
-        method: "POST"
-      });
-      const resultado = await res.json();
-
-      if (resultado.status === "ok") {
-        alert("📤 Todos los borradores fueron enviados para validación.");
-      } else {
-        alert("⚠️ Error: " + resultado.message);
-      }
-    } catch (error) {
-      console.error("❌ Error al conectar:", error);
-      alert("No se pudo enviar los borradores.");
-    }
-  });
-}
-})
- 
+});

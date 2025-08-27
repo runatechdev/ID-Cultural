@@ -42,6 +42,5 @@ document.addEventListener("DOMContentLoaded", () => {
       errorMsg.hidden = false;
     }
   });
-
   // (Removidos los fetch de navbar/footer como antes)
 });
