@@ -7,26 +7,23 @@
 -- Versión del servidor: 10.5.29-MariaDB-ubu2004
 -- Versión de PHP: 8.2.27
 
+SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
 --
 -- Base de datos: `idcultural`
 --
+CREATE DATABASE IF NOT EXISTS `idcultural` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `idcultural`;
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `artistas`
 --
-
+DROP TABLE IF EXISTS `artistas`;
 CREATE TABLE `artistas` (
   `id` int(11) NOT NULL,
   `nombre` varchar(255) NOT NULL,
@@ -45,7 +42,6 @@ CREATE TABLE `artistas` (
 --
 -- Volcado de datos para la tabla `artistas`
 --
-
 INSERT INTO `artistas` (`id`, `nombre`, `apellido`, `fecha_nacimiento`, `genero`, `pais`, `provincia`, `municipio`, `email`, `password`, `role`, `status`) VALUES
 (2, 'nuevo', 'nuevo', '2000-12-12', 'femenino', 'Argentina', 'Buenos Aires', 'La Plata', 'nuevo@gmail.com', '$2y$10$7nxg3IMycH8sDjm0RbHDaO3DlYedW8ZOdsX4dXcJ3vV/K9IA.o8rq', 'artista', 'rechazado'),
 (3, 'prueba', 'prueba', '2001-02-21', 'masculino', 'Argentina', 'Buenos Aires', 'La Plata', 'prueba@gmail.com', '$2y$10$Swtb6xK8KSKsuNXFLfcJtOZPfLgqUKYeWMBDJqVFqCO/c7C8UYDwi', 'artista', 'validado'),
@@ -58,7 +54,7 @@ INSERT INTO `artistas` (`id`, `nombre`, `apellido`, `fecha_nacimiento`, `genero`
 --
 -- Estructura de tabla para la tabla `intereses_artista`
 --
-
+DROP TABLE IF EXISTS `intereses_artista`;
 CREATE TABLE `intereses_artista` (
   `id` int(11) NOT NULL,
   `artista_id` int(11) DEFAULT NULL,
@@ -68,7 +64,6 @@ CREATE TABLE `intereses_artista` (
 --
 -- Volcado de datos para la tabla `intereses_artista`
 --
-
 INSERT INTO `intereses_artista` (`id`, `artista_id`, `interes`) VALUES
 (1, 7, 'musica'),
 (2, 7, 'artes_visuales');
@@ -78,7 +73,7 @@ INSERT INTO `intereses_artista` (`id`, `artista_id`, `interes`) VALUES
 --
 -- Estructura de tabla para la tabla `noticias`
 --
-
+DROP TABLE IF EXISTS `noticias`;
 CREATE TABLE `noticias` (
   `id` int(11) NOT NULL,
   `titulo` varchar(255) NOT NULL,
@@ -91,7 +86,6 @@ CREATE TABLE `noticias` (
 --
 -- Volcado de datos para la tabla `noticias`
 --
-
 INSERT INTO `noticias` (`id`, `titulo`, `contenido`, `imagen_url`, `editor_id`, `fecha_creacion`) VALUES
 (1, '¡Gran Apertura del Festival de Arte!', 'Este fin de semana se celebra el festival anual de arte con más de 50 artistas locales...', NULL, 2, '2025-08-14 19:38:03'),
 (5, 'hoy', 'qwerert', NULL, 2, '2025-08-18 20:12:31');
@@ -101,7 +95,7 @@ INSERT INTO `noticias` (`id`, `titulo`, `contenido`, `imagen_url`, `editor_id`, 
 --
 -- Estructura de tabla para la tabla `publicaciones`
 --
-
+DROP TABLE IF EXISTS `publicaciones`;
 CREATE TABLE `publicaciones` (
   `id` int(11) NOT NULL,
   `usuario_id` int(11) NOT NULL,
@@ -122,7 +116,7 @@ CREATE TABLE `publicaciones` (
 --
 -- Estructura de tabla para la tabla `site_content`
 --
-
+DROP TABLE IF EXISTS `site_content`;
 CREATE TABLE `site_content` (
   `id` int(11) NOT NULL,
   `content_key` varchar(100) NOT NULL,
@@ -132,7 +126,6 @@ CREATE TABLE `site_content` (
 --
 -- Volcado de datos para la tabla `site_content`
 --
-
 INSERT INTO `site_content` (`id`, `content_key`, `content_value`) VALUES
 (1, 'welcome_title', 'Bienvenidos a ID Cultural'),
 (2, 'welcome_paragraph', '<strong>ID Cultural</strong> es una plataforma digital dedicada a visibilizar, preservar y promover la identidad artística y cultural de Santiago del Estero. Te invitamos a explorar, descubrir y formar parte de este espacio pensado para fortalecer nuestras raíces.'),
@@ -146,7 +139,7 @@ INSERT INTO `site_content` (`id`, `content_key`, `content_value`) VALUES
 --
 -- Estructura de tabla para la tabla `system_logs`
 --
-
+DROP TABLE IF EXISTS `system_logs`;
 CREATE TABLE `system_logs` (
   `id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
@@ -159,7 +152,6 @@ CREATE TABLE `system_logs` (
 --
 -- Volcado de datos para la tabla `system_logs`
 --
-
 INSERT INTO `system_logs` (`id`, `user_id`, `user_name`, `action`, `details`, `timestamp`) VALUES
 (1, 1, 'Administrador Principal', 'INICIO DE SESIÓN', 'El usuario ha iniciado sesión correctamente.', '2025-08-14 18:21:33'),
 (2, 2, 'Editor de Contenidos', 'CREACIÓN DE NOTICIA', 'Se ha creado la noticia con ID: 101.', '2025-08-14 18:21:33'),
@@ -176,7 +168,7 @@ INSERT INTO `system_logs` (`id`, `user_id`, `user_name`, `action`, `details`, `t
 --
 -- Estructura de tabla para la tabla `users`
 --
-
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `nombre` varchar(255) NOT NULL,
@@ -188,7 +180,6 @@ CREATE TABLE `users` (
 --
 -- Volcado de datos para la tabla `users`
 --
-
 INSERT INTO `users` (`id`, `nombre`, `email`, `password`, `role`) VALUES
 (1, 'Administrador Principal', 'admin@idcultural.com', '$2y$10$cv2EG9pZ/4y1H.z.QztN.OuGTO9x8resRsMrnJxdaKFPqreWtndf6', 'admin'),
 (2, 'Editor de Contenidos', 'editor@idcultural.com', '$2y$10$9/iW1.fVT0I8E2PiYzNGv.q5AKtnboEwl4rBAHuMgV2rVcDW6wd6W', 'editor'),
@@ -198,51 +189,30 @@ INSERT INTO `users` (`id`, `nombre`, `email`, `password`, `role`) VALUES
 -- Índices para tablas volcadas
 --
 
---
--- Indices de la tabla `artistas`
---
 ALTER TABLE `artistas`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
---
--- Indices de la tabla `intereses_artista`
---
 ALTER TABLE `intereses_artista`
   ADD PRIMARY KEY (`id`),
   ADD KEY `artista_id` (`artista_id`);
 
---
--- Indices de la tabla `noticias`
---
 ALTER TABLE `noticias`
   ADD PRIMARY KEY (`id`),
   ADD KEY `editor_id` (`editor_id`);
 
---
--- Indices de la tabla `publicaciones`
---
 ALTER TABLE `publicaciones`
   ADD PRIMARY KEY (`id`),
   ADD KEY `usuario_id` (`usuario_id`),
   ADD KEY `validador_id` (`validador_id`);
 
---
--- Indices de la tabla `site_content`
---
 ALTER TABLE `site_content`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `content_key` (`content_key`);
 
---
--- Indices de la tabla `system_logs`
---
 ALTER TABLE `system_logs`
   ADD PRIMARY KEY (`id`);
 
---
--- Indices de la tabla `users`
---
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
@@ -251,45 +221,24 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
---
--- AUTO_INCREMENT de la tabla `artistas`
---
 ALTER TABLE `artistas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
---
--- AUTO_INCREMENT de la tabla `intereses_artista`
---
 ALTER TABLE `intereses_artista`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
---
--- AUTO_INCREMENT de la tabla `noticias`
---
 ALTER TABLE `noticias`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
---
--- AUTO_INCREMENT de la tabla `publicaciones`
---
 ALTER TABLE `publicaciones`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
---
--- AUTO_INCREMENT de la tabla `site_content`
---
 ALTER TABLE `site_content`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
---
--- AUTO_INCREMENT de la tabla `system_logs`
---
 ALTER TABLE `system_logs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
---
--- AUTO_INCREMENT de la tabla `users`
---
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
@@ -297,26 +246,16 @@ ALTER TABLE `users`
 -- Restricciones para tablas volcadas
 --
 
---
--- Filtros para la tabla `intereses_artista`
---
 ALTER TABLE `intereses_artista`
   ADD CONSTRAINT `intereses_artista_ibfk_1` FOREIGN KEY (`artista_id`) REFERENCES `artistas` (`id`);
 
---
--- Filtros para la tabla `noticias`
---
 ALTER TABLE `noticias`
   ADD CONSTRAINT `noticias_ibfk_1` FOREIGN KEY (`editor_id`) REFERENCES `users` (`id`);
 
---
--- Filtros para la tabla `publicaciones`
---
 ALTER TABLE `publicaciones`
   ADD CONSTRAINT `publicaciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `artistas` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `publicaciones_ibfk_2` FOREIGN KEY (`validador_id`) REFERENCES `users` (`id`);
+
+SET FOREIGN_KEY_CHECKS=1;
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
