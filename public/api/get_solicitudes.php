@@ -1,22 +1,21 @@
 <?php
-ob_start();
-require_once __DIR__ . '/../../backend/config/connection.php'; 
-ob_end_clean();
-
 header('Content-Type: application/json');
+require_once __DIR__ . '/../../backend/config/connection.php';
 
 try {
-    // Consulta que une 'publicaciones' con 'artistas' para obtener el nombre del artista
+    // Consulta mejorada que une 'publicaciones' con 'artistas' para obtener todos los detalles necesarios.
     $stmt = $pdo->prepare("
         SELECT 
-            p.id, 
+            p.id AS publicacion_id, 
             p.titulo, 
-            p.fecha_envio_validacion, 
-            p.estado,
-            CONCAT(a.nombre, ' ', a.apellido) AS nombre_artista
+            p.fecha_envio_validacion,
+            a.id AS artista_id,
+            CONCAT(a.nombre, ' ', a.apellido) AS nombre_artista,
+            a.municipio -- Se añade el municipio
         FROM publicaciones p
         JOIN artistas a ON p.usuario_id = a.id
         WHERE p.estado = 'pendiente_validacion'
+        ORDER BY p.fecha_envio_validacion ASC
     ");
     
     $stmt->execute();
@@ -28,5 +27,4 @@ try {
     http_response_code(500);
     echo json_encode(['error' => 'Error al consultar la base de datos: ' . $e->getMessage()]);
 }
-exit;
 ?>

@@ -1,5 +1,3 @@
-/* Estilos súper optimizados para la página de login */
-
 .login-container {
   display: flex;
   align-items: center;
@@ -14,7 +12,11 @@
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   width: 100%;
-  /* 👇 CAMBIA ESTA LÍNEA 👇 */
-  max-width: 550px; /* Aumentamos el ancho para que se vea más robusto */
+  max-width: 450px; /* Un tamaño más estándar para login */
   border-top: 5px solid var(--color-primario);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.login-box:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 }
