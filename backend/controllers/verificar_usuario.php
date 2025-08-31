@@ -67,7 +67,7 @@ function checkUserCredentials($email, $password) {
                 $redirect = '/src/views/pages/validador/panel_validador.php';
                 break;
             case 'artista':
-                $redirect = '/src/views/pages/artista/dashboard-user.php';
+                $redirect = '/src/views/pages/artista/dashboard-artista.php';
                 break;
             default:
                 $redirect = '/src/views/pages/public/home.php'; // Asumiendo que home.php es la landing pública
