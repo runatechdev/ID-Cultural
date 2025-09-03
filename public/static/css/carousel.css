@@ -1,139 +1,149 @@
 :root {
-  /* --color-primario: #080b0c;       
-  --color-secundario: #F6F3EF;      
-  --color-acento: #0a0805;          
-  --color-arte-1: #fafcfd;          
-  --color-arte-2: #0a0a0a;          
-  --color-arte-3: #F6CCD7;          
-  --color-neutro: #D3DDE4;          
-  --color-texto-oscuro: #f6fcfb;    
-  --color-texto-claro: #ffffff;      */
-  --color-primario: #3B1F2B;         /* Terracota profundo, cálido y sofisticado */
---color-secundario: #F4EDE4;       /* Beige suave, ideal para fondos */
---color-acento: #798ec7;           /* Rojo ciruela, vibrante para botones o enlaces */
---color-arte-1: #FDF8F5;           /* Blanco cálido, para áreas artísticas o detalles */
---color-arte-2: #4e3653;           /* Gris carbón, para contraste gráfico */
---color-arte-3: #D8A7B1;           /* Rosa antiguo, elegante y expresivo */
---color-neutro: #C9D6DA;           /* Azul grisáceo, ideal para elementos secundarios */
---color-texto-oscuro: #ede3e3;     /* Marrón oscuro, legible y cálido */
---color-texto-claro: #d8ee91;      /* Blanco puro, para textos sobre fondos oscuros */
-
+  --color-primario: #3B1F2B;
+  --color-secundario: #F4EDE4;
+  --color-acento: #798ec7;
+  --color-arte-1: #FDF8F5;
+  --color-arte-2: #4e3653;
+  --color-arte-3: #D8A7B1;
+  --color-neutro: #C9D6DA;
+  --color-texto-oscuro: #ede3e3;
+  --color-texto-claro: #d8ee91;
   --fuente-principal: 'Segoe UI', sans-serif;
 
   /* Animaciones */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeImage {
-  from { opacity: 0; transform: scale(1.05); }
-  to { opacity: 1; transform: scale(1); }
-}
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
 
-/* Estructura global */
-body {
-  font-family: var(--fuente-principal);
-  background-color: var(--color-secundario);
-  color: var(--color-texto-oscuro);
-  margin: 0;
-  padding: 0;
-}
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-header {
-  background-color: var(--color-primario);
-  color: var(--color-texto-claro);
-  padding: 1rem;
-  text-align: center;
-}
+  @keyframes fadeImage {
+    from {
+      opacity: 0;
+      transform: scale(1.05);
+    }
 
-/* Diseño principal */
-main.wiki-layout {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0 10px;
-  gap: 10px;
-}
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
-.sidebar {
-  flex: 0 0 15%;
-  min-width: 180px;
-}
+  /* Estructura global */
+  body {
+    font-family: var(--fuente-principal);
+    background-color: var(--color-secundario);
+    color: var(--color-texto-oscuro);
+    margin: 0;
+    padding: 0;
+  }
 
-.main-content {
-  flex: 1;
-  min-width: 0;
-}
+  header {
+    background-color: var(--color-primario);
+    color: var(--color-texto-claro);
+    padding: 1rem;
+    text-align: center;
+  }
 
-/* Botones de categoría */
-.category-btn {
-  display: block;
-  width: 100%;
-  background-color: var(--color-acento);
-  color: var(--color-texto-claro);
-  border: none;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 10px;
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  position: relative;
-  overflow: hidden;
-  z-index: 0;
-}
+  /* Diseño principal */
+  main.wiki-layout {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 10px;
+    gap: 10px;
+  }
 
-.category-btn i {
-  margin-right: 8px;
-}
+  .sidebar {
+    flex: 0 0 15%;
+    min-width: 180px;
+  }
 
-.category-btn::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background-color: var(--color-arte-2);
-  z-index: -1;
-  transition: left 0.3s ease;
-}
+  .main-content {
+    flex: 1;
+    min-width: 0;
+  }
 
-.category-btn:hover {
-  transform: scale(1.03);
-  background-color: var(--color-arte-2);
-  color: var(--color-texto-oscuro);
-}
+  /* Botones de categoría */
+  .category-btn {
+    display: block;
+    width: 100%;
+    background-color: var(--color-acento);
+    color: var(--color-texto-claro);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+  }
 
-.category-btn:hover::after {
-  left: 0;
-}
+  .category-btn i {
+    margin-right: 8px;
+  }
 
-.search {
+  .category-btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-arte-2);
+    z-index: -1;
+    transition: left 0.3s ease;
+  }
+
+  .category-btn:hover {
+    transform: scale(1.03);
+    background-color: var(--color-arte-2);
+    color: var(--color-texto-oscuro);
+  }
+
+  .category-btn:hover::after {
+    left: 0;
+  }
+
+  .search {
     text-align: center;
     margin-bottom: 30px;
     padding: 20px;
     background-color: #f7f9fc;
     border-radius: 8px;
-}
+  }
 
-.search form {
+  .search form {
     display: flex;
     gap: 10px;
     justify-content: center;
-}
+  }
 
-.search input, .search select {
+  .search input,
+  .search select {
     padding: 10px;
     font-size: 1rem;
     border: 1px solid #ddd;
     border-radius: 4px;
-}
+  }
 
-.search input { flex-grow: 1; } /* El input de texto ocupa más espacio */
+  .search input {
+    flex-grow: 1;
+  }
 
-.search button {
+  /* El input de texto ocupa más espacio */
+
+  .search button {
     padding: 10px 20px;
     background-color: var(--color-primario);
     color: white;
@@ -141,204 +151,212 @@ main.wiki-layout {
     font-size: 1rem;
     cursor: pointer;
     border-radius: 4px;
-}
-
-h2 {
-  font-size: 2.5rem;
-  text-align: center;
-  color: var(--color-primario);
-  text-shadow: 0 0 10px rgba(241, 168, 93, 0.6), 
-               0 0 20px rgba(241, 168, 93, 0.5), 
-               0 0 30px rgba(241, 168, 93, 0.4);
-  animation: shimmer 3s infinite linear;
-}
-
-
-@keyframes shimmer {
-  0%   { text-shadow: 0 0 10px rgba(241, 168, 93, 0.4); }
-  50%  { text-shadow: 0 0 20px rgba(241, 168, 93, 0.7); }
-  100% { text-shadow: 0 0 10px rgba(241, 168, 93, 0.4); }
-}
-
-
-/* Títulos */
-.main-content h2 {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  text-align: center;
-  color: var(--color-primario);
-}
-
-.categoria h3 {
-  font-size: 1.5rem;
-  color: var(--color-acento);
-  margin-bottom: 15px;
-  border-bottom: 2px solid var(--color-arte-2);
-  padding-bottom: 5px;
-}
-
-/* Secciones de categoría */
-.categoria {
-  margin-bottom: 40px;
-  padding: 20px;
-  background-color: var(--color-primario);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-/* Tarjetas */
-.categoria .card {
-  display: flexbox;
-  gap: 20px;
-  align-items: center;
-  background-color: var(--color-acento);
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  padding: 15px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.categoria .card:hover {
-  transform: scale(1.01);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
-.categoria .card img {
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid var(--color-primario);
-}
-
-/* Información del artista */
-.card-info {
-  flex: 1;
-}
-
-.card-info h4 {
-  font-size: 1.2rem;
-  margin: 0 0 10px;
-  color: var(--color-primario);
-}
-
-.card-info p {
-  font-size: 0.95rem;
-  margin-bottom: 10px;
-  color: var(--color-texto-oscuro);
-}
-
-/* Botón biografía */
-.btn-biografia {
-  display: inline-block;
-  padding: 8px 16px;
-  background-color: var(--color-acento);
-  color: var(--color-texto-claro);
-  border-radius: 5px;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 0.85rem;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.btn-biografia:hover {
-  background-color: var(--color-primario);
-  transform: scale(1.05);
-}
-
-/* Carrusel */
-.carousel-img-wrapper {
-  width: 300px;
-  height: 300px;
-  overflow: hidden;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  border: 3px solid var(--color-primario); 
-}
-
-.carousel-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  animation: fadeImage 0.8s ease-in-out;
-}
-
-.carousel-item .d-flex {
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-/* Responsive */
-@media (max-width: 992px) {
-  main.wiki-layout {
-    flex-direction: column;
   }
 
-  .sidebar,
-  .main-content {
-    flex: 0 0 100%;
-    width: 100%;
+  h2 {
+    font-size: 2.5rem;
+    text-align: center;
+    color: var(--color-primario);
+    text-shadow: 0 0 10px rgba(241, 168, 93, 0.6),
+      0 0 20px rgba(241, 168, 93, 0.5),
+      0 0 30px rgba(241, 168, 93, 0.4);
+    animation: shimmer 3s infinite linear;
   }
 
-  .cards-container {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+
+  @keyframes shimmer {
+    0% {
+      text-shadow: 0 0 10px rgba(241, 168, 93, 0.4);
+    }
+
+    50% {
+      text-shadow: 0 0 20px rgba(241, 168, 93, 0.7);
+    }
+
+    100% {
+      text-shadow: 0 0 10px rgba(241, 168, 93, 0.4);
+    }
   }
 
-  .search form {
-    flex-direction: column;
-    gap: 10px;
+
+  /* Títulos */
+  .main-content h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+    color: var(--color-primario);
   }
 
-  .search input,
-  .search select,
-  .search button {
-    width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  main.wiki-layout {
-    margin: 20px;
+  .categoria h3 {
+    font-size: 1.5rem;
+    color: var(--color-acento);
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--color-arte-2);
+    padding-bottom: 5px;
   }
 
-  .carousel-img-wrapper {
-    max-width: 100%;
-    aspect-ratio: auto;
-    margin: 0 auto;
+  /* Secciones de categoría */
+  .categoria {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: var(--color-primario);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
-  .carousel-img {
+  /* Tarjetas */
+  .categoria .card {
+    display: flexbox;
+    gap: 20px;
+    align-items: center;
+    background-color: var(--color-acento);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    padding: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .categoria .card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .categoria .card img {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
     object-fit: cover;
-    height: auto;
+    border: 3px solid var(--color-primario);
   }
-}
 
-@media (max-width: 576px) {
+  /* Información del artista */
+  .card-info {
+    flex: 1;
+  }
+
   .card-info h4 {
-    font-size: 0.95rem;
+    font-size: 1.2rem;
+    margin: 0 0 10px;
+    color: var(--color-primario);
   }
 
   .card-info p {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    color: var(--color-texto-oscuro);
   }
 
+  /* Botón biografía */
   .btn-biografia {
-    font-size: 0.8rem;
-    padding: 6px 12px;
-  }
-
-  .search {
-    padding: 10px;
-  }
-
-  .category-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: var(--color-acento);
+    color: var(--color-texto-claro);
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
     font-size: 0.85rem;
-    padding: 0.6rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
   }
-}
+
+  .btn-biografia:hover {
+    background-color: var(--color-primario);
+    transform: scale(1.05);
+  }
+
+  /* Carrusel */
+  .carousel-img-wrapper {
+    width: 300px;
+    height: 300px;
+    overflow: hidden;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    border: 3px solid var(--color-primario);
+  }
+
+  .carousel-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: fadeImage 0.8s ease-in-out;
+  }
+
+  .carousel-item .d-flex {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  /* Responsive */
+  @media (max-width: 992px) {
+    main.wiki-layout {
+      flex-direction: column;
+    }
+
+    .sidebar,
+    .main-content {
+      flex: 0 0 100%;
+      width: 100%;
+    }
+
+    .cards-container {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+
+    .search form {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .search input,
+    .search select,
+    .search button {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    main.wiki-layout {
+      margin: 20px;
+    }
+
+    .carousel-img-wrapper {
+      max-width: 100%;
+      aspect-ratio: auto;
+      margin: 0 auto;
+    }
+
+    .carousel-img {
+      object-fit: cover;
+      height: auto;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .card-info h4 {
+      font-size: 0.95rem;
+    }
+
+    .card-info p {
+      font-size: 0.85rem;
+    }
+
+    .btn-biografia {
+      font-size: 0.8rem;
+      padding: 6px 12px;
+    }
+
+    .search {
+      padding: 10px;
+    }
+
+    .category-btn {
+      font-size: 0.85rem;
+      padding: 0.6rem;
+    }
+  }
 
 }
 
@@ -367,6 +385,7 @@ h2 {
   gap: 10px;
 }
 
-h3 , p{
+h3,
+p {
   color: brown;
 }
