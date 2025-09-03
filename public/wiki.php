@@ -14,11 +14,12 @@
   <!-- SweetAlert2 + Animaciones -->
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
-  <!-- Estilos personalizados -->
+  
+  <!-- 
   <link rel="stylesheet" href="/static/css/main.css" />
   <link rel="stylesheet" href="/static/css/wiki.css" />
-  <link rel="stylesheet" href="/static/css/carousel.css" /> <!-- Estilo específico de la Biblioteca Digital -->
+  <link rel="stylesheet" href="/static/css/carousel.css" />
+  Estilos personalizados -->
 </head>
 
 <body>
