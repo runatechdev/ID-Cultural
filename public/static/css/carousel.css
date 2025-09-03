@@ -1,5 +1,5 @@
 :root {
-  --color-primario: #080b0c;       
+  /* --color-primario: #080b0c;       
   --color-secundario: #F6F3EF;      
   --color-acento: #0a0805;          
   --color-arte-1: #fafcfd;          
@@ -7,7 +7,17 @@
   --color-arte-3: #F6CCD7;          
   --color-neutro: #D3DDE4;          
   --color-texto-oscuro: #f6fcfb;    
-  --color-texto-claro: #ffffff;     
+  --color-texto-claro: #ffffff;      */
+  --color-primario: #3B1F2B;         /* Terracota profundo, cálido y sofisticado */
+--color-secundario: #F4EDE4;       /* Beige suave, ideal para fondos */
+--color-acento: #798ec7;           /* Rojo ciruela, vibrante para botones o enlaces */
+--color-arte-1: #FDF8F5;           /* Blanco cálido, para áreas artísticas o detalles */
+--color-arte-2: #4e3653;           /* Gris carbón, para contraste gráfico */
+--color-arte-3: #D8A7B1;           /* Rosa antiguo, elegante y expresivo */
+--color-neutro: #C9D6DA;           /* Azul grisáceo, ideal para elementos secundarios */
+--color-texto-oscuro: #ede3e3;     /* Marrón oscuro, legible y cálido */
+--color-texto-claro: #d8ee91;      /* Blanco puro, para textos sobre fondos oscuros */
+
   --fuente-principal: 'Segoe UI', sans-serif;
 
   /* Animaciones */
@@ -181,7 +191,7 @@ h2 {
   display: flexbox;
   gap: 20px;
   align-items: center;
-  background-color: var(--color-secundario);
+  background-color: var(--color-acento);
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
   padding: 15px;
