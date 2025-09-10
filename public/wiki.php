@@ -8,97 +8,161 @@ include(__DIR__ . '/../components/header.php');
 
 <body>
 
-  <?php
-  include __DIR__ . '/../components/navbar.php';
-  ?>
+    <?php include __DIR__ . '/../components/navbar.php'; ?>
 
-    <!-- Contenido Principal -->
-    <main>
-        <img src="/static/img/portada.png" alt="Logo Santiago del Estero">
+    <main class="container my-5">
 
-        <!-- Búsqueda -->
-        <div class="search">
-            <h2>Buscar en la Biblioteca</h2>
+        <section class="text-center mb-5">
+            <h1 class="display-5 fw-bold">Bienvenidos a la Wiki de Artistas</h1>
+            <p class="lead text-muted">La biblioteca digital de los artistas locales de Santiago del Estero.</p>
+        </section>
+        <section class="search-section card p-4 mb-5 shadow-sm">
+            <h2 class="text-center mb-4">Buscar en la Biblioteca</h2>
             <form id="form-busqueda" action="#" method="get">
-                <input type="text" placeholder="Buscar por nombre o palabra clave..." name="search" id="search" required>
+                <div class="input-group input-group-lg">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Buscar por nombre o palabra clave..." name="search" id="search" required>
 
-                <select name="categoria" id="categoria">
-                    <option value="">Todas las categorías</option>
-                    <option value="Artesania">Artesania</option>
-                    <option value="Audiovisual">Audiovisual</option>
-                    <option value="Danza">Danza</option>
-                    <option value="Teatro">Teatro</option>
-                    <option value="Musica">Musica</option>
-                    <option value="Literatura">Literatura</option>
-                    <option value="Escultura">Escultura</option>
-                    <!-- Podés agregar más categorías según los datos que tengas -->
-                </select>
-
-                <button type="submit">Buscar</button>
+                    <select name="categoria" id="categoria" class="form-select" style="max-width: 200px;">
+                        <option value="">Categorías</option>
+                        <option value="Artesania">Artesanía</option>
+                        <option value="Audiovisual">Audiovisual</option>
+                        <option value="Danza">Danza</option>
+                        <option value="Teatro">Teatro</option>
+                        <option value="Musica">Música</option>
+                        <option value="Literatura">Literatura</option>
+                        <option value="Escultura">Escultura</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </div>
             </form>
-        </div>
+        </section>
 
-
-        <div class="container">
-            <aside class="sidebar">
-                <h2>🎨 Artistas Famosos</h2>
-
-                <div class="famoso">
-                    <img src="/static/img/merce.jpg" alt="Mercedes Sosa">
-                    <h4>Mercedes Sosa</h4>
-                    <p>Cantante y referente del folklore argentino.</p>
-                </div>
-
-                <div class="famoso">
-                    <img src="/static/img/berni.jpg" alt="Antonio Berni">
-                    <h4>Antonio Berni</h4>
-                    <p>Pintor y grabador destacado por su arte social.</p>
-                </div>
-            </aside>
-
-            <!-- Sección Dinámica por Categorías -->
-            <section class="main-content" id="biografias">
-                <h2>Artistas Registrados</h2>
-
-                <div class="categoria" data-category="Música">
-                    <h3>Música</h3>
-                    <div class="card">
-                        <img src="/static/img/juanperez.jpg" alt="Juan Pérez">
-                        <div class="card-info">
-                            <h4>Juan Pérez</h4>
-                            <p>Guitarrista y compositor de música folclórica.</p>
-                            <a href="#" class="btn-biografia">Leer Biografía Completa</a>
+        <section class="mb-5">
+            <h2 class="mb-4 section-title">Artistas Destacados</h2>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                <div class="col">
+                    <div class="card h-100 text-center artist-card border-0">
+                        <img src="/static/img/merce.jpg" class="card-img-top" alt="Mercedes Sosa">
+                        <div class="card-body">
+                            <h5 class="card-title">Mercedes Sosa</h5>
+                            <p class="card-text">Cantante de folklore y referente cultural.</p>
                         </div>
                     </div>
-                </div> <!-- 👈 Cerrás la categoría Música -->
-
-                <div class="categoria" data-category="Literatura">
-                    <h3>Literatura</h3>
-                    <div class="card">
-                        <img src="/static/img/dem.jpg" alt="María González">
-                        <div class="card-info">
-                            <h4>María González</h4>
-                            <p>Escritora y poeta contemporánea.</p>
-                            <a href="#" class="btn-biografia">Leer Biografía Completa</a>
+                </div>
+                <div class="col">
+                    <div class="card h-100 text-center artist-card border-0">
+                        <img src="/static/img/nocheros.jpg" class="card-img-top" alt="Los Nocheros">
+                        <div class="card-body">
+                            <h5 class="card-title">Los Nocheros</h5>
+                            <p class="card-text">Grupo de folklore muy popular en Argentina.</p>
                         </div>
                     </div>
-                </div> <!-- 👈 Cerrás la categoría Literatura -->
-            </section>
+                </div>
+                <div class="col">
+                    <div class="card h-100 text-center artist-card border-0">
+                        <img src="/static/img/chaqueno.jpg" class="card-img-top" alt="El Chaqueño Palavecino">
+                        <div class="card-body">
+                            <h5 class="card-title">El Chaqueño Palavecino</h5>
+                            <p class="card-text">Cantante de folklore reconocido nacionalmente.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 text-center artist-card border-0">
+                        <img src="/static/img/abel.jpg" class="card-img-top" alt="Abel Pintos">
+                        <div class="card-body">
+                            <h5 class="card-title">Abel Pintos</h5>
+                            <p class="card-text">Cantautor con fuerte influencia del folklore.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="biografias">
+            <h2 class="mb-4 section-title">Artistas Registrados</h2>
+            <div class="accordion" id="accordionArtistas">
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingMusica">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMusica" aria-expanded="true" aria-controls="collapseMusica">
+                            Música
+                        </button>
+                    </h2>
+                    <div id="collapseMusica" class="accordion-collapse collapse show" aria-labelledby="headingMusica" data-bs-parent="#accordionArtistas">
+                        <div class="accordion-body">
+
+                            <div class="card artist-list-card mb-3">
+                                <div class="row g-0">
+                                    <div class="col-md-3">
+                                        <img src="/static/img/juanperez.jpg" class="img-fluid rounded-start" alt="Juan Pérez">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Juan Pérez</h5>
+                                            <p class="card-text">Guitarrista y compositor de música folclórica.</p>
+                                            <a href="#" class="btn btn-outline-primary">Leer Biografía Completa</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card artist-list-card mb-3">
+                                <div class="row g-0">
+                                    <div class="col-md-3">
+                                        <img src="/static/img/froilan.jpg" class="img-fluid rounded-start" alt="Froilán Gonzales">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Froilán Gonzales</h5>
+                                            <p class="card-text">Luthier santiagueño reconocido como 'El Indio Froilán', creador de bombos legüeros emblemáticos.</p>
+                                            <a href="#" class="btn btn-outline-primary">Leer Biografía Completa</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingLiteratura">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLiteratura" aria-expanded="false" aria-controls="collapseLiteratura">
+                            Literatura
+                        </button>
+                    </h2>
+                    <div id="collapseLiteratura" class="accordion-collapse collapse" aria-labelledby="headingLiteratura" data-bs-parent="#accordionArtistas">
+                        <div class="accordion-body">
+
+                            <div class="card artist-list-card mb-3">
+                                <div class="row g-0">
+                                    <div class="col-md-3">
+                                        <img src="/static/img/dem.jpg" class="img-fluid rounded-start" alt="María González">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="card-body">
+                                            <h5 class="card-title">María González</h5>
+                                            <p class="card-text">Escritora y poeta contemporánea.</p>
+                                            <a href="#" class="btn btn-outline-primary">Leer Biografía Completa</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
 
     </main>
-    </div>
 
-    <!-- Footer -->
     <?php include("../components/footer.php"); ?>
 
-
-    <script src="/static/js/main.js"></script>
-    <script src="/static/js/navbar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
-
-
-
 </body>
 
 </html>
