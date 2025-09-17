@@ -73,7 +73,7 @@ include(__DIR__ . '/../components/header.php');
       </div>
       <p class="h5 mt-3"><em><?php echo htmlspecialchars($site_content['welcome_slogan'] ?? 'La identidad de un pueblo, en un solo lugar.'); ?></em></p>
     </section>
-
+    
     <section class="container my-5">
       <h2 class="text-center display-5 mb-4">Últimas Noticias</h2>
       <div id="contenedor-noticias" class="row g-4">

@@ -1,5 +1,5 @@
 /* ============================================= */
-/* ESTILOS GLOBALES (main.css)                   */
+/* ESTILOS GLOBALES (main.css) - VERSIÓN CORREGIDA */
 /* ============================================= */
 
 /* Importación de Fuentes Globales */
@@ -40,15 +40,12 @@ html {
   overflow-y: scroll;
 }
 
-/* En main.css */
 header {
-  /* Estos estilos ya los tenías y están correctos */
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: linear-gradient(to left, #C30135, #00A0E5);
-  /* Este es el degradado */
-  padding: 10px 30px;
+  padding: 20px 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -65,7 +62,6 @@ body {
 
 main {
   flex-grow: 1;
-  /* Esto empuja el footer hacia abajo */
 }
 
 .container {
@@ -140,7 +136,6 @@ main {
   object-fit: cover;
 }
 
-/* Animación Quichua */
 .quichua-hover:hover::before {
   content: "¿Qué puedes hacer ";
   color: black;
@@ -153,9 +148,9 @@ main {
   transition: all 0.3s ease;
 }
 
-/* Sección de Noticias en la Home */
+/* --- SECCIÓN DE NOTICIAS CORREGIDA --- */
 .noticias-home {
-  max-width: 900px;
+  max-width: 1200px; /* Ampliado para que quepan 3 tarjetas */
   margin: 30px auto;
   padding: 20px;
   background: #fff;
@@ -169,19 +164,24 @@ main {
   text-align: center;
 }
 
-#contenedor-noticias {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  max-width: 800px;
-  margin: 0 auto;
-}
+/* DEJAMOS QUE BOOTSTRAP (.row) MANEJE EL CONTENEDOR */
+/* Se elimina el #contenedor-noticias conflictivo */
 
 .noticia-card {
   background: #fff;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  /* === CAMBIO CLAVE === */
+  height: 100%; /* Para que todas las tarjetas en una fila tengan la misma altura */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.noticia-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .noticia-card img {
@@ -190,6 +190,10 @@ main {
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 15px;
+}
+
+.noticia-card h3 {
+    margin-top: 0;
 }
 
 /* --------------------------------------------- */
@@ -202,7 +206,6 @@ footer {
   text-align: center;
   padding: 15px 0;
   margin-top: auto;
-  /* Clave para el sticky footer */
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -252,18 +255,19 @@ footer p {
   }
 }
 
-/* Estilo para el botón 'Crear Cuenta' en la barra de navegación */
 .navbar .btn-light {
   background-color: var(--color-arte-2);
-  /* El amarillo vibrante de tu paleta */
   color: var(--color-texto-oscuro);
   border: none;
-  /* O un borde personalizado si lo prefieres */
   font-weight: bold;
 }
 
 .navbar .btn-light:hover {
   background-color: #e6b23c;
-  /* Un tono de amarillo más oscuro para el hover */
   color: var(--color-texto-oscuro);
+}
+
+.navbar {
+  padding-top: 15px !important;    /* Ajusta este valor para más/menos altura */
+  padding-bottom: 15px !important; /* Ajusta este valor para más/menos altura */
 }
