@@ -5,7 +5,11 @@
   <header class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container d-flex align-items-center justify-content-between">
 
-      <h4 class="m-0 text-white fw-bold text-left flex-grow-1">ID Cultural</h4>
+      <div class="d-flex align-items-center flex-grow-1">
+  <img src="<?php echo BASE_URL; ?>static/img/logo-cultura.png" alt="Logo ID Cultural" class="logo-idcultural me-2" width="40" height="auto">
+  <h4 class="m-0 text-white fw-bold">ID Cultural</h4>
+</div>
+
 
       <div>
         <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
