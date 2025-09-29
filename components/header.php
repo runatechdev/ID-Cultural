@@ -37,4 +37,32 @@ $page_title = $page_title ?? 'ID Cultural';
             <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/<?php echo htmlspecialchars($css_file); ?>" />
         <?php endforeach; ?>
     <?php endif; ?>
+
+    <!-- Google Translate Widget -->
+<div id="google_translate_element" style="display: none;"></div>
+
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'es',
+      includedLanguages: 'en,fr,it,de,pt',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  }
+</script>
+
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const translateBtn = document.getElementById('translate-btn');
+    if (translateBtn) {
+      translateBtn.addEventListener('click', function () {
+        const widget = document.getElementById('google_translate_element');
+        if (widget) widget.style.display = 'block';
+      });
+    }
+  });
+</script>
+
 </head>

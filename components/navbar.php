@@ -14,6 +14,13 @@
       <nav class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center">
           
+        <!-- Botón de traducción -->
+<li class="nav-item">
+  <button class="btn btn-link nav-link" id="translate-btn" aria-label="Traducir página">
+    <i class="bi bi-translate"></i> Traducir
+  </button>
+</li>
+
           <li class="nav-item"><a class="nav-link" href="/index.php">Inicio</a></li>
 
           <!-- Botón de Búsqueda -->
