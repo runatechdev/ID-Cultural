@@ -271,3 +271,25 @@ footer p {
   padding-top: 15px !important;    /* Ajusta este valor para más/menos altura */
   padding-bottom: 15px !important; /* Ajusta este valor para más/menos altura */
 }
+.footer-zigzag {
+    overflow: hidden;
+    line-height: 0;
+    margin-bottom: -1px; /* Para que se una bien al footer */
+}
+.navbar {
+  background: linear-gradient(to right, #00BFFF, #32CD32, #FFD700, #FF8C00, #FF1493);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-crear-cuenta {
+  background-color: #FF1493;
+  color: white;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border: none;
+}
+
+.btn-crear-cuenta:hover {
+  background-color: #FF8C00;
+}
