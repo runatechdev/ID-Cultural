@@ -14,12 +14,55 @@
       <nav class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center">
           
-        <!-- Botón de traducción -->
-<li class="nav-item">
-  <button class="btn btn-link nav-link" id="translate-btn" aria-label="Traducir página">
-    <i class="bi bi-translate"></i> Traducir
-  </button>
-</li>
+        <!-- Botón de traducción 
+        <li class="nav-item">
+          <button class="btn btn-link nav-link" id="translate-btn" aria-label="Traducir página">
+            <i class="bi bi-translate"></i> Traducir
+          </button>
+          -->
+        </li>
+
+           <!-- Google Translate Widget -->
+<div id="google_translate_element" ></div>
+
+<!-- style="display: none;" -->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'es',
+      includedLanguages: 'en,fr,it,de,pt',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  }
+</script>
+
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const translateBtn = document.getElementById('translate-btn');
+    if (translateBtn) {
+      translateBtn.addEventListener('click', function () {
+        const widget = document.getElementById('google_translate_element');
+        if (widget) widget.style.display = 'block';
+      });
+    }
+  });
+</script>
+
+<!-- <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const translateBtn = document.getElementById('translate-btn');
+    translateBtn.addEventListener('click', function () {
+      const select = document.querySelector('.goog-te-combo');
+      if (select) {
+        select.value = 'en'; // Cambia 'en' por el idioma deseado
+        select.dispatchEvent(new Event('change'));
+      }
+    });
+  });
+</script> -->
+
 
           <li class="nav-item"><a class="nav-link" href="/index.php">Inicio</a></li>
 
