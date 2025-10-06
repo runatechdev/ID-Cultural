@@ -12,8 +12,9 @@ include(__DIR__ . '/../../../../../components/header.php');
   <main class="login-container">
     <div class="login-box">
       <div class="text-center mb-4">
-        <i class="bi bi-person-circle display-1 text-primary"></i>
+        <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="Huella ID Cultural" class="logo-huella-login">
       </div>
+
       <h2 class="mb-4 text-center">Iniciar Sesión</h2>
 
       <form id="loginForm" novalidate>

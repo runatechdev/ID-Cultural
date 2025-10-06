@@ -200,30 +200,59 @@ main {
 /* Estilos Globales del Footer                   */
 /* --------------------------------------------- */
 
-footer {
-  background-color: #265e70;
-  color: #ffffff;
+/* --------------------------------------------- */
+/* Estilos Globales del Footer                   */
+/* --------------------------------------------- */
+
+/*footer,
+footer.footer,
+body footer,
+body footer.footer {
+   background: linear-gradient(to right, #00BFFF 0%, #32CD32 20%, #FFD700 40%, #FF8C00 60%, #FF1493 80%);
+  
+  background-color: transparent !important;
+  color: white !important;
   text-align: center;
-  padding: 15px 0;
-  margin-top: auto;
-  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px 0 !important;
+  margin-top: auto !important;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1) !important;
+}
+*/
+.footer-content h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white !important;
 }
 
-footer p {
-  margin: 0;
+.footer-content p {
+  margin: 5px 0 15px 0;
+  font-size: 0.9rem;
+  color: white !important;
+}
+
+footer p,
+footer .copyright {
+  margin: 10px 0 0 0;
   font-size: 14px;
+  color: white !important;
+}
+
+.copyright img {
+  vertical-align: middle;
+  margin-right: 8px;
 }
 
 .footer-links {
   display: flex;
   gap: 15px;
-  margin-top: 10px;
+  margin: 15px 0;
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .footer-links a {
-  color: #ffffff;
+  color: #ffffff !important;
   text-decoration: none;
   font-weight: bold;
   font-size: 14px;
@@ -232,9 +261,8 @@ footer p {
 
 .footer-links a:hover {
   text-decoration: underline;
-  color: var(--color-acento);
+  color: #FFD700 !important;
 }
-
 /* --------------------------------------------- */
 /* Media Queries para Diseño Responsivo          */
 /* --------------------------------------------- */
@@ -271,11 +299,8 @@ footer p {
   padding-top: 15px !important;    /* Ajusta este valor para más/menos altura */
   padding-bottom: 15px !important; /* Ajusta este valor para más/menos altura */
 }
-.footer-zigzag {
-    overflow: hidden;
-    line-height: 0;
-    margin-bottom: -1px; /* Para que se una bien al footer */
-}
+
+
 .navbar {
   background: linear-gradient(to right, #00BFFF, #32CD32, #FFD700, #FF8C00, #FF1493);
   color: white;
@@ -304,4 +329,24 @@ footer p {
 @keyframes fadeInLogo {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
+}
+.footer-zigzag {
+  width: 100%;
+  height: 100px;
+  overflow: hidden;
+  margin-bottom: -1px; /* Elimina la línea divisoria */
+}
+
+.zigzag-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.footer {
+  background: linear-gradient(to right, #00BFFF 0%, #32CD32 20%, #FFD700 40%, #FF8C00 60%, #FF1493 80%);
+  color: white;
+  padding: 20px;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
 }

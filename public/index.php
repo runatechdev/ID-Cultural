@@ -67,7 +67,7 @@ include(__DIR__ . '/../components/header.php');
 
     <!-- --- 4. USAR DATOS DINÁMICOS EN LA BIENVENIDA --- -->
     <section class="container text-center welcome-section">
-    <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="Huella ID Cultural" class="huella-idcultural mb-4" width="150" height="auto">
+    <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="Huella ID Cultural" class="huella-idcultural mb-4" width="200" height="auto">
   
     <h1 class="display-4"><?php echo htmlspecialchars($site_content['welcome_title'] ?? 'Bienvenidos a ID Cultural'); ?></h1>
       <div class="lead col-lg-8 mx-auto">

@@ -6,7 +6,7 @@
     <div class="container d-flex align-items-center justify-content-between">
 
       <div class="d-flex align-items-center flex-grow-1">
-  <img src="<?php echo BASE_URL; ?>static/img/logo-cultura.png" alt="Logo ID Cultural" class="logo-idcultural me-2" width="40" height="auto">
+  <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="Logo ID Cultural" class="logo-idcultural me-2" width="40" height="auto">
   <h4 class="m-0 text-white fw-bold">ID Cultural</h4>
 </div>
 
