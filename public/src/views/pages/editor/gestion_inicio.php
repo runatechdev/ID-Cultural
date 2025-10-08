@@ -36,16 +36,16 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <!-- Sección de Bienvenida -->
                     <h4 class="mb-3">Sección de Bienvenida</h4>
                     <div class="mb-3">
-                        <label for="welcome_title" class="form-label">Título Principal</label>
-                        <input type="text" class="form-control" id="welcome_title">
+                        <label class="form-label">Título Principal</label>
+                        <div id="editor_welcome_title" style="height: 100px;"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="welcome_paragraph" class="form-label">Párrafo de Bienvenida</label>
-                        <textarea class="form-control" id="welcome_paragraph" rows="4"></textarea>
+                        <label class="form-label">Párrafo de Bienvenida</label>
+                        <div id="editor_welcome_paragraph" style="height: 150px;"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="welcome_slogan" class="form-label">Eslogan</label>
-                        <input type="text" class="form-control" id="welcome_slogan">
+                        <label class="form-label">Eslogan</label>
+                        <div id="editor_welcome_slogan" style="height: 100px;"></div>
                     </div>
 
                     <hr class="my-4">
@@ -74,36 +74,93 @@ include(__DIR__ . '/../../../../../components/header.php');
     </main>
 
     <?php include(__DIR__ . '/../../../../../components/footer.php'); ?>
-    
+
+    <!-- Quill Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <style>
+      .ql-snow .ql-picker.ql-font .ql-picker-label::before,
+      .ql-snow .ql-picker.ql-font .ql-picker-item::before {
+        content: attr(data-label);
+        font-family: inherit;
+      }
+    </style>
+    <script>
+        const Font = Quill.import('formats/font');
+        Font.whitelist = ['sans-serif', 'serif', 'monospace', 'arial', 'times-new-roman', 'courier-new'];
+        Quill.register(Font, true);
+
+        const quillTitle = new Quill('#editor_welcome_title', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ font: Font.whitelist }],
+                    [{ size: ['small', false, 'large', 'huge'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ color: [] }, { background: [] }],
+                    [{ align: [] }],
+                    ['clean']
+                ]
+            }
+        });
+
+        const quillParagraph = new Quill('#editor_welcome_paragraph', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ font: Font.whitelist }],
+                    [{ size: ['small', false, 'large', 'huge'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ color: [] }, { background: [] }],
+                    [{ align: [] }],
+                    ['blockquote', 'code-block'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        const quillSlogan = new Quill('#editor_welcome_slogan', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ font: Font.whitelist }],
+                    [{ size: ['small', false, 'large', 'huge'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ color: [] }, { background: [] }],
+                    [{ align: [] }],
+                    ['clean']
+                ]
+            }
+        });
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('form-edit-inicio');
 
-            // Cargar datos actuales en el formulario
             async function cargarContenido() {
                 try {
                     const response = await fetch('<?php echo BASE_URL; ?>api/get_site_content.php');
                     const content = await response.json();
-                    
-                    document.getElementById('welcome_title').value = content.welcome_title || '';
-                    document.getElementById('welcome_paragraph').value = content.welcome_paragraph || '';
-                    document.getElementById('welcome_slogan').value = content.welcome_slogan || '';
-                    // Aquí podrías mostrar una vista previa de las imágenes actuales
+
+                    quillTitle.root.innerHTML = content.welcome_title || '';
+                    quillParagraph.root.innerHTML = content.welcome_paragraph || '';
+                    quillSlogan.root.innerHTML = content.welcome_slogan || '';
                 } catch (error) {
                     Swal.fire('Error', 'No se pudo cargar el contenido actual.', 'error');
                 }
             }
 
-            // Enviar formulario para guardar cambios
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData(form);
-                // Añadir los campos de texto al FormData
-                formData.append('welcome_title', document.getElementById('welcome_title').value);
-                formData.append('welcome_paragraph', document.getElementById('welcome_paragraph').value);
-                formData.append('welcome_slogan', document.getElementById('welcome_slogan').value);
+                formData.append('welcome_title', quillTitle.root.innerHTML);
+                formData.append('welcome_paragraph', quillParagraph.root.innerHTML);
+                formData.append('welcome_slogan', quillSlogan.root.innerHTML);
 
                 try {
                     const response = await fetch('<?php echo BASE_URL; ?>api/update_site_content.php', {
