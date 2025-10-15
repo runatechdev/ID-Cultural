@@ -3,6 +3,22 @@
 /* ================================================= */
 
 /* Estilo del Banner Principal */
+:root {
+    --color-azul: #00BFFF;
+    --color-rosa: #FF1493;
+    --color-amarillo: #FFD700;
+    --color-cian: #00FFFF;
+    --color-negro: #000000;
+    --color-blanco: #FFFFFF;
+
+    /* Aplicaciones base */
+    --color-primario: var(--color-azul);
+    --color-secundario: var(--color-cian);
+    --color-acento: var(--color-rosa);
+    --color-texto-oscuro: var(--color-negro);
+}
+
+
 .banner {
     width: 100%;
     height: auto;
@@ -104,3 +120,26 @@
     object-fit: cover;
     max-height: 150px;
 }
+.section-title {
+    background: linear-gradient(90deg, var(--color-azul), var(--color-rosa), var(--color-cian));
+    border-bottom: 3px solid var(--color-amarillo);
+}
+.accordion-button {
+    background-color: var(--color-cian);
+    color: var(--color-texto-oscuro);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+}
+.btn-primary {
+    background-color: var(--color-primario);
+    border-color: var(--color-primario);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-acento);
+    border-color: var(--color-acento);
+}
+
