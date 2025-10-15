@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_data']) || !in_array($_SESSION['user_data']['role'], 
 // --- Variables para el header ---
 $page_title = "Panel de Editor";
 // ===== LA CORRECCIÓN ESTÁ AQUÍ =====
-$specific_css_files = ['dashboard.css', 'dashboard-adm.css'];
+$specific_css_files = ['panel_editor.css'];
 $nombre_editor = $_SESSION['user_data']['nombre'] ?? 'Editor';
 
 // --- Incluir la cabecera ---

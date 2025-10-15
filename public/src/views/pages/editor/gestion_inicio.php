@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_data']) || !in_array($_SESSION['user_data']['role'], 
 
 // --- Variables para el header ---
 $page_title = "Editar Página Principal";
-$specific_css_files = ['dashboard.css'];
+$specific_css_files = ['gestion_inicio.css'];
 
 // --- Incluir la cabecera ---
 include(__DIR__ . '/../../../../../components/header.php');
