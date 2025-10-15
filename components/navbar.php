@@ -87,15 +87,14 @@
 </svg>-->
 
 
-  <!-- Estructura de la ventana de búsqueda (sin cambios) -->
-  <div id="search-overlay" class="search-overlay">
-    <button id="close-search-btn" class="btn-close-search" aria-label="Cerrar búsqueda">&times;</button>
-    <div class="search-overlay-content">
-      <form id="search-form" action="/search.php" method="get">
-        <input type="search" name="q" class="form-control-search" placeholder="Buscar artistas, obras, eventos..." autofocus>
-        <button type="submit" class="btn-search-submit" aria-label="Buscar">
-          <i class="bi bi-search"></i>
-        </button>
-      </form>
-    </div>
+<!-- Estructura de la ventana de búsqueda (sin cambios) -->
+<div id="search-overlay" class="search-overlay">
+  <button id="close-search-btn" class="btn-close-search" aria-label="Cerrar búsqueda">&times;</button>
+  <div class="search-overlay-content">
+    <form id="search-form" action="/busqueda.php" method="get">
+      <input type="search" name="q" class="form-control-search" placeholder="Buscar artistas, obras, eventos..." autofocus>
+      <button type="submit" class="btn-search-submit" aria-label="Buscar">
+        <i class="bi bi-search"></i>
+      </button>
+    </form>
   </div>
