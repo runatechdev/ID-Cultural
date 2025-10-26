@@ -143,3 +143,101 @@
     border-color: var(--color-acento);
 }
 
+/* ==== ESTILO GEOMÉTRICO COLORIDO ==== */
+
+body {
+  background-color: #ffffff;
+}
+
+/* Patrón geométrico como fondo decorativo */
+.wiki-bg {
+  background: linear-gradient(135deg, #00BFFF 0%, #32CD32 25%, #FFD700 50%, #FF8C00 75%, #FF1493 100%);
+  -webkit-mask-image: url('/static/img/pattern.svg');
+  -webkit-mask-repeat: repeat;
+  -webkit-mask-size: 200px;
+  mask-image: url('/static/img/pattern.svg');
+  mask-repeat: repeat;
+  mask-size: 200px;
+  opacity: 0.1;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+}
+
+/* Contenedor principal */
+.container {
+  position: relative;
+  z-index: 2;
+}
+
+/* Títulos */
+.section-title {
+  color: #003366;
+  font-weight: 700;
+  border-left: 6px solid #FF8C00;
+  padding-left: 10px;
+}
+
+/* Tarjetas de artistas */
+.artist-card img {
+  border-radius: 16px;
+}
+
+.artist-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #ffffff;
+}
+
+.artist-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Botones */
+.btn-primary {
+  background: linear-gradient(45deg, #FF8C00, #FF1493);
+  border: none;
+}
+
+.btn-outline-primary {
+  border-color: #00BFFF;
+  color: #00BFFF;
+}
+
+.btn-outline-primary:hover {
+  background-color: #00BFFF;
+  color: white;
+}
+/* ==== FONDO GEOMÉTRICO COLORIDO ==== */
+body {
+  position: relative;
+  background-color: #fff;
+  overflow-x: hidden;
+}
+
+/* Capa del patrón */
+.wiki-pattern {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: url('/static/img/pattern.png');
+  background-repeat: repeat;
+  background-size: 400px;
+  opacity: 0.12; /* sutil para no distraer */
+  z-index: 0;
+}
+
+/* Asegura que el contenido quede por encima */
+main.container {
+  position: relative;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}

@@ -9,13 +9,15 @@ include(__DIR__ . '/../components/header.php');
 <body>
 
     <?php include __DIR__ . '/../components/navbar.php'; ?>
-
+    
+  
     <main class="container my-5">
-
+    <div class="wiki-pattern"></div>
         <section class="text-center mb-5">
             <h1 class="display-5 fw-bold">Bienvenidos a la Wiki de Artistas</h1>
             <p class="lead text-muted">La biblioteca digital de los artistas locales de Santiago del Estero.</p>
         </section>
+        
         <section class="search-section card p-4 mb-5 shadow-sm">
             <h2 class="text-center mb-4">Buscar en la Biblioteca</h2>
             <form id="form-busqueda" action="#" method="get">
