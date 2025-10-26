@@ -1,72 +1,73 @@
-// Datos simulados — luego reemplazá con datos desde PHP
-const artistasPendientes = [
-  {
-    nombre: "Lucía Gómez",
-    disciplina: "Música",
-    localidad: "La Banda",
-    estado: "Pendiente"
-  },
-  {
-    nombre: "Carlos Ruiz",
-    disciplina: "Pintura",
-    localidad: "Termas de Río Hondo",
-    estado: "Pendiente"
-  }
-];
+/**
+ * JavaScript para Panel del Validador
+ * Archivo: /static/js/panel_validador.js
+ */
 
-const tabla = document.querySelector("#tabla-artistas tbody");
-
-artistasPendientes.forEach((artista, index) => {
-  const fila = document.createElement("tr");
-
-  fila.innerHTML = `
-    <td>${artista.nombre}</td>
-    <td>${artista.disciplina}</td>
-    <td>${artista.localidad}</td>
-    <td>${artista.estado}</td>
-    <td>
-      <button class="btn details">Ver</button>
-      <button class="btn approve">Aprobar</button>
-      <button class="btn reject btn-reject">Rechazar</button>
-    </td>
-    <td class="motivo-rechazo">—</td>
-  `;
-
-  tabla.appendChild(fila);
+document.addEventListener('DOMContentLoaded', function() {
+    cargarEstadisticas();
+    
+    // Actualizar estadísticas cada 30 segundos
+    setInterval(cargarEstadisticas, 30000);
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const botonesRechazo = document.querySelectorAll(".btn-reject");
-  const modal = document.getElementById("modal-rechazo");
-  const textarea = document.getElementById("input-motivo");
-  const btnCancelar = document.getElementById("btn-cancelar");
-  const btnConfirmar = document.getElementById("btn-confirmar");
-
-  let artistaActual = null;
-  let filaActual = null;
-
-  botonesRechazo.forEach((boton, index) => {
-    boton.addEventListener("click", () => {
-      artistaActual = artistasPendientes[index];
-      filaActual = tabla.rows[index];
-      textarea.value = "";
-      modal.classList.remove("hidden");
-    });
-  });
-
-  btnCancelar.addEventListener("click", () => {
-    modal.classList.add("hidden");
-  });
-
-  btnConfirmar.addEventListener("click", () => {
-    const motivo = textarea.value.trim();
-    if (motivo !== "") {
-      const celdaMotivo = filaActual.querySelector(".motivo-rechazo");
-      celdaMotivo.textContent = motivo;
-      alert(`Motivo guardado para ${artistaActual.nombre}:\n"${motivo}"`);
-      modal.classList.add("hidden");
-    } else {
-      alert("Debes escribir un motivo para rechazar.");
+async function cargarEstadisticas() {
+    try {
+        const response = await fetch(`${BASE_URL}api/get_estadisticas_validador.php`);
+        const data = await response.json();
+        
+        if (data.status === 'ok') {
+            actualizarEstadisticas(data.data);
+        } else if (data.pendientes !== undefined) {
+            // Formato antiguo de respuesta
+            actualizarEstadisticas(data);
+        } else {
+            console.error('Error al cargar estadísticas:', data.message);
+        }
+    } catch (error) {
+        console.error('Error de conexión:', error);
     }
-  });
+}
+
+function actualizarEstadisticas(stats) {
+    // Actualizar números con animación
+    animarNumero('stat-pendientes', stats.pendientes, 'text-warning');
+    animarNumero('stat-validados', stats.validados, 'text-success');
+    animarNumero('stat-rechazados', stats.rechazados, 'text-danger');
+}
+
+function animarNumero(elementId, valorFinal, colorClass = '') {
+    const elemento = document.getElementById(elementId);
+    if (!elemento) return;
+    
+    const valorActual = parseInt(elemento.textContent) || 0;
+    const diferencia = valorFinal - valorActual;
+    const duracion = 500; // ms
+    const pasos = 20;
+    const incremento = diferencia / pasos;
+    const intervalo = duracion / pasos;
+    
+    let paso = 0;
+    
+    const timer = setInterval(() => {
+        paso++;
+        const nuevoValor = Math.round(valorActual + (incremento * paso));
+        elemento.textContent = nuevoValor;
+        
+        // Aplicar clase de color si hay cambios
+        if (colorClass && diferencia !== 0) {
+            elemento.classList.add(colorClass);
+            setTimeout(() => elemento.classList.remove(colorClass), duracion);
+        }
+        
+        if (paso >= pasos) {
+            elemento.textContent = valorFinal;
+            clearInterval(timer);
+        }
+    }, intervalo);
+}
+
+// Inicializar tooltips de Bootstrap
+const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
 });
