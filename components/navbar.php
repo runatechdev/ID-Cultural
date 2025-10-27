@@ -1,7 +1,12 @@
 <?php
 // Si tienes alguna lógica de sesión al inicio, déjala aquí.
 ?>
+<?php
+// Si tienes alguna lógica de sesión al inicio, déjala aquí.
+?>
 
+<header class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container d-flex align-items-center justify-content-between">
 <header class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container d-flex align-items-center justify-content-between">
 
@@ -43,9 +48,22 @@
               <i class="bi bi-search"></i>
             </button>
           </li>
+          <!-- Botón de Búsqueda -->
+          <li class="nav-item">
+            <button class="btn btn-link nav-link" id="open-search-btn" aria-label="Abrir búsqueda">
+              <i class="bi bi-search"></i>
+            </button>
+          </li>
 
           <li class="nav-item"><a class="nav-link" href="/wiki.php">Wiki de artistas</a></li>
+          <li class="nav-item"><a class="nav-link" href="/wiki.php">Wiki de artistas</a></li>
 
+          <?php if (isset($_SESSION['user_data'])): ?>
+            <?php
+              // --- INICIO: LÓGICA DE ROLES MEJORADA ---
+              $user_role = $_SESSION['user_data']['role'];
+              $profile_link = '';
+              $profile_text = '';
           <?php if (isset($_SESSION['user_data'])): ?>
             <?php
               // --- INICIO: LÓGICA DE ROLES MEJORADA ---
@@ -83,6 +101,9 @@
             </li>
           <?php endif; ?>
 
+        </ul>
+      </nav>
+    </div>
         </ul>
       </nav>
     </div>
