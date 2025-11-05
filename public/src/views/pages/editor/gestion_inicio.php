@@ -84,7 +84,8 @@ include(__DIR__ . '/../../../../../components/header.php');
             // Cargar datos actuales en el formulario
             async function cargarContenido() {
                 try {
-                    const response = await fetch('<?php echo BASE_URL; ?>api/site_content.php');
+                    const response = await fetch('<?php echo BASE_URL; ?>api/site_content.php?action=get');
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const content = await response.json();
                     
                     document.getElementById('welcome_title').value = content.welcome_title || '';
@@ -92,6 +93,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                     document.getElementById('welcome_slogan').value = content.welcome_slogan || '';
                     // Aquí podrías mostrar una vista previa de las imágenes actuales
                 } catch (error) {
+                    console.error('Error al cargar contenido:', error);
                     Swal.fire('Error', 'No se pudo cargar el contenido actual.', 'error');
                 }
             }
@@ -100,24 +102,27 @@ include(__DIR__ . '/../../../../../components/header.php');
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData(form);
+                formData.append('action', 'update');
                 // Añadir los campos de texto al FormData
                 formData.append('welcome_title', document.getElementById('welcome_title').value);
                 formData.append('welcome_paragraph', document.getElementById('welcome_paragraph').value);
                 formData.append('welcome_slogan', document.getElementById('welcome_slogan').value);
 
                 try {
-                    const response = await fetch('<?php echo BASE_URL; ?>api/update_site_content.php', {
+                    const response = await fetch('<?php echo BASE_URL; ?>api/site_content.php', {
                         method: 'POST',
                         body: formData
                     });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const result = await response.json();
 
-                    if (response.ok && result.status === 'ok') {
+                    if (result.status === 'ok') {
                         Swal.fire('¡Guardado!', result.message, 'success');
                     } else {
                         Swal.fire('Error', result.message, 'error');
                     }
                 } catch (error) {
+                    console.error('Error al guardar:', error);
                     Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
                 }
             });

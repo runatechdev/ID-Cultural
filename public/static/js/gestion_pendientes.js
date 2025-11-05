@@ -4,7 +4,17 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const tbody = document.getElementById('tabla-obras-pendientes-body');
+    // Buscar tbody de manera flexible (puede ser tabla-obras-pendientes-body o tabla-artistas-body con clase tabla-obras-body)
+    let tbody = document.getElementById('tabla-obras-pendientes-body');
+    if (!tbody) {
+        tbody = document.querySelector('tbody.tabla-obras-body');
+    }
+    
+    if (!tbody) {
+        console.error('No se encontró el elemento tbody para cargar las obras');
+        return;
+    }
+    
     let obrasPendientes = [];
     let obrasFiltradas = [];
 

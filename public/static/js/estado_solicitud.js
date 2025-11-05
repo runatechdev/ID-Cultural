@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function cargarArtistas() {
         tbody.innerHTML = '<tr><td colspan="4" class="text-center">Cargando artistas...</td></tr>';
         try {
-            const response = await fetch(`${BASE_URL}api/get_artistas.php`);
+            const response = await fetch(`${BASE_URL}api/artistas.php?action=get`);
             if (!response.ok) throw new Error('Error al obtener los datos.');
             const artistas = await response.json();
 
