@@ -84,7 +84,7 @@ include(__DIR__ . '/../../../../../components/header.php');
             // Cargar datos actuales en el formulario
             async function cargarContenido() {
                 try {
-                    const response = await fetch('<?php echo BASE_URL; ?>api/get_site_content.php');
+                    const response = await fetch('<?php echo BASE_URL; ?>api/site_content.php');
                     const content = await response.json();
                     
                     document.getElementById('welcome_title').value = content.welcome_title || '';

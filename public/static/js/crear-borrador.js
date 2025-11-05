@@ -30,9 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const estado = e.submitter.id === 'btn-enviar-validacion' ? 'pendiente_validacion' : 'borrador';
+        const estado = e.submitter.id === 'btn-enviar-validacion' ? 'pendiente' : 'borrador';
         
         const formData = new FormData();
+        formData.append('action', 'save');
         formData.append('titulo', document.getElementById('titulo').value);
         formData.append('descripcion', document.getElementById('descripcion').value);
         formData.append('categoria', document.getElementById('categoria').value);
@@ -45,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         try {
-            const response = await fetch(`${BASE_URL}api/save_borrador.php`, {
+            const response = await fetch(`${BASE_URL}api/borradores.php`, {
                 method: 'POST',
                 body: formData
             });

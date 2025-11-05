@@ -99,7 +99,7 @@ async function cargarNoticias() {
     const contenedor = document.getElementById('contenedor-noticias');
     
     try {
-        const response = await fetch(`${BASE_URL}api/get_noticias.php?limit=6`);
+        const response = await fetch(`${BASE_URL}api/noticias.php?action=get`);
         const data = await response.json();
 
         // Verificar si hay error en la respuesta
@@ -116,7 +116,7 @@ async function cargarNoticias() {
         }
 
         // Si data es un array vacío o no hay noticias
-        const noticias = Array.isArray(data) ? data : (data.noticias || []);
+        const noticias = Array.isArray(data) ? data.slice(0, 6) : (data.noticias || []);
         
         if (noticias.length === 0) {
             contenedor.innerHTML = `
@@ -179,7 +179,7 @@ async function cargarNoticias() {
  */
 async function abrirModalNoticia(noticiaId) {
     try {
-        const response = await fetch(`${BASE_URL}api/get_noticia_detalle.php?id=${noticiaId}`);
+        const response = await fetch(`${BASE_URL}api/noticias.php?action=get&id=${noticiaId}`);
         const noticia = await response.json();
 
         if (noticia.error) {

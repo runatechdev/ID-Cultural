@@ -44,11 +44,11 @@ try {
     // Iniciar transacción
     $pdo->beginTransaction();
 
-    // 1. Obtener información de la publicación y el usuario
+    // 1. Obtener información de la publicación y el artista
     $stmt = $pdo->prepare("
-        SELECT p.usuario_id, u.role, u.nombre, u.apellido
+        SELECT p.usuario_id, a.status, a.nombre, a.apellido
         FROM publicaciones p
-        INNER JOIN usuarios u ON p.usuario_id = u.id
+        INNER JOIN artistas a ON p.usuario_id = a.id
         WHERE p.id = ? AND p.estado = 'pendiente'
     ");
     $stmt->execute([$publicacion_id]);
@@ -71,16 +71,14 @@ try {
             UPDATE publicaciones 
             SET estado = ?, 
                 validador_id = ?, 
-                fecha_validacion = NOW(),
-                motivo_rechazo = NULL
+                fecha_validacion = NOW()
             WHERE id = ?
         ");
         $stmt->execute([$nuevo_estado, $validador_id, $publicacion_id]);
 
-        // 3. Actualizar el rol del usuario a 'artista_validado' si es su primera obra validada
-        // (esto también lo hace el trigger, pero por si no está activo lo hacemos manual)
-        if ($publicacion['role'] === 'usuario') {
-            $stmt = $pdo->prepare("UPDATE usuarios SET role = 'artista_validado' WHERE id = ?");
+        // 3. Actualizar el status del artista a 'validado' si es su primera obra validada
+        if ($publicacion['status'] !== 'validado') {
+            $stmt = $pdo->prepare("UPDATE artistas SET status = 'validado' WHERE id = ?");
             $stmt->execute([$usuario_id]);
         }
 
@@ -107,15 +105,14 @@ try {
 
     // 4. Registrar en el log del sistema
     $stmt = $pdo->prepare("
-        INSERT INTO system_logs (user_id, user_name, action, details, ip_address)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO system_logs (user_id, user_name, action, details)
+        VALUES (?, ?, ?, ?)
     ");
     $stmt->execute([
         $validador_id,
         $validador_nombre,
         $log_action,
-        $log_details,
-        $_SERVER['REMOTE_ADDR'] ?? 'Unknown'
+        $log_details
     ]);
 
     // 5. Confirmar transacción

@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function cargarBorradores() {
         tbody.innerHTML = '<tr><td colspan="3" class="text-center">Cargando tus borradores...</td></tr>';
         try {
-            const response = await fetch(`${BASE_URL}api/get_mis_borradores.php`);
+            const response = await fetch(`${BASE_URL}api/borradores.php?action=get`);
             if (!response.ok) throw new Error('Error al obtener los datos.');
             const borradores = await response.json();
 
@@ -53,7 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (result.isConfirmed) {
                     const formData = new FormData();
                     formData.append('id', id);
-                    const response = await fetch(`${BASE_URL}api/delete_publicacion.php`, { method: 'POST', body: formData });
+                    formData.append('action', 'delete');
+                    const response = await fetch(`${BASE_URL}api/borradores.php`, { method: 'POST', body: formData });
                     const res = await response.json();
                     if (response.ok && res.status === 'ok') {
                         Swal.fire('¡Eliminado!', res.message, 'success');

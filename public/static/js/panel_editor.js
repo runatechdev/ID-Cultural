@@ -26,7 +26,7 @@ async function cargarNoticias() {
     tbody.innerHTML = '<tr><td colspan="3" class="text-center">Cargando noticias...</td></tr>';
 
     try {
-        const response = await fetch(`${BASE_URL}api/get_noticias.php?limit=100`);
+        const response = await fetch(`${BASE_URL}api/noticias.php?action=get`);
         const data = await response.json();
 
         const noticias = Array.isArray(data) ? data : (data.noticias || []);
@@ -74,6 +74,7 @@ async function agregarNoticia() {
     }
 
     const formData = new FormData();
+    formData.append('action', 'add');
     formData.append('titulo', titulo);
     formData.append('contenido', contenido);
     
@@ -91,7 +92,7 @@ async function agregarNoticia() {
             }
         });
 
-        const response = await fetch(`${BASE_URL}api/add_noticia.php`, {
+        const response = await fetch(`${BASE_URL}api/noticias.php`, {
             method: 'POST',
             body: formData
         });
@@ -152,7 +153,7 @@ async function agregarNoticia() {
 async function editarNoticia(id) {
     try {
         // Obtener detalles de la noticia
-        const response = await fetch(`${BASE_URL}api/get_noticia_detalle.php?id=${id}`);
+        const response = await fetch(`${BASE_URL}api/noticias.php?action=get&id=${id}`);
         const noticia = await response.json();
 
         if (noticia.error) {
@@ -190,6 +191,7 @@ async function guardarEdicion() {
     }
 
     const formData = new FormData();
+    formData.append('action', 'update');
     formData.append('id', id);
     formData.append('titulo', titulo);
     formData.append('contenido', contenido);
@@ -208,7 +210,7 @@ async function guardarEdicion() {
             }
         });
 
-        const response = await fetch(`${BASE_URL}api/edit_noticia.php`, {
+        const response = await fetch(`${BASE_URL}api/noticias.php`, {
             method: 'POST',
             body: formData
         });
@@ -272,9 +274,10 @@ async function eliminarNoticia(id) {
 
     try {
         const formData = new FormData();
+        formData.append('action', 'delete');
         formData.append('id', id);
 
-        const response = await fetch(`${BASE_URL}api/delete_noticia.php`, {
+        const response = await fetch(`${BASE_URL}api/noticias.php`, {
             method: 'POST',
             body: formData
         });

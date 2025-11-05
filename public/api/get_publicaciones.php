@@ -13,7 +13,7 @@ $categoria_filter = $_GET['categoria'] ?? null;
 $municipio_filter = $_GET['municipio'] ?? null;
 
 try {
-    // Consulta mejorada que une 'publicaciones' con 'usuarios' (antes artistas)
+    // Consulta mejorada que une 'publicaciones' con 'artistas'
     $sql = "
         SELECT 
             p.id,
@@ -23,18 +23,18 @@ try {
             p.estado,
             p.fecha_envio_validacion,
             p.fecha_creacion,
-            u.id AS usuario_id,
-            CONCAT(u.nombre, ' ', u.apellido) AS artista_nombre,
-            u.municipio,
-            u.provincia,
-            u.email AS artista_email,
-            u.role,
+            a.id AS usuario_id,
+            CONCAT(a.nombre, ' ', a.apellido) AS artista_nombre,
+            a.municipio,
+            a.provincia,
+            a.email AS artista_email,
+            a.status,
             CASE 
-                WHEN u.role = 'artista_validado' THEN TRUE 
+                WHEN a.status = 'validado' THEN TRUE 
                 ELSE FALSE 
             END AS es_artista_validado
         FROM publicaciones p
-        INNER JOIN usuarios u ON p.usuario_id = u.id
+        INNER JOIN artistas a ON p.usuario_id = a.id
         WHERE 1=1
     ";
     
@@ -52,7 +52,7 @@ try {
     }
 
     if ($municipio_filter) {
-        $sql .= " AND u.municipio = ?";
+        $sql .= " AND a.municipio = ?";
         $params[] = $municipio_filter;
     }
 

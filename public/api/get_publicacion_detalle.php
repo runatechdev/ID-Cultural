@@ -26,24 +26,23 @@ try {
             p.campos_extra,
             p.multimedia,
             p.estado,
-            p.motivo_rechazo,
             p.fecha_creacion,
             p.fecha_envio_validacion,
             p.fecha_validacion,
-            u.id AS usuario_id,
-            CONCAT(u.nombre, ' ', u.apellido) AS artista_nombre,
-            u.email AS artista_email,
-            u.municipio,
-            u.provincia,
-            u.role,
+            a.id AS usuario_id,
+            CONCAT(a.nombre, ' ', a.apellido) AS artista_nombre,
+            a.email AS artista_email,
+            a.municipio,
+            a.provincia,
+            a.status,
             CASE 
-                WHEN u.role = 'artista_validado' THEN TRUE 
+                WHEN a.status = 'validado' THEN TRUE 
                 ELSE FALSE 
             END AS es_artista_validado,
-            CONCAT(v.nombre, ' ', v.apellido) AS validador_nombre
+            v.nombre AS validador_nombre
         FROM publicaciones p
-        INNER JOIN usuarios u ON p.usuario_id = u.id
-        LEFT JOIN usuarios v ON p.validador_id = v.id
+        INNER JOIN artistas a ON p.usuario_id = a.id
+        LEFT JOIN users v ON p.validador_id = v.id
         WHERE p.id = ?
     ");
     
