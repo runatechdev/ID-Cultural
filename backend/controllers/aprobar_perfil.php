@@ -1,6 +1,7 @@
 <?php
 // Incluimos la configuración central para la conexión y las sesiones
 require_once __DIR__ . '/../config/connection.php';
+require_once __DIR__ . '/../helpers/EmailHelper.php';
 
 // Indicamos que la respuesta será en formato JSON
 header('Content-Type: application/json');
@@ -23,18 +24,37 @@ if (empty($id_artista) || !is_numeric($id_artista)) {
 
 // --- 3. Operación en la Base de Datos ---
 try {
+    // Obtener datos del artista antes de actualizar
+    $stmtGet = $pdo->prepare("SELECT nombre, apellido, email FROM artistas WHERE id = ?");
+    $stmtGet->execute([$id_artista]);
+    $artista = $stmtGet->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$artista) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontró ningún artista con ese ID.']);
+        exit();
+    }
+    
     // Preparamos la consulta para actualizar el estado y la fecha de validación
-    // Asumimos que la tabla se llama 'artistas', ajústalo si es necesario.
-    $sql = "UPDATE artistas SET estado = ?, fecha_validacion = ? WHERE id = ?";
+    $sql = "UPDATE artistas SET status = ?, fecha_validacion = ? WHERE id = ?";
     
     // Obtenemos la fecha y hora actual
     $fecha_actual = date('Y-m-d H:i:s');
     
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['Aprobado', $fecha_actual, $id_artista]);
+    $stmt->execute(['validado', $fecha_actual, $id_artista]);
 
     // Verificamos si la actualización afectó a alguna fila
     if ($stmt->rowCount() > 0) {
+        // Enviar email de notificación
+        try {
+            $emailHelper = new EmailHelper();
+            $nombreCompleto = $artista['nombre'] . ' ' . $artista['apellido'];
+            $emailHelper->notificarPerfilValidado($artista['email'], $nombreCompleto);
+        } catch (Exception $e) {
+            error_log("Error enviando email: " . $e->getMessage());
+            // Continuar aunque falle el email
+        }
+        
         // Si se actualizó al menos una fila, la operación fue exitosa
         echo json_encode([
             'status' => 'ok', 
