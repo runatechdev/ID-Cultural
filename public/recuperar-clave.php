@@ -126,7 +126,7 @@ include(__DIR__ . '/../components/header.php');
               icon: 'success',
               confirmButtonText: 'OK'
             }).then(() => {
-              window.location.href = '/login.php';
+              window.location.href = '/src/views/pages/auth/login.php';
             });
           } else {
             Swal.fire('Error', data.error || 'Error al procesar', 'error');
@@ -175,7 +175,7 @@ include(__DIR__ . '/../components/header.php');
               icon: 'success',
               confirmButtonText: 'Ir a Login'
             }).then(() => {
-              window.location.href = '/login.php';
+              window.location.href = '/src/views/pages/auth/login.php';
             });
           } else {
             Swal.fire('Error', data.error || 'Error al actualizar', 'error');
