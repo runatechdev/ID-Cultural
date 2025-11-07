@@ -41,7 +41,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Párrafo de Bienvenida</label>
-                        <div id="editor_welcome_paragraph" style="height: 250px;"></div>
+                        <div id="editor_welcome_paragraph" style="height: 250px; background-image: url('<?php echo BASE_URL; ?>static/img/pattern.png'); background-size: 200px 200px; background-position: center; background-attachment: fixed;"></div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Eslogan</label>
