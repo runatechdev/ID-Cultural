@@ -29,6 +29,38 @@
     font-style: italic;
 }
 
+/* Estilos específicos para el editor del párrafo */
+#editor_welcome_paragraph {
+    position: relative;
+}
+
+/* Usar un pseudo-elemento para la capa transparente */
+#editor_welcome_paragraph::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../img/pattern.png');
+    background-size: 200px 200px;
+    background-position: center;
+    background-attachment: fixed;
+    opacity: 0.15;
+    z-index: 0;
+    border-radius: 0 0 4px 4px;
+    pointer-events: none;
+}
+
+#editor_welcome_paragraph .ql-container {
+    position: relative;
+    z-index: 1;
+}
+
+#editor_welcome_paragraph .ql-editor {
+    background: transparent;
+}
+
 /* Estilos de formato dentro del editor */
 .ql-editor strong {
     font-weight: bold;
