@@ -44,6 +44,7 @@ try {
     if ($success) {
         // Enviar notificación por email
         try {
+            /** @var EmailHelper $emailHelper */
             $emailHelper = new EmailHelper();
             
             if ($nuevo_estado === 'publicada') {

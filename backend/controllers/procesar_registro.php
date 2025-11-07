@@ -30,6 +30,7 @@ try {
 
     // Enviar email de bienvenida
     try {
+        /** @var EmailHelper $emailHelper */
         $emailHelper = new EmailHelper();
         $emailHelper->enviarBienvenida($email, $nombre);
     } catch (Exception $e) {

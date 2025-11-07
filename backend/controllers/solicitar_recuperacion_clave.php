@@ -46,6 +46,7 @@ try {
     $stmt->execute([$usuario['id'], $token, $fecha_expiracion]);
     
     // Enviar email
+    /** @var EmailHelper $emailHelper */
     $emailHelper = new EmailHelper();
     $nombreCompleto = $usuario['nombre'] . ' ' . $usuario['apellido'];
     $enviado = $emailHelper->enviarRecuperacionClave($usuario['email'], $nombreCompleto, $token);

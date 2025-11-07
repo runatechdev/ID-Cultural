@@ -47,6 +47,7 @@ try {
     if ($stmt->rowCount() > 0) {
         // Enviar email de notificación
         try {
+            /** @var EmailHelper $emailHelper */
             $emailHelper = new EmailHelper();
             $nombreCompleto = $artista['nombre'] . ' ' . $artista['apellido'];
             $emailHelper->notificarPerfilValidado($artista['email'], $nombreCompleto);
