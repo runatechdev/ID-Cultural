@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_data']) || $_SESSION['user_data']['role'] !== 'artist
 
 $usuario_id = $_SESSION['user_data']['id'];
 
-// Obtener datos actuales del perfil
+// Obtener datos actuales del artista
 try {
     $stmt = $pdo->prepare("SELECT * FROM artistas WHERE id = ?");
     $stmt->execute([$usuario_id]);
@@ -27,7 +27,7 @@ try {
 }
 
 // --- Variables para el header ---
-$page_title = "Editar Perfil - ID Cultural";
+$page_title = "Editar Datos de Contacto - ID Cultural";
 $specific_css_files = ['dashboard.css'];
 
 // --- Incluir la cabecera ---
@@ -42,15 +42,15 @@ include(__DIR__ . '/../../../../../components/header.php');
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h1 class="mb-0">Editar Perfil</h1>
-                        <p class="lead">Actualiza tu información personal y datos de contacto.</p>
+                        <h1 class="mb-0">📋 Editar Datos de Contacto</h1>
+                        <p class="lead">Actualiza tu información personal y datos de ubicación.</p>
                     </div>
                     <a href="<?php echo BASE_URL; ?>src/views/pages/artista/dashboard-artista.php" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left"></i> Volver al Dashboard
+                        <i class="bi bi-arrow-left"></i> Volver
                     </a>
                 </div>
 
-                <form id="form-editar-perfil" method="POST" class="needs-validation" novalidate>
+                <form id="form-editar-datos-contacto" method="POST" class="needs-validation" novalidate>
                     <!-- Sección: Datos Personales -->
                     <h4 class="mb-3 mt-4">Datos Personales</h4>
                     <div class="row">
@@ -186,20 +186,18 @@ include(__DIR__ . '/../../../../../components/header.php');
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('form-editar-perfil');
+            const form = document.getElementById('form-editar-datos-contacto');
 
             if (form) {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
 
-                    // Validación del formulario
                     if (!form.checkValidity()) {
                         e.stopPropagation();
                         form.classList.add('was-validated');
                         return;
                     }
 
-                    // Recopilar datos
                     const datos = {
                         nombre: document.getElementById('nombre').value.trim(),
                         apellido: document.getElementById('apellido').value.trim(),
@@ -211,7 +209,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                     };
 
                     try {
-                        const res = await fetch('/api/actualizar_perfil_artista.php', {
+                        const res = await fetch('/api/actualizar_datos_contacto.php', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(datos)
@@ -222,14 +220,14 @@ include(__DIR__ . '/../../../../../components/header.php');
                         if (res.ok && data.success) {
                             Swal.fire({
                                 title: '✓ Éxito',
-                                text: 'Tu perfil ha sido actualizado correctamente.',
+                                text: 'Tus datos de contacto han sido actualizados correctamente.',
                                 icon: 'success',
                                 confirmButtonText: 'OK'
                             }).then(() => {
                                 window.location.href = '/src/views/pages/artista/dashboard-artista.php';
                             });
                         } else {
-                            Swal.fire('Error', data.error || 'Error al actualizar el perfil', 'error');
+                            Swal.fire('Error', data.error || 'Error al actualizar', 'error');
                         }
                     } catch (err) {
                         console.error(err);

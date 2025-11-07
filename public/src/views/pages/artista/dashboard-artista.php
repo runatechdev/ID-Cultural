@@ -31,25 +31,43 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <p class="lead">Desde aquí puedes gestionar tu perfil, tus obras y enviarlas a validación.</p>
                 </div>
 
-                <!-- Menú de Acciones del Artista -->
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Acciones Principales</h4>
-                        <p class="mb-0 text-muted small">Crea y administra tus publicaciones para el wiki de artistas.</p>
+                <!-- Menú de Acciones del Artista - Perfil y Datos -->
+                <div class="card mt-4">
+                    <div class="card-header bg-light">
+                        <h4>📋 Gestión de Perfil</h4>
+                        <p class="mb-0 text-muted small">Administra tu información personal y pública.</p>
                     </div>
                     <div class="card-body">
                         <div class="dashboard-menu">
-                            <a href="<?php echo BASE_URL; ?>src/views/pages/artista/editar_perfil.php>" class="dashboard-item" data-bs-toggle="tooltip" title="Crea un nuevo borrador para tu perfil, una obra o un evento.">
-                                <i class="bi bi-person-bounding-box "> </i> Editar Perfil
+                            <a href="<?php echo BASE_URL; ?>src/views/pages/artista/editar_datos_contacto.php" class="dashboard-item" data-bs-toggle="tooltip" title="Actualiza tu nombre, email, ubicación y datos de contacto.">
+                                <i class="bi bi-person-vcard"></i> Editar Datos de Contacto
                             </a>
+                            <a href="<?php echo BASE_URL; ?>src/views/pages/artista/editar_perfil_publico.php" class="dashboard-item" data-bs-toggle="tooltip" title="Edita tu biografía, foto de perfil y redes sociales.">
+                                <i class="bi bi-image"></i> Editar Perfil Público
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menú de Acciones del Artista - Obras -->
+                <div class="card mt-4">
+                    <div class="card-header bg-light">
+                        <h4>🎨 Gestión de Obras</h4>
+                        <p class="mb-0 text-muted small">Crea, edita y administra tus publicaciones.</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="dashboard-menu">
                             <a href="<?php echo BASE_URL; ?>src/views/pages/artista/crear-borrador.php" class="dashboard-item" data-bs-toggle="tooltip" title="Crea un nuevo borrador para tu perfil, una obra o un evento.">
-                                <i class="bi bi-plus-square-fill dashboard-icon"></i> Crear Borrador
+                                <i class="bi bi-plus-square-fill"></i> Crear Nueva Obra
                             </a>
-                            <a href="<?php echo BASE_URL; ?>src/views/pages/artista/mis-borradores.php" class="dashboard-item" data-bs-toggle="tooltip" title="Revisa y edita los borradores que has guardado. (Próximamente)">
-                                <i class="bi bi-journal-richtext dashboard-icon"></i> Ver Mis Borradores
+                            <a href="<?php echo BASE_URL; ?>src/views/pages/artista/mis-borradores.php" class="dashboard-item" data-bs-toggle="tooltip" title="Revisa y edita los borradores que has guardado.">
+                                <i class="bi bi-journal-richtext"></i> Ver Mis Borradores
+                            </a>
+                            <a href="<?php echo BASE_URL; ?>src/views/pages/artista/mis-obras-validadas.php" class="dashboard-item" data-bs-toggle="tooltip" title="Edita tus obras ya publicadas (requiere validación).">
+                                <i class="bi bi-check2-square"></i> Mis Obras Publicadas
                             </a>
                             <a href="<?php echo BASE_URL; ?>src/views/pages/artista/solicitudes-enviadas.php" class="dashboard-item" data-bs-toggle="tooltip" title="Consulta el estado de las publicaciones que has enviado a validación.">
-                                <i class="bi bi-send-check-fill dashboard-icon"></i> Solicitudes Enviadas
+                                <i class="bi bi-send-check-fill"></i> Solicitudes Enviadas
                             </a>
                         </div>
                     </div>
