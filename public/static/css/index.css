@@ -94,6 +94,51 @@
   background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
 }
 
+/* Estilos para contenido HTML de Quill */
+.welcome-section h2,
+.welcome-section .display-4 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.welcome-section .display-4 p {
+  margin: 0;
+  padding: 0;
+  display: inline;
+}
+
+.welcome-section .display-4 p:first-child {
+  margin-top: 0;
+}
+
+.welcome-section .lead p {
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.welcome-section .lead p:last-child {
+  margin-bottom: 0;
+}
+
+.welcome-section .lead strong {
+  color: #00BFFF;
+  font-weight: 700;
+}
+
+.welcome-section .lead em {
+  color: #0099CC;
+}
+
+.welcome-section h5 p {
+  margin: 0;
+  padding: 0;
+  display: inline;
+}
+
 .huella-idcultural {
   animation: float 3s ease-in-out infinite;
   filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));

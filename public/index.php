@@ -107,16 +107,24 @@ include(__DIR__ . '/../components/header.php');
                  style="max-width: 250px;">
           </div>
           <div class="col-lg-8" data-aos="fade-left">
-            <h2 class="display-4 mb-4">
-              <?php echo htmlspecialchars($site_content['welcome_title'] ?? 'Bienvenidos a ID Cultural'); ?>
-            </h2>
+            <div class="display-4 mb-4">
+              <?php 
+                $title = $site_content['welcome_title'] ?? '<p>Bienvenidos a ID Cultural</p>';
+                // Si contiene HTML de Quill, no escapar; si es texto plano, escapar
+                echo (strpos($title, '<p>') !== false) ? $title : htmlspecialchars($title);
+              ?>
+            </div>
             <div class="lead mb-4">
               <?php echo $site_content['welcome_paragraph'] ?? ''; ?>
             </div>
-            <p class="h5 text-primary fst-italic">
+            <div class="h5 text-primary fst-italic">
               <i class="bi bi-quote me-2"></i>
-              <?php echo htmlspecialchars($site_content['welcome_slogan'] ?? 'La identidad de un pueblo, en un solo lugar.'); ?>
-            </p>
+              <?php 
+                $slogan = $site_content['welcome_slogan'] ?? '<p>La identidad de un pueblo, en un solo lugar.</p>';
+                // Si contiene HTML de Quill, no escapar; si es texto plano, escapar
+                echo (strpos($slogan, '<p>') !== false) ? $slogan : htmlspecialchars($slogan);
+              ?>
+            </div>
           </div>
         </div>
       </div>

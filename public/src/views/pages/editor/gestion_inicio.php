@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_data']) || !in_array($_SESSION['user_data']['role'], 
 
 // --- Variables para el header ---
 $page_title = "Editar Página Principal";
-$specific_css_files = ['dashboard.css'];
+$specific_css_files = ['dashboard.css', 'gestion_inicio.css'];
 
 // --- Incluir la cabecera ---
 include(__DIR__ . '/../../../../../components/header.php');
@@ -36,16 +36,16 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <!-- Sección de Bienvenida -->
                     <h4 class="mb-3">Sección de Bienvenida</h4>
                     <div class="mb-3">
-                        <label for="welcome_title" class="form-label">Título Principal</label>
-                        <input type="text" class="form-control" id="welcome_title">
+                        <label class="form-label">Título Principal</label>
+                        <div id="editor_welcome_title" style="height: 100px;"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="welcome_paragraph" class="form-label">Párrafo de Bienvenida</label>
-                        <textarea class="form-control" id="welcome_paragraph" rows="4"></textarea>
+                        <label class="form-label">Párrafo de Bienvenida</label>
+                        <div id="editor_welcome_paragraph" style="height: 250px;"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="welcome_slogan" class="form-label">Eslogan</label>
-                        <input type="text" class="form-control" id="welcome_slogan">
+                        <label class="form-label">Eslogan</label>
+                        <div id="editor_welcome_slogan" style="height: 100px;"></div>
                     </div>
 
                     <hr class="my-4">
@@ -75,9 +75,146 @@ include(__DIR__ . '/../../../../../components/header.php');
 
     <?php include(__DIR__ . '/../../../../../components/footer.php'); ?>
     
+    <!-- Quill Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <style>
+      /* Estilos para el selector de fuentes */
+      .ql-snow .ql-picker.ql-font {
+        width: auto;
+        min-width: 100px;
+      }
+      
+      .ql-snow .ql-picker.ql-font .ql-picker-label {
+        font-family: 'Arial', sans-serif;
+        padding: 0 8px;
+      }
+      
+      .ql-snow .ql-picker.ql-font .ql-picker-item {
+        padding: 5px 8px;
+      }
+      
+      /* Ocultar los pseudo-elementos que causan problemas */
+      .ql-snow .ql-picker.ql-font .ql-picker-label::before,
+      .ql-snow .ql-picker.ql-font .ql-picker-item::before {
+        display: none !important;
+        content: none !important;
+      }
+      
+      /* Mostrar el texto de las opciones */
+      .ql-snow .ql-picker.ql-font .ql-picker-label {
+        display: flex;
+        align-items: center;
+        min-height: 26px;
+      }
+      
+      .ql-snow .ql-picker.ql-font .ql-picker-options {
+        padding: 5px 0;
+        min-width: 120px;
+      }
+    </style>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
     <script>
+        // Configurar fuentes disponibles (web-safe fonts)
+        const Font = Quill.import('formats/font');
+        Font.whitelist = [
+            'sans-serif',
+            'serif', 
+            'monospace',
+            'arial',
+            'georgia',
+            'verdana',
+            'times-new-roman',
+            'courier'
+        ];
+        Quill.register(Font, true);
+
+        // Inicializar Quill para el título
+        const quillTitle = new Quill('#editor_welcome_title', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ font: Font.whitelist }],
+                    [{ size: ['small', false, 'large', 'huge'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ color: [] }, { background: [] }],
+                    [{ align: [] }],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Inicializar Quill para el párrafo
+        const quillParagraph = new Quill('#editor_welcome_paragraph', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ font: Font.whitelist }],
+                    [{ size: ['small', false, 'large', 'huge'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ color: [] }, { background: [] }],
+                    [{ align: [] }],
+                    ['blockquote', 'code-block'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Inicializar Quill para el eslogan
+        const quillSlogan = new Quill('#editor_welcome_slogan', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ font: Font.whitelist }],
+                    [{ size: ['small', false, 'large', 'huge'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ color: [] }, { background: [] }],
+                    [{ align: [] }],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Configurar etiquetas de fuentes después de que Quill se inicialice
+        setTimeout(() => {
+            const fontLabels = [
+                'Sin serifs',
+                'Con serifs',
+                'Monoespaciada',
+                'Arial',
+                'Georgia',
+                'Verdana',
+                'Times New Roman',
+                'Courier'
+            ];
+            
+            // Buscar todos los selectores de fuentes (uno por cada editor)
+            const fontPickers = document.querySelectorAll('.ql-picker.ql-font');
+            
+            fontPickers.forEach(picker => {
+                const options = picker.querySelectorAll('.ql-picker-item');
+                const label = picker.querySelector('.ql-picker-label');
+                
+                // Configurar cada opción de fuente
+                options.forEach((option, index) => {
+                    if (fontLabels[index]) {
+                        option.textContent = fontLabels[index];
+                        option.setAttribute('data-label', fontLabels[index]);
+                    }
+                });
+                
+                // Configurar el label principal
+                if (label) {
+                    label.textContent = 'Fuente';
+                    label.setAttribute('data-label', 'Fuente');
+                }
+            });
+        }, 300);
+
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('form-edit-inicio');
 
@@ -88,10 +225,9 @@ include(__DIR__ . '/../../../../../components/header.php');
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const content = await response.json();
                     
-                    document.getElementById('welcome_title').value = content.welcome_title || '';
-                    document.getElementById('welcome_paragraph').value = content.welcome_paragraph || '';
-                    document.getElementById('welcome_slogan').value = content.welcome_slogan || '';
-                    // Aquí podrías mostrar una vista previa de las imágenes actuales
+                    quillTitle.root.innerHTML = content.welcome_title || '';
+                    quillParagraph.root.innerHTML = content.welcome_paragraph || '';
+                    quillSlogan.root.innerHTML = content.welcome_slogan || '';
                 } catch (error) {
                     console.error('Error al cargar contenido:', error);
                     Swal.fire('Error', 'No se pudo cargar el contenido actual.', 'error');
@@ -103,10 +239,9 @@ include(__DIR__ . '/../../../../../components/header.php');
                 e.preventDefault();
                 const formData = new FormData(form);
                 formData.append('action', 'update');
-                // Añadir los campos de texto al FormData
-                formData.append('welcome_title', document.getElementById('welcome_title').value);
-                formData.append('welcome_paragraph', document.getElementById('welcome_paragraph').value);
-                formData.append('welcome_slogan', document.getElementById('welcome_slogan').value);
+                formData.append('welcome_title', quillTitle.root.innerHTML);
+                formData.append('welcome_paragraph', quillParagraph.root.innerHTML);
+                formData.append('welcome_slogan', quillSlogan.root.innerHTML);
 
                 try {
                     const response = await fetch('<?php echo BASE_URL; ?>api/site_content.php', {

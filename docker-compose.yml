@@ -31,6 +31,8 @@ services:
       MYSQL_PASSWORD: 1234
     volumes:
       - db_data:/var/lib/mysql
+      # Inicializar BD con el SQL exportado si existe
+      - ./database/idcultural_export.sql:/docker-entrypoint-initdb.d/idcultural_export.sql:ro
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
