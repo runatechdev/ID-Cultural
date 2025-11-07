@@ -111,7 +111,7 @@ include(__DIR__ . '/../components/header.php');
         const email = document.getElementById('email').value.trim();
         
         try {
-          const res = await fetch('../backend/controllers/solicitar_recuperacion_clave.php', {
+          const res = await fetch('/api/solicitar_recuperacion_clave.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'email=' + encodeURIComponent(email)
@@ -159,7 +159,7 @@ include(__DIR__ . '/../components/header.php');
         }
         
         try {
-          const res = await fetch('../backend/controllers/cambiar_clave_token.php', {
+          const res = await fetch('/api/cambiar_clave_token.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'token=' + encodeURIComponent(token) + 
