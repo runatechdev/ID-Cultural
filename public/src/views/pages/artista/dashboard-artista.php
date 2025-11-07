@@ -39,6 +39,9 @@ include(__DIR__ . '/../../../../../components/header.php');
                     </div>
                     <div class="card-body">
                         <div class="dashboard-menu">
+                            <a href="<?php echo BASE_URL; ?>src/views/pages/artista/editar_perfil.php>" class="dashboard-item" data-bs-toggle="tooltip" title="Crea un nuevo borrador para tu perfil, una obra o un evento.">
+                                <i class="bi bi-person-bounding-box "> </i> Editar Perfil
+                            </a>
                             <a href="<?php echo BASE_URL; ?>src/views/pages/artista/crear-borrador.php" class="dashboard-item" data-bs-toggle="tooltip" title="Crea un nuevo borrador para tu perfil, una obra o un evento.">
                                 <i class="bi bi-plus-square-fill dashboard-icon"></i> Crear Borrador
                             </a>
