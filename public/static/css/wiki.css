@@ -143,3 +143,109 @@
     border-color: var(--color-acento);
 }
 
+/* ===== ESTILOS PARA TARJETAS DE OBRAS ===== */
+
+.obra-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.obra-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 191, 255, 0.2) !important;
+}
+
+.obra-imagen-container {
+    position: relative;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e9e9e9 100%);
+    overflow: hidden;
+}
+
+.obra-imagen-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.obra-card:hover .obra-imagen-container img {
+    transform: scale(1.08);
+}
+
+.obra-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.obra-card:hover .obra-overlay {
+    opacity: 1;
+}
+
+.obra-card .card-title {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.obra-card .card-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #666;
+}
+
+.obra-card .badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--color-primario) !important;
+}
+
+/* Hover lift effect */
+.hover-lift {
+    position: relative;
+}
+
+/* Grid responsive para obras */
+@media (max-width: 768px) {
+    .obra-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* ===== SECCIÓN DE OBRAS EN WIKI ===== */
+
+#contenedor-obras-wiki {
+    margin-top: 2rem;
+}
+
+.obras-seccion {
+    padding: 2rem 0;
+}
+
+.obras-seccion h2 {
+    color: var(--color-primario);
+    font-weight: 700;
+    margin-bottom: 2rem;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.obras-seccion h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primario) 0%, var(--color-secundario) 100%);
+    border-radius: 2px;
+}
