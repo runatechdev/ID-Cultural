@@ -24,13 +24,13 @@ try {
             p.descripcion,
             p.categoria,
             p.estado,
-            p.imagen_url,
+            p.multimedia,
             p.fecha_creacion,
             a.id AS artista_id,
             CONCAT(a.nombre, ' ', a.apellido) AS artista_nombre,
             a.municipio,
             a.provincia,
-            a.foto_perfil,
+            a.email AS artista_email,
             a.status AS artista_status
         FROM publicaciones p
         INNER JOIN artistas a ON p.usuario_id = a.id
@@ -70,12 +70,24 @@ try {
     
     $obras = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Procesar URLs de imágenes
+    // Procesar URLs de imágenes desde multimedia (JSON o ruta)
     foreach ($obras as &$obra) {
-        // Si no tiene imagen, usar placeholder
-        if (empty($obra['imagen_url'])) {
-            $obra['imagen_url'] = '/static/img/placeholder-obra.png';
+        // Si multimedia contiene JSON, extraer primera imagen
+        $imagen_url = '/static/img/placeholder-obra.png';
+        
+        if (!empty($obra['multimedia'])) {
+            // Intentar decodificar como JSON
+            $multimedia = json_decode($obra['multimedia'], true);
+            if (is_array($multimedia) && !empty($multimedia)) {
+                // Si es un array de imágenes, tomar la primera
+                $imagen_url = $multimedia[0];
+            } else {
+                // Si es una ruta directa
+                $imagen_url = $obra['multimedia'];
+            }
         }
+        
+        $obra['imagen_url'] = $imagen_url;
     }
     
     echo json_encode([

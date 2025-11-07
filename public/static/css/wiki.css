@@ -51,6 +51,7 @@
     color: var(--color-primario);
     display: inline-block;
     background: linear-gradient(90deg, var(--color-primario), #2a5a69);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     padding-bottom: 5px;

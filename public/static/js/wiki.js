@@ -120,11 +120,10 @@ function crearTarjetaObra(obra) {
                     
                     <div class="mt-3 pt-3 border-top">
                         <div class="d-flex align-items-center gap-2">
-                            <img src="${escaparHTML(obra.foto_perfil || BASE_URL + 'static/img/default-avatar.png')}" 
-                                 class="rounded-circle" 
-                                 width="32" 
-                                 height="32" 
-                                 alt="${escaparHTML(obra.artista_nombre)}">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                                 style="width: 32px; height: 32px; font-size: 14px; font-weight: bold;">
+                                ${escaparHTML(obra.artista_nombre.charAt(0).toUpperCase())}
+                            </div>
                             <small>
                                 <strong>${escaparHTML(obra.artista_nombre)}</strong><br>
                                 <span class="text-muted">${escaparHTML(obra.municipio || 'Santiago del Estero')}</span>
