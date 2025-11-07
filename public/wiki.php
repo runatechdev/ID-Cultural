@@ -96,13 +96,13 @@ include(__DIR__ . '/../components/header.php');
                             <div class="card artist-list-card mb-3">
                                 <div class="row g-0">
                                     <div class="col-md-3">
-                                        <img src="/static/img/juanperez.jpg" class="img-fluid rounded-start" alt="Juan Pérez">
+                                        <img src="/assets/img/faces/rusher.jpeg" class="img-fluid rounded-start" alt="Rusher King">
                                     </div>
                                     <div class="col-md-9">
                                         <div class="card-body">
-                                            <h5 class="card-title">Juan Pérez</h5>
-                                            <p class="card-text">Guitarrista y compositor de música folclórica.</p>
-                                            <a href="#" class="btn btn-outline-primary">Leer Biografía Completa</a>
+                                            <h5 class="card-title">Rusher King</h5>
+                                            <p class="card-text">Rusherking (Thomas Nicolás Tobar) es un cantante de trap argentino.</p>
+                                            <a href="/perfil_artista.php" class="btn btn-outline-primary">Ver Perfil</a>
                                         </div>
                                     </div>
                                 </div>
