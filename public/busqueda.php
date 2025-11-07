@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../config.php';
 // --- 1. CONECTAR A LA BASE DE DATOS ---
 require_once __DIR__ . '/../backend/config/connection.php';
+require_once __DIR__ . '/../backend/helpers/Pagination.php';
 
 // --- 2. OBTENER EL CONTENIDO DEL SITIO DESDE LA BD ---
 try {
@@ -56,6 +57,8 @@ include(__DIR__ . '/../components/header.php');
 
   $obras = [];
   $tituloResultado = "";
+  $pagination = null;
+  $paginaActual = isset($_GET['pagina']) ? max(1, (int)$_GET['pagina']) : 1;
 
   // Buscar por término de búsqueda (q) o por categoría
   if (isset($_GET['q']) && !empty(trim($_GET['q']))):
@@ -63,7 +66,22 @@ include(__DIR__ . '/../components/header.php');
     $tituloResultado = htmlspecialchars($busqueda);
     
     try {
-      // Buscar en título, descripción y nombre del artista
+      // Contar total de resultados
+      $stmtCount = $pdo->prepare("
+        SELECT COUNT(*) as total
+        FROM publicaciones p
+        INNER JOIN artistas a ON p.usuario_id = a.id
+        WHERE p.estado = 'publicada' AND a.status = 'validado' 
+        AND (p.titulo LIKE ? OR p.descripcion LIKE ? OR CONCAT(a.nombre, ' ', a.apellido) LIKE ?)
+      ");
+      $searchTerm = '%' . $busqueda . '%';
+      $stmtCount->execute([$searchTerm, $searchTerm, $searchTerm]);
+      $totalObrasBusqueda = $stmtCount->fetch(PDO::FETCH_ASSOC)['total'];
+      
+      // Crear paginación
+      $pagination = new Pagination($totalObrasBusqueda, 12, $paginaActual);
+      
+      // Buscar en título, descripción y nombre del artista (con paginación)
       $stmt = $pdo->prepare("
         SELECT p.id, p.titulo, p.descripcion, p.multimedia, p.fecha_creacion,
                a.id AS artista_id, CONCAT(a.nombre, ' ', a.apellido) AS artista_nombre,
@@ -73,8 +91,8 @@ include(__DIR__ . '/../components/header.php');
         WHERE p.estado = 'publicada' AND a.status = 'validado' 
         AND (p.titulo LIKE ? OR p.descripcion LIKE ? OR CONCAT(a.nombre, ' ', a.apellido) LIKE ?)
         ORDER BY p.fecha_creacion DESC
+        " . $pagination->getLimitSQL() . "
       ");
-      $searchTerm = '%' . $busqueda . '%';
       $stmt->execute([$searchTerm, $searchTerm, $searchTerm]);
       $obras = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
@@ -86,7 +104,20 @@ include(__DIR__ . '/../components/header.php');
     $categoriaDB = $categorias_db[$_GET['categoria']];
     
     try {
-      // Obtener obras publicadas de esa categoría
+      // Contar total de resultados
+      $stmtCount = $pdo->prepare("
+        SELECT COUNT(*) as total
+        FROM publicaciones p
+        INNER JOIN artistas a ON p.usuario_id = a.id
+        WHERE p.estado = 'publicada' AND a.status = 'validado' AND p.categoria = ?
+      ");
+      $stmtCount->execute([$categoriaDB]);
+      $totalObrasBusqueda = $stmtCount->fetch(PDO::FETCH_ASSOC)['total'];
+      
+      // Crear paginación
+      $pagination = new Pagination($totalObrasBusqueda, 12, $paginaActual);
+      
+      // Obtener obras publicadas de esa categoría (con paginación)
       $stmt = $pdo->prepare("
         SELECT p.id, p.titulo, p.descripcion, p.multimedia, p.fecha_creacion,
                a.id AS artista_id, CONCAT(a.nombre, ' ', a.apellido) AS artista_nombre,
@@ -95,6 +126,7 @@ include(__DIR__ . '/../components/header.php');
         INNER JOIN artistas a ON p.usuario_id = a.id
         WHERE p.estado = 'publicada' AND a.status = 'validado' AND p.categoria = ?
         ORDER BY p.fecha_creacion DESC
+        " . $pagination->getLimitSQL() . "
       ");
       $stmt->execute([$categoriaDB]);
       $obras = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -144,6 +176,20 @@ include(__DIR__ . '/../components/header.php');
           </div>
         <?php endif; ?>
       </div>
+      
+      <!-- Paginador -->
+      <?php if ($pagination && $pagination->getTotalPages() > 1): ?>
+        <div style="margin-top: 40px; display: flex; justify-content: center;">
+          <?php
+            $baseUrl = $_SERVER['REQUEST_URI'];
+            $baseUrl = explode('?', $baseUrl)[0]; // Remover query string anterior
+            $params = [];
+            if (isset($_GET['q'])) $params['q'] = $_GET['q'];
+            if (isset($_GET['categoria'])) $params['categoria'] = $_GET['categoria'];
+            echo $pagination->renderHTML($baseUrl, $params);
+          ?>
+        </div>
+      <?php endif; ?>
     </section>
   <?php endif; ?>
 
