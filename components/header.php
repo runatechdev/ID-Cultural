@@ -25,7 +25,7 @@ $page_title = $page_title ?? 'ID Cultural';
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <!-- Favicon y CSS principal (siempre se carga) -->
-    <link rel="shortcut icon" href="<?php echo BASE_URL; ?>static/img/favicon/id.png" />
+    <link rel="shortcut icon" href="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" />
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/main.css" />
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/search.css" />
 

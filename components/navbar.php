@@ -7,7 +7,7 @@
 
     <!-- Logo y Nombre -->
     <a href="/index.php" class="navbar-brand d-flex align-items-center text-decoration-none">
-      <img src="/static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
+      <img src="static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
       <h4 class="m-0 text-white fw-bold">ID Cultural</h4>
     </a>
 
