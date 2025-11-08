@@ -1,241 +1,306 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php
+session_start();
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../backend/config/connection.php';
 
-<head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/png" href="../static/img/huella-idcultural.png">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <title>
-        Perfil Artista
-    </title>
-    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no'
-        name='viewport' />
-    <!--     Fonts and icons     -->
-    <link rel="stylesheet" type="text/css"
-        href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <!-- CSS Files -->
-    <link href="../assets/css/material-kit.css?v=2.2.1" rel="stylesheet" />
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link href="../assets/demo/demo.css" rel="stylesheet" />
-    <link href="../assets/demo/vertical-nav.css" rel="stylesheet" />
-</head>
+// Obtener ID del artista desde la URL
+$artista_id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 
-<body class="profile-page sidebar-collapse">
-    <nav class="navbar navbar-color-on-scroll navbar-transparent    fixed-top  navbar-expand-lg " color-on-scroll="100" id="sectionsNav">
-    <div class="container">
-      <div class="navbar-translate">
-        <a class="navbar-brand" href="#">
-          Perfil Artista </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="navbar-toggler-icon"></span>
-          <span class="navbar-toggler-icon"></span>
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      </div>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ml-auto">
-          <li class="dropdown nav-item">
-            <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-              <i class="material-icons">view_carousel</i> Menu
-            </a>
-            <div class="dropdown-menu dropdown-with-icons">
-                <a href="/index.php" class="dropdown-item">
-                  <i class="material-icons">fingerprint</i> Inicio
-                </a>
-              <a href="/src/views/pages/artista/crear-borrador.php" class="dropdown-item">
-                <i class="material-icons">assignment</i> Agregar obras
-              </a>
-              <a href="/src/views/pages/artista/dashboard-artista.php" class="dropdown-item">
-                <i class="material-icons">build</i> Editar Perfil
-              </a>
-              <a href="/src/views/pages/auth/login.php" class="dropdown-item">
-                <i class="material-icons">person_add</i> Salir
-              </a>
-            </div>
-          </li>
-           <li class="button-container nav-item iframe-extern">
-                        <a href="https://www.whatsapp.com/?lang=es" target="_blank"
-                            class="btn  btn-rose   btn-round btn-block">
-                            <i class="material-icons">call</i> Contactar
-                        </a>
-                    </li>
-        </ul>
-      </div>
+// Si no hay ID, mostrar error
+if (!$artista_id) {
+    header('Location: /index.php');
+    exit;
+}
+
+// Consultar artista
+try {
+    // Obtener datos del artista
+    $stmt = $pdo->prepare("
+        SELECT a.*, 
+               (SELECT COUNT(*) FROM publicaciones WHERE usuario_id = a.id AND estado = 'validado') as obras_validadas,
+               (SELECT COUNT(*) FROM publicaciones WHERE usuario_id = a.id) as total_obras
+        FROM artistas a 
+        WHERE a.id = ?
+    ");
+    $stmt->execute([$artista_id]);
+    $artista = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Si no existe, mostrar error
+    if (!$artista) {
+        header('Location: /index.php');
+        exit;
+    }
+    
+    // Verificar permisos de acceso
+    $es_propietario = isset($_SESSION['user_data']) && $_SESSION['user_data']['role'] === 'artista' && $_SESSION['user_data']['id'] === $artista_id;
+    $es_validado = $artista['status'] === 'validado';
+    
+    // Si no es propietario y el perfil no está validado, redirigir
+    if (!$es_propietario && !$es_validado) {
+        header('Location: /index.php');
+        exit;
+    }
+    
+} catch (PDOException $e) {
+    error_log("Error al obtener artista: " . $e->getMessage());
+    header('Location: /index.php');
+    exit;
+}
+
+// Variables para el header
+$page_title = "{$artista['nombre']} {$artista['apellido']} - ID Cultural";
+$specific_css_files = ['perfil-artista.css'];
+
+include(__DIR__ . '/../components/header.php');
+?>
+
+<body class="profile-page">
+    <?php include __DIR__ . '/../components/navbar.php'; ?>
+    
+    <!-- Hero Header with Background Image -->
+    <div class="hero-header" style="background-image: url('../assets/img/sgo.jpg'); background-position: center; background-size: cover; background-attachment: fixed; min-height: 500px; position: relative; display: flex; align-items: flex-start; justify-content: center; padding-top: 60px;">
+        <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(54, 119, 137, 0.6), rgba(195, 1, 53, 0.4)), linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5));"></div>
+        <div style="position: relative; z-index: 2; text-align: center; color: white;">
+            <h1 class="display-3 fw-bold mb-2">Perfil de Artista</h1>
+            <p class="lead fs-5">Explora la trayectoria y obras de nuestros talentos locales</p>
+        </div>
     </div>
-  </nav>
-                   
- <div class="page-header header-filter" data-parallax="true"
-        style="background-image: url('../assets/img/sgo.jpg');"></div>
-    <div class="main main-raised">
-        <div class="profile-content">
+
+    <main>
+        <!-- Profile Section -->
+        <section class="profile-section" style="margin-top: -180px; position: relative; z-index: 10;">
             <div class="container">
-                <div class="row">
-                    <div class="col-md-6 ml-auto mr-auto">
-                        <div class="profile">
-                            <div class="avatar">
-                                <img src="../assets/img/faces/rusher.jpeg" alt="Circle Image"
-                                    class="img-raised rounded-circle img-fluid">
-                            </div>
-                            <div class="name">
-                                <h3 class="title">Rusher King</h3>
-                                <h6>Cantante</h6>
-                                <a href="#pablo" class="btn btn-just-icon btn-link btn-dribbble"><i
-                                        class="fa fa-dribbble"></i></a>
-                                <a href="#pablo" class="btn btn-just-icon btn-link btn-twitter"><i
-                                        class="fa fa-twitter"></i></a>
-                                <a href="#pablo" class="btn btn-just-icon btn-link btn-pinterest"><i
-                                        class="fa fa-pinterest"></i></a>
+                <!-- Profile Card -->
+                <div class="row justify-content-center mb-5">
+                    <div class="col-lg-8">
+                        <div class="card shadow-lg border-0 rounded-4 overflow-visible">
+                            <div class="card-body text-center p-5">
+                                <!-- Avatar -->
+                                <div class="mb-4 avatar-container">
+                                    <img src="<?php echo htmlspecialchars($artista['foto_perfil'] ?? '/static/img/default-avatar.png'); ?>" alt="<?php echo htmlspecialchars($artista['nombre'] . ' ' . $artista['apellido']); ?>"
+                                        class="rounded-circle border border-4 border-white shadow"
+                                        style="width: 220px; height: 220px; object-fit: cover; margin-top: -110px; background-color: white;">
+                                </div>
+                                
+                                <!-- Name and Title -->
+                                <h2 class="h1 fw-bold mb-2"><?php echo htmlspecialchars($artista['nombre'] . ' ' . $artista['apellido']); ?></h2>
+                                <p class="text-muted fs-5 mb-5"><?php echo htmlspecialchars($artista['disciplina'] ?? 'Artista'); ?></p>
+                                
+                                <!-- Social Links -->
+                                <div class="social-links mb-4">
+                                    <?php if (!empty($artista['instagram'])): ?>
+                                        <a href="<?php echo htmlspecialchars($artista['instagram']); ?>" class="btn btn-outline-primary btn-sm rounded-circle social-btn" title="Instagram" target="_blank">
+                                            <i class="bi bi-instagram"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!empty($artista['twitter'])): ?>
+                                        <a href="<?php echo htmlspecialchars($artista['twitter']); ?>" class="btn btn-outline-primary btn-sm rounded-circle social-btn" title="Twitter" target="_blank">
+                                            <i class="bi bi-twitter-x"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!empty($artista['facebook'])): ?>
+                                        <a href="<?php echo htmlspecialchars($artista['facebook']); ?>" class="btn btn-outline-primary btn-sm rounded-circle social-btn" title="Facebook" target="_blank">
+                                            <i class="bi bi-facebook"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!empty($artista['sitio_web'])): ?>
+                                        <a href="<?php echo htmlspecialchars($artista['sitio_web']); ?>" class="btn btn-outline-primary btn-sm rounded-circle social-btn" title="Sitio Web" target="_blank">
+                                            <i class="bi bi-globe"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- Edit Profile Button (solo si es el artista logueado) -->
+                                <?php if (isset($_SESSION['user_data']) && $_SESSION['user_data']['role'] === 'artista' && $_SESSION['user_data']['id'] === $artista['id']): ?>
+                                    <a href="/src/views/pages/editar-perfil.php" class="btn btn-primary btn-lg rounded-pill px-5 mb-4">
+                                        <i class="bi bi-pencil me-2"></i>Editar Perfil
+                                    </a>
+                                <?php endif; ?>
+
+                                <!-- Description -->
+                                <div class="alert alert-light border border-2 border-secondary rounded-3 p-4 text-start">
+                                    <?php if (!empty($artista['biografia'])): ?>
+                                        <p class="mb-0">
+                                            <?php echo nl2br(htmlspecialchars($artista['biografia'])); ?>
+                                        </p>
+                                    <?php else: ?>
+                                        <p class="mb-0 text-muted">
+                                            <em>Este artista aún no ha añadido una biografía.</em>
+                                        </p>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="description text-center">
-                    <p>
-                        <strong>Rusherking</strong>, cuyo nombre real es <strong>Thomas Nicolás Tobar</strong>, es un
-                        rapero y artista de música urbana argentino que se hizo conocido en <strong>2021</strong> con el
-                        remix de su sencillo <em>«Además de mí»</em>. Nacido en <strong>Santiago del Estero</strong>, el
-                        artista se mudó a <strong>Buenos Aires</strong> para seguir su carrera musical, la cual se basa
-                        en el género <strong>trap</strong>, a menudo mezclado con otros estilos. Recientemente ha
-                        decidido cambiar su nombre artístico a solo <strong>"Rusher"</strong>.
-                    </p>
                 </div>
 
+                <!-- Tabs Section -->
+                <div class="row justify-content-center mb-5">
+                    <div class="col-lg-8">
+                        <ul class="nav nav-tabs nav-fill border-bottom-2 mb-4" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active fw-bold" id="obras-tab" data-bs-toggle="tab" data-bs-target="#obras" type="button" role="tab" aria-controls="obras" aria-selected="true">
+                                    <i class="bi bi-camera me-2"></i>Obras
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-bold" id="colaboraciones-tab" data-bs-toggle="tab" data-bs-target="#colaboraciones" type="button" role="tab" aria-controls="colaboraciones" aria-selected="false">
+                                    <i class="bi bi-music-note me-2"></i>Colaboraciones
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-bold" id="favoritos-tab" data-bs-toggle="tab" data-bs-target="#favoritos" type="button" role="tab" aria-controls="favoritos" aria-selected="false">
+                                    <i class="bi bi-heart me-2"></i>Favoritos
+                                </button>
+                            </li>
+                        </ul>
 
-                <div class="row">
-                    <div class="col-md-6 ml-auto mr-auto">
-                        <div class="profile-tabs">
-                            <ul class="nav nav-pills nav-pills-icons justify-content-center" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" href="#studio" role="tab" data-toggle="tab">
-                                        <i class="material-icons">camera</i>
-                                        Obras
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#works" role="tab" data-toggle="tab">
-                                        <i class="material-icons">music_note</i>
-                                        Colaboraciones
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#favorite" role="tab" data-toggle="tab">
-                                        <i class="material-icons">favorite</i>
-                                        Favoritos
-                                    </a>
-                                </li>
-                            </ul>
+                        <!-- Tab Content -->
+                        <div class="tab-content">
+                            <!-- Obras Tab -->
+                            <div class="tab-pane fade show active" id="obras" role="tabpanel" aria-labelledby="obras-tab">
+                                <div class="row g-4">
+                                    <?php
+                                    // Traer obras validadas del artista
+                                    try {
+                                        $stmt_obras = $pdo->prepare("
+                                            SELECT id, titulo, descripcion, multimedia, fecha_validacion 
+                                            FROM publicaciones 
+                                            WHERE usuario_id = ? AND estado = 'validado'
+                                            ORDER BY fecha_validacion DESC
+                                        ");
+                                        $stmt_obras->execute([$artista_id]);
+                                        $obras = $stmt_obras->fetchAll(PDO::FETCH_ASSOC);
+                                        
+                                        if (empty($obras)):
+                                    ?>
+                                        <div class="col-12">
+                                            <div class="alert alert-info" role="alert">
+                                                <i class="bi bi-info-circle me-2"></i>
+                                                Este artista aún no tiene obras validadas.
+                                            </div>
+                                        </div>
+                                    <?php
+                                        else:
+                                            foreach ($obras as $obra):
+                                                $thumbnail = $obra['multimedia'] ? BASE_URL . ltrim($obra['multimedia'], '/') : BASE_URL . 'static/img/paleta-de-pintura.png';
+                                    ?>
+                                        <div class="col-md-6 col-lg-4">
+                                            <div class="card h-100 shadow-sm border-0 overflow-hidden" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#obraModal" onclick="mostrarObra(<?php echo htmlspecialchars(json_encode($obra)); ?>)">
+                                                <img src="<?php echo htmlspecialchars($thumbnail); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($obra['titulo']); ?>" style="height: 250px; object-fit: cover;">
+                                                <div class="card-body">
+                                                    <h5 class="card-title"><?php echo htmlspecialchars($obra['titulo']); ?></h5>
+                                                    <p class="card-text text-muted small"><?php echo htmlspecialchars(substr($obra['descripcion'], 0, 80) . (strlen($obra['descripcion']) > 80 ? '...' : '')); ?></p>
+                                                </div>
+                                                <div class="card-footer bg-light border-top-0">
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-calendar-check"></i>
+                                                        <?php echo date('d/m/Y', strtotime($obra['fecha_validacion'])); ?>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php
+                                            endforeach;
+                                        endif;
+                                    } catch (PDOException $e) {
+                                        echo '<div class="col-12"><div class="alert alert-danger">Error al cargar obras</div></div>';
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+
+                            <!-- Colaboraciones Tab -->
+                            <div class="tab-pane fade" id="colaboraciones" role="tabpanel" aria-labelledby="colaboraciones-tab">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="overflow-hidden rounded-3">
+                                            <img src="<?php echo BASE_URL; ?>static/img/paleta-de-pintura.png" class="img-fluid w-100" alt="Colaboración 1" style="aspect-ratio: 1; object-fit: cover;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="overflow-hidden rounded-3">
+                                            <img src="<?php echo BASE_URL; ?>static/img/paleta-de-pintura.png" class="img-fluid w-100" alt="Colaboración 2" style="aspect-ratio: 1; object-fit: cover;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="overflow-hidden rounded-3">
+                                            <img src="<?php echo BASE_URL; ?>static/img/paleta-de-pintura.png" class="img-fluid w-100" alt="Colaboración 3" style="aspect-ratio: 1; object-fit: cover;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="overflow-hidden rounded-3">
+                                            <img src="<?php echo BASE_URL; ?>static/img/paleta-de-pintura.png" class="img-fluid w-100" alt="Colaboración 4" style="aspect-ratio: 1; object-fit: cover;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Favoritos Tab -->
+                            <div class="tab-pane fade" id="favoritos" role="tabpanel" aria-labelledby="favoritos-tab">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="overflow-hidden rounded-3">
+                                            <img src="<?php echo BASE_URL; ?>static/img/paleta-de-pintura.png" class="img-fluid w-100" alt="Favorito 1" style="aspect-ratio: 1; object-fit: cover;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="overflow-hidden rounded-3">
+                                            <img src="<?php echo BASE_URL; ?>static/img/paleta-de-pintura.png" class="img-fluid w-100" alt="Favorito 2" style="aspect-ratio: 1; object-fit: cover;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="overflow-hidden rounded-3">
+                                            <img src="<?php echo BASE_URL; ?>static/img/paleta-de-pintura.png" class="img-fluid w-100" alt="Favorito 3" style="aspect-ratio: 1; object-fit: cover;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="overflow-hidden rounded-3">
+                                            <img src="<?php echo BASE_URL; ?>static/img/paleta-de-pintura.png" class="img-fluid w-100" alt="Favorito 4" style="aspect-ratio: 1; object-fit: cover;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="overflow-hidden rounded-3">
+                                            <img src="<?php echo BASE_URL; ?>static/img/paleta-de-pintura.png" class="img-fluid w-100" alt="Favorito 5" style="aspect-ratio: 1; object-fit: cover;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="tab-content tab-space">
-                    <div class="tab-pane active text-center gallery" id="studio">
-                        <div class="row">
-                            <div class="col-md-3 ml-auto">
-                                <img src="../assets/img/examples/studio-1.jpg" class="rounded">
-                                <img src="../assets/img/examples/studio-2.jpg" class="rounded">
-                            </div>
-                            <div class="col-md-3 mr-auto">
-                                <img src="../assets/img/examples/studio-5.jpg" class="rounded">
-                                <img src="../assets/img/examples/studio-4.jpg" class="rounded">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane text-center gallery" id="works">
-                        <div class="row">
-                            <div class="col-md-3 ml-auto">
-                                <img src="../assets/img/examples/olu-eletu.jpg" class="rounded">
-                                <img src="../assets/img/examples/clem-onojeghuo.jpg" class="rounded">
-                                <img src="../assets/img/examples/cynthia-del-rio.jpg" class="rounded">
-                            </div>
-                            <div class="col-md-3 mr-auto">
-                                <img src="../assets/img/examples/mariya-georgieva.jpg" class="rounded">
-                                <img src="../assets/img/examples/clem-onojegaw.jpg" class="rounded">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane text-center gallery" id="favorite">
-                        <div class="row">
-                            <div class="col-md-3 ml-auto">
-                                <img src="../assets/img/examples/mariya-georgieva.jpg" class="rounded">
-                                <img src="../assets/img/examples/studio-3.jpg" class="rounded">
-                            </div>
-                            <div class="col-md-3 mr-auto">
-                                <img src="../assets/img/examples/clem-onojeghuo.jpg" class="rounded">
-                                <img src="../assets/img/examples/olu-eletu.jpg" class="rounded">
-                                <img src="../assets/img/examples/studio-1.jpg" class="rounded">
-                            </div>
-                        </div>
-                    </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal para ver obra completa -->
+    <div class="modal fade" id="obraModal" tabindex="-1" aria-labelledby="obraModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="obraModalLabel">Detalle de Obra</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="obraImagen" src="" alt="" class="img-fluid mb-3" style="max-height: 400px; object-fit: cover; width: 100%;">
+                    <h4 id="obraTitulo"></h4>
+                    <p id="obraDescripcion" class="text-muted"></p>
+                    <small id="obraFecha" class="text-muted d-block"></small>
                 </div>
             </div>
         </div>
     </div>
-    <footer class="footer footer-default">
-        <div class="container">
-            <nav class="float-left">
-                <ul>
-                    <li>
-                        <a href="#">
-                            Facebook
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            Youtube
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            Instgram
-                        </a>
-                    </li>
-                    <li>
-                        <a href="
-                        #">
-                            X
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-            <div class="copyright float-right">
-                &copy;
-                <script>
-                    document.write(new Date().getFullYear())
-                </script>, hecha <i class="material-icons">favorite</i> por
-                <a href="#" target="_blank">RunaTech</a>.
-            </div>
-        </div>
-    </footer>
-    <!--   Core JS Files   -->
-    <script src="../assets/js/core/jquery.min.js" type="text/javascript"></script>
-    <script src="../assets/js/core/popper.min.js" type="text/javascript"></script>
-    <script src="../assets/js/core/bootstrap-material-design.min.js" type="text/javascript"></script>
-    <script src="../assets/js/plugins/moment.min.js"></script>
-    <!--	Plugin for the Datepicker, full documentation here: https://github.com/Eonasdan/bootstrap-datetimepicker -->
-    <script src="../assets/js/plugins/bootstrap-datetimepicker.js" type="text/javascript"></script>
-    <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
-    <script src="../assets/js/plugins/nouislider.min.js" type="text/javascript"></script>
-    <!--  Google Maps Plugin    -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
-    <!--	Plugin for Tags, full documentation here: https://github.com/bootstrap-tagsinput/bootstrap-tagsinputs  -->
-    <script src="../assets/js/plugins/bootstrap-tagsinput.js"></script>
-    <!--	Plugin for Select, full documentation here: http://silviomoreto.github.io/bootstrap-select -->
-    <script src="../assets/js/plugins/bootstrap-selectpicker.js" type="text/javascript"></script>
-    <!--	Plugin for Fileupload, full documentation here: http://www.jasny.net/bootstrap/javascript/#fileinput -->
-    <script src="../assets/js/plugins/jasny-bootstrap.min.js" type="text/javascript"></script>
-    <!--	Plugin for Small Gallery in Product Page -->
-    <script src="../assets/js/plugins/jquery.flexisel.js" type="text/javascript"></script>
-    <!-- Plugins for presentation and navigation  -->
-    <script src="../assets/demo/modernizr.js" type="text/javascript"></script>
-    <script src="../assets/demo/vertical-nav.js" type="text/javascript"></script>
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-    <!-- Js With initialisations For Demo Purpose, Don't Include it in Your Project -->
-    <script src="../assets/demo/demo.js" type="text/javascript"></script>
-    <!-- Control Center for Material Kit: parallax effects, scripts for the example pages etc -->
-    <script src="../assets/js/material-kit.js?v=2.2.1" type="text/javascript"></script>
+
+    <?php include __DIR__ . '/../components/footer.php'; ?>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        const BASE_URL = '<?php echo BASE_URL; ?>';
+    </script>
+    <script src="<?php echo BASE_URL; ?>static/js/perfil-artista.js"></script>
 </body>
 
 </html>

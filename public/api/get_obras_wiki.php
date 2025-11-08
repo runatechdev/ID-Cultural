@@ -34,7 +34,7 @@ try {
             a.status AS artista_status
         FROM publicaciones p
         INNER JOIN artistas a ON p.usuario_id = a.id
-        WHERE p.estado = 'publicada' AND a.status = 'validado'
+        WHERE p.estado = 'validado' AND a.status = 'validado'
     ";
     
     $params = [];

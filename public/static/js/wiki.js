@@ -193,16 +193,69 @@ function aplicarFiltros() {
  * Ver detalle de obra
  */
 function verDetalleObra(obraId) {
-    // Puedes implementar un modal o redireccionar a una página de detalle
-    console.log('Ver obra:', obraId);
+    fetch(BASE_URL + `api/get_publicacion_detalle.php?id=${obraId}`)
+        .then(r => {
+            if (!r.ok) throw new Error('No encontrada');
+            return r.json();
+        })
+        .then(data => mostrarModalObra(data))
+        .catch(error => {
+            console.error('Error:', error);
+            alert('No se pudo cargar la obra');
+        });
+}
+
+/**
+ * Mostrar detalle de obra en modal
+ */
+function mostrarModalObra(obra) {
+    if (!obra.id) {
+        alert('Error: Obra inválida');
+        return;
+    }
     
-    // Opción 1: Abrir en modal
-    // fetch(BASE_URL + `api/get_publicacion_detalle.php?id=${obraId}`)
-    //     .then(r => r.json())
-    //     .then(data => mostrarModalObra(data))
+    // Construir galería de multimedia
+    let multimediaHTML = '';
+    if (obra.multimedia && obra.multimedia.length > 0) {
+        const multimedia = Array.isArray(obra.multimedia) ? obra.multimedia : [obra.multimedia];
+        multimediaHTML = '<div class="mt-3"><h6>Galería:</h6>';
+        multimedia.forEach(file => {
+            if (typeof file === 'string' && /\.(jpg|jpeg|png|gif|webp)$/i.test(file)) {
+                multimediaHTML += `<img src="${escaparHTML(file)}" style="max-width: 100%; margin: 5px 0; border-radius: 4px;" alt="Obra">`;
+            }
+        });
+        multimediaHTML += '</div>';
+    }
     
-    // Opción 2: Redireccionar
-    // window.location.href = BASE_URL + `obra.php?id=${obraId}`;
+    // Construir campos extra
+    let camposHTML = '';
+    if (obra.campos_extra && Object.keys(obra.campos_extra).length > 0) {
+        camposHTML = '<div class="mt-3"><h6>Detalles:</h6><dl class="row">';
+        for (const [key, value] of Object.entries(obra.campos_extra)) {
+            if (value) {
+                const label = key.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
+                camposHTML += `<dt class="col-sm-4">${escaparHTML(label)}:</dt><dd class="col-sm-8">${escaparHTML(value)}</dd>`;
+            }
+        }
+        camposHTML += '</dl></div>';
+    }
+    
+    Swal.fire({
+        title: escaparHTML(obra.titulo),
+        html: `
+            <div class="text-start">
+                <p><strong>Artista:</strong> ${escaparHTML(obra.artista_nombre)}</p>
+                <p><strong>Ubicación:</strong> ${escaparHTML(obra.municipio)}, ${escaparHTML(obra.provincia)}</p>
+                <p><strong>Categoría:</strong> ${escaparHTML(obra.categoria)}</p>
+                <hr>
+                <p>${escaparHTML(obra.descripcion)}</p>
+                ${camposHTML}
+                ${multimediaHTML}
+            </div>
+        `,
+        width: '700px',
+        confirmButtonText: 'Cerrar'
+    });
 }
 
 /**

@@ -16,6 +16,41 @@ class MultimediaValidator {
     const ALLOWED_AUDIO = ['audio/mpeg', 'audio/wav', 'audio/ogg'];
     
     /**
+     * Obtiene el tipo MIME de un archivo
+     */
+    private static function getMimeType($file_path) {
+        // Intentar usar finfo si está disponible (más confiable)
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $file_path);
+            finfo_close($finfo);
+            return $mime;
+        }
+        
+        // Fallback a mime_content_type si está disponible
+        if (function_exists('mime_content_type')) {
+            return mime_content_type($file_path);
+        }
+        
+        // Fallback final: obtener del nombre del archivo
+        $ext = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
+        $mime_types = [
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            'mp4' => 'video/mp4',
+            'webm' => 'video/webm',
+            'mov' => 'video/quicktime',
+            'mp3' => 'audio/mpeg',
+            'wav' => 'audio/wav',
+            'ogg' => 'audio/ogg'
+        ];
+        return $mime_types[$ext] ?? 'application/octet-stream';
+    }
+    
+    /**
      * Valida un archivo de imagen
      * 
      * @param array $file Información del archivo ($_FILES['field'])
@@ -35,9 +70,9 @@ class MultimediaValidator {
         }
         
         // Verificar tipo MIME
-        $mime = mime_content_type($file['tmp_name']);
+        $mime = self::getMimeType($file['tmp_name']);
         if (!in_array($mime, self::ALLOWED_IMAGES)) {
-            $respuesta['mensaje'] = "Tipo de archivo no permitido. Acepta: JPG, PNG, WEBP, GIF";
+            $respuesta['mensaje'] = "Tipo de archivo no permitido. Acepta: JPG, PNG, WEBP, GIF (MIME detectado: $mime)";
             return $respuesta;
         }
         
@@ -85,7 +120,7 @@ class MultimediaValidator {
             return $respuesta;
         }
         
-        $mime = mime_content_type($file['tmp_name']);
+        $mime = self::getMimeType($file['tmp_name']);
         if (!in_array($mime, self::ALLOWED_VIDEOS)) {
             $respuesta['mensaje'] = "Tipo de video no permitido. Acepta: MP4, WEBM, MOV";
             return $respuesta;
@@ -122,7 +157,7 @@ class MultimediaValidator {
             return $respuesta;
         }
         
-        $mime = mime_content_type($file['tmp_name']);
+        $mime = self::getMimeType($file['tmp_name']);
         if (!in_array($mime, self::ALLOWED_AUDIO)) {
             $respuesta['mensaje'] = "Tipo de audio no permitido. Acepta: MP3, WAV, OGG";
             return $respuesta;

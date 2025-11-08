@@ -100,7 +100,7 @@ try {
                 }
             } else {
                 // Obtener todas las solicitudes pendientes
-                $estado = $_GET['estado'] ?? 'pendiente';
+                $estado = $_GET['estado'] ?? 'pendiente_validacion';
                 $sql_where = "WHERE p.estado = ?";
                 $params = [$estado];
 

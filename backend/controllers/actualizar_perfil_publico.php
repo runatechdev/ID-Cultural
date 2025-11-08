@@ -3,15 +3,28 @@
  * actualizar_perfil_publico.php
  * Controller para actualizar perfil público del artista (con validación)
  */
-session_start();
+
+// Limpiar cualquier salida anterior si existe buffer
+if (ob_get_length()) {
+    ob_clean();
+}
+
+// Configurar error handling para que no muestre errores en pantalla
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
+header('Content-Type: application/json; charset=UTF-8');
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . '/../config/connection.php';
 require_once __DIR__ . '/../helpers/MultimediaValidator.php';
 
-header('Content-Type: application/json');
-
 if (!isset($_SESSION['user_data']) || $_SESSION['user_data']['role'] !== 'artista') {
     http_response_code(401);
-    echo json_encode(['error' => 'No autorizado']);
+    echo json_encode(['error' => 'No autorizado'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -32,55 +45,69 @@ $foto_ruta = null;
 if ($foto_perfil && $foto_perfil['error'] === UPLOAD_ERR_OK) {
     try {
         $validator = new MultimediaValidator();
-        $foto_ruta = $validator->validarImagen($foto_perfil);
+        $resultado_guardado = $validator->guardarArchivo($foto_perfil, 'imagen');
+        
+        if (!$resultado_guardado['exitoso']) {
+            http_response_code(400);
+            echo json_encode(['error' => $resultado_guardado['mensaje']], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        
+        $foto_ruta = $resultado_guardado['ruta'];
     } catch (Exception $e) {
         http_response_code(400);
-        echo json_encode(['error' => $e->getMessage()]);
+        echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
         exit;
     }
 }
 
 try {
-    // Crear registro de cambios pendientes de validación
-    $stmt = $pdo->prepare("
-        INSERT INTO cambios_pendientes_validacion 
-        (usuario_id, tipo_cambio, datos_antiguos, datos_nuevos, estado) 
-        VALUES (?, 'perfil_publico', ?, ?, 'pendiente')
-    ");
-
-    $datos_nuevos = [
-        'biografia' => $biografia,
-        'especialidades' => $especialidades,
-        'instagram' => $instagram,
-        'facebook' => $facebook,
-        'twitter' => $twitter,
-        'sitio_web' => $sitio_web,
-        'foto_perfil' => $foto_ruta
-    ];
-
-    // Obtener datos antiguos
-    $stmt_get = $pdo->prepare("SELECT biografia, especialidades, instagram, facebook, twitter, sitio_web FROM artistas WHERE id = ?");
-    $stmt_get->execute([$usuario_id]);
-    $datos_antiguos = $stmt_get->fetch(PDO::FETCH_ASSOC);
-
-    $resultado = $stmt->execute([
-        $usuario_id,
-        json_encode($datos_antiguos),
-        json_encode($datos_nuevos)
-    ]);
+    // Actualizar directamente el perfil público en la tabla artistas
+    $sql = "UPDATE artistas SET ";
+    $campos = [];
+    $valores = [];
+    
+    $campos[] = "biografia = ?";
+    $valores[] = $biografia;
+    
+    $campos[] = "especialidades = ?";
+    $valores[] = $especialidades;
+    
+    $campos[] = "instagram = ?";
+    $valores[] = $instagram;
+    
+    $campos[] = "facebook = ?";
+    $valores[] = $facebook;
+    
+    $campos[] = "twitter = ?";
+    $valores[] = $twitter;
+    
+    $campos[] = "sitio_web = ?";
+    $valores[] = $sitio_web;
+    
+    if ($foto_ruta) {
+        $campos[] = "foto_perfil = ?";
+        $valores[] = $foto_ruta;
+    }
+    
+    $sql .= implode(", ", $campos) . " WHERE id = ?";
+    $valores[] = $usuario_id;
+    
+    $stmt = $pdo->prepare($sql);
+    $resultado = $stmt->execute($valores);
 
     if ($resultado) {
         http_response_code(200);
         echo json_encode([
             'success' => true, 
-            'mensaje' => 'Tu perfil público ha sido enviado a validación. Te notificaremos cuando sea aprobado.'
-        ]);
+            'mensaje' => 'Tu perfil público ha sido actualizado correctamente.'
+        ], JSON_UNESCAPED_UNICODE);
     } else {
         http_response_code(400);
-        echo json_encode(['error' => 'No se pudo procesar la solicitud']);
+        echo json_encode(['error' => 'No se pudo procesar la solicitud'], JSON_UNESCAPED_UNICODE);
     }
 } catch (Exception $e) {
     error_log("Error al actualizar perfil público: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Error al procesar la solicitud']);
+    echo json_encode(['error' => 'Error al procesar la solicitud: ' . $e->getMessage()], JSON_UNESCAPED_UNICODE);
 }

@@ -19,7 +19,9 @@ $publicacion_id = $_POST['id'] ?? null;
 $accion = $_POST['accion'] ?? null; // 'validar' o 'rechazar'
 $motivo = trim($_POST['motivo'] ?? '');
 $validador_id = $_SESSION['user_data']['id'];
-$validador_nombre = $_SESSION['user_data']['nombre'] . ' ' . ($_SESSION['user_data']['apellido'] ?? '');
+// Construir nombre del validador desde sesión con fallback
+$validador_nombre = trim(($_SESSION['user_data']['nombre'] ?? '') . ' ' . ($_SESSION['user_data']['apellido'] ?? ''));
+$validador_nombre = !empty($validador_nombre) ? $validador_nombre : $_SESSION['user_data']['role'];
 
 // Validaciones
 if (empty($publicacion_id) || empty($accion)) {
@@ -49,7 +51,7 @@ try {
         SELECT p.usuario_id, a.status, a.nombre, a.apellido
         FROM publicaciones p
         INNER JOIN artistas a ON p.usuario_id = a.id
-        WHERE p.id = ? AND p.estado = 'pendiente'
+        WHERE p.id = ? AND p.estado IN ('pendiente', 'pendiente_validacion')
     ");
     $stmt->execute([$publicacion_id]);
     $publicacion = $stmt->fetch(PDO::FETCH_ASSOC);

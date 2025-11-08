@@ -15,7 +15,7 @@ $usuario_id = $_SESSION['user_data']['id'];
 try {
     $stmt = $pdo->prepare("
         SELECT * FROM publicaciones 
-        WHERE usuario_id = ? AND estado = 'publicada'
+        WHERE usuario_id = ? AND estado = 'validado'
         ORDER BY fecha_validacion DESC
     ");
     $stmt->execute([$usuario_id]);

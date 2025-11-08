@@ -1,13 +1,24 @@
 <?php
-// Si tienes alguna lógica de sesión al inicio, déjala aquí.
+// Iniciar sesión si no está iniciada
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Asegurar que BASE_URL esté definido
+if (!defined('BASE_URL')) {
+    require_once __DIR__ . '/../config.php';
+}
 ?>
+
+<!-- Material Icons - CDN -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
 <header class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container d-flex align-items-center justify-content-between">
 
     <!-- Logo y Nombre -->
-    <a href="/index.php" class="navbar-brand d-flex align-items-center text-decoration-none">
-      <img src="static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
+    <a href="<?php echo BASE_URL; ?>index.php" class="navbar-brand d-flex align-items-center text-decoration-none">
+      <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
       <h4 class="m-0 text-white fw-bold">ID Cultural</h4>
     </a>
 
@@ -46,41 +57,98 @@
 
           <li class="nav-item"><a class="nav-link" href="/wiki.php">Wiki de artistas</a></li>
 
-          <?php if (isset($_SESSION['user_data'])): ?>
-            <?php
-              // --- INICIO: LÓGICA DE ROLES MEJORADA ---
-              $user_role = $_SESSION['user_data']['role'];
-              $profile_link = '';
-              $profile_text = '';
+          <!-- Menú dinámico - Siempre visible pero con opciones diferentes -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="mainMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="gap: 8px;">
+              <i class="material-icons" style="font-size: 22px;">view_carousel</i>
+              <span>Menú</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-end dropdown-with-icons" aria-labelledby="mainMenuDropdown">
+              <?php
+                // Determinar si hay sesión y qué rol tiene
+                $is_logged_in = isset($_SESSION['user_data']);
+                $user_role = $is_logged_in ? $_SESSION['user_data']['role'] : null;
+              ?>
+              
+              <?php if ($is_logged_in && ($user_role === 'artista' || $user_role === 'artista_validado' || $user_role === 'usuario')): ?>
+                <!-- Menú para Artistas Logueados -->
+                <a href="/index.php" class="dropdown-item">
+                  <i class="material-icons">fingerprint</i> Inicio
+                </a>
+                <a href="/perfil_artista.php?id=<?php echo htmlspecialchars($_SESSION['user_data']['id']); ?>" class="dropdown-item">
+                  <i class="material-icons">person</i> Mi Perfil
+                </a>
+                <a href="/src/views/pages/artista/crear-borrador.php" class="dropdown-item">
+                  <i class="material-icons">assignment</i> Agregar obras
+                </a>
+                <a href="/src/views/pages/artista/dashboard-artista.php" class="dropdown-item">
+                  <i class="material-icons">build</i> Editar Perfil
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="/logout.php" class="dropdown-item">
+                  <i class="material-icons">exit_to_app</i> Salir
+                </a>
+              <?php elseif ($is_logged_in && $user_role === 'admin'): ?>
+                <!-- Menú para Administradores -->
+                <a href="/index.php" class="dropdown-item">
+                  <i class="material-icons">fingerprint</i> Inicio
+                </a>
+                <a href="/src/views/pages/admin/dashboard-adm.php" class="dropdown-item">
+                  <i class="material-icons">dashboard</i> Panel de Control
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="/logout.php" class="dropdown-item">
+                  <i class="material-icons">exit_to_app</i> Salir
+                </a>
+              <?php elseif ($is_logged_in && $user_role === 'editor'): ?>
+                <!-- Menú para Editores -->
+                <a href="/index.php" class="dropdown-item">
+                  <i class="material-icons">fingerprint</i> Inicio
+                </a>
+                <a href="/src/views/pages/editor/panel_editor.php" class="dropdown-item">
+                  <i class="material-icons">edit</i> Panel de Control
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="/logout.php" class="dropdown-item">
+                  <i class="material-icons">exit_to_app</i> Salir
+                </a>
+              <?php elseif ($is_logged_in && $user_role === 'validador'): ?>
+                <!-- Menú para Validadores -->
+                <a href="/index.php" class="dropdown-item">
+                  <i class="material-icons">fingerprint</i> Inicio
+                </a>
+                <a href="/src/views/pages/validador/panel_validador.php" class="dropdown-item">
+                  <i class="material-icons">verified</i> Panel de Control
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="/logout.php" class="dropdown-item">
+                  <i class="material-icons">exit_to_app</i> Salir
+                </a>
+              <?php else: ?>
+                <!-- Menú para usuarios NO logueados -->
+                <a href="/index.php" class="dropdown-item">
+                  <i class="material-icons">fingerprint</i> Inicio
+                </a>
+                <a href="/wiki.php" class="dropdown-item">
+                  <i class="material-icons">library_books</i> Wiki de artistas
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="/src/views/pages/auth/login.php" class="dropdown-item">
+                  <i class="material-icons">person_add</i> Iniciar Sesión
+                </a>
+                <a href="/src/views/pages/auth/registro.php" class="dropdown-item">
+                  <i class="material-icons">person_add_alt</i> Crear cuenta
+                </a>
+              <?php endif; ?>
+            </div>
+          </li>
 
-              if ($user_role === 'admin') {
-                  $profile_text = 'Panel de Control';
-                  $profile_link = '/src/views/pages/admin/dashboard-adm.php';
-              } elseif ($user_role === 'editor') {
-                  $profile_text = 'Panel de Control';
-                  $profile_link = '/src/views/pages/editor/panel_editor.php';
-              } elseif ($user_role === 'validador') {
-                  $profile_text = 'Panel de Control';
-                  $profile_link = '/src/views/pages/validador/panel_validador.php';
-              } elseif ($user_role === 'artista_validado' || $user_role === 'usuario') {
-                  $profile_text = 'Mi Perfil';
-                  $profile_link = '/src/views/pages/artista/dashboard-artista.php';
-              } else {
-                  // Fallback para roles no definidos
-                  $profile_text = 'Mi Perfil';
-                  $profile_link = '/src/views/pages/artista/dashboard-artista.php';
-              }
-            ?>
-            <!-- Se muestra si el usuario INICIÓ SESIÓN -->
-            <li class="nav-item"><a class="nav-link" href="<?php echo $profile_link; ?>"><?php echo $profile_text; ?></a></li>
-            <li class="nav-item"><a class="btn btn-danger rounded-pill btn-sm" href="/logout.php">Cerrar Sesión</a></li>
-            <!-- --- FIN: LÓGICA DE ROLES --- -->
+          <?php if (isset($_SESSION['user_data'])): ?>
+            <!-- Usuario logueado - no mostrar botón adicional, todo está en el menú -->
+            <!-- El dropdown menu ya contiene todas las opciones para cada rol -->
           <?php else: ?>
             <!-- Se muestra si el usuario NO ha iniciado sesión (invitado) -->
-            <li class="nav-item"><a class="nav-link" href="/src/views/pages/auth/login.php">Iniciar Sesión</a></li>
-            <li class="nav-item">
-              <a class="btn btn-outline-light rounded-pill btn-sm" href="/src/views/pages/auth/registro.php">Crear cuenta</a>
-            </li>
+            <!-- Las opciones de login/registro ahora están en el menú dinámico -->
           <?php endif; ?>
 
         </ul>
@@ -225,6 +293,66 @@ window.addEventListener('load', function() {
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <style>
+/* Estilos para Material Icons en el navbar */
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -moz-font-feature-settings: 'liga';
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  vertical-align: middle;
+}
+
+/* Estilos para el dropdown con iconos (Material Icons) */
+.dropdown-with-icons {
+  min-width: 250px;
+  padding: 5px 0;
+  border-radius: 4px;
+}
+
+.dropdown-with-icons .dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  position: relative;
+}
+
+.dropdown-with-icons .dropdown-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: #0d6efd;
+}
+
+.dropdown-with-icons .dropdown-item i {
+  margin-right: 16px;
+  font-size: 20px;
+  color: #666;
+  width: 24px;
+  text-align: center;
+}
+
+.dropdown-with-icons .dropdown-item:hover i {
+  color: #0d6efd;
+}
+
+.dropdown-with-icons .dropdown-divider {
+  margin: 5px 0;
+  background-color: #e9ecef;
+}
+
 /* Estilos adicionales para el dropdown de traducción */
 .dropdown-menu {
   min-width: 200px;

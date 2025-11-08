@@ -38,7 +38,7 @@ function checkUserCredentials($email, $password) {
 
     // Si no se encontró en users, buscar en artistas
     if (!$user) {
-        $stmtArtista = $pdo->prepare("SELECT id, email, password FROM artistas WHERE email = ?");
+        $stmtArtista = $pdo->prepare("SELECT id, email, password, nombre, apellido FROM artistas WHERE email = ?");
         $stmtArtista->execute([$email]);
         $artista = $stmtArtista->fetch(PDO::FETCH_ASSOC);
 
@@ -79,9 +79,11 @@ function checkUserCredentials($email, $password) {
             "role" => $user['role'],
             "redirect" => $redirect, // Devolvemos la URL para que JS redirija
             "source" => $origen,
-            "user_data" => [ // Opcional: devolver algunos datos del usuario (sin password)
+            "user_data" => [ // Devolver datos del usuario completos (sin password)
                 'id' => $user['id'],
                 'email' => $user['email'],
+                'nombre' => $user['nombre'] ?? '',
+                'apellido' => $user['apellido'] ?? '',
                 'role' => $user['role']
             ]
         ];

@@ -58,6 +58,26 @@ include(__DIR__ . '/../../../../../components/header.php');
                     </div>
 
                     <hr class="my-4">
+                    <h5 class="mb-3">📷 Multimedia (Imágenes)</h5>
+                    
+                    <div class="mb-3">
+                        <label for="multimedia" class="form-label">Subir Imágenes <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="multimedia" name="multimedia" accept="image/*" multiple required>
+                            <span class="input-group-text"><i class="bi bi-image"></i></span>
+                        </div>
+                        <small class="text-muted d-block mt-2">
+                            Formatos: JPG, PNG, WEBP (máx. 5MB cada una)<br>
+                            Puedes subir múltiples imágenes
+                        </small>
+                    </div>
+
+                    <!-- Preview de imágenes -->
+                    <div id="preview-container" class="mb-3">
+                        <div id="image-previews" class="row g-3"></div>
+                    </div>
+
+                    <hr class="my-4">
                     <h5 class="mb-3">Detalles Específicos de la Categoría</h5>
 
                     <!-- Campos Condicionales -->

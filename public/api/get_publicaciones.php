@@ -42,8 +42,15 @@ try {
 
     // Aplicar filtros
     if ($estado_filter) {
-        $sql .= " AND p.estado = ?";
-        $params[] = $estado_filter;
+        // Si busca 'pendiente', incluir también 'pendiente_validacion' (normalización)
+        if ($estado_filter === 'pendiente') {
+            $sql .= " AND p.estado IN (?, ?)";
+            $params[] = 'pendiente';
+            $params[] = 'pendiente_validacion';
+        } else {
+            $sql .= " AND p.estado = ?";
+            $params[] = $estado_filter;
+        }
     }
 
     if ($categoria_filter) {

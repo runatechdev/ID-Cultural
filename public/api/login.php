@@ -19,9 +19,10 @@ if ($result['status'] === 'ok') {
     //    Esto mantiene la sesión más limpia y es consistente con nuestro navbar.
     $_SESSION['user_data'] = [
         'id' => $result['user_data']['id'],
-        'role' => $result['user_data']['role']
-        // Aquí puedes añadir más datos si los necesitas, como el nombre o email.
-        // 'email' => $email
+        'role' => $result['user_data']['role'],
+        'nombre' => $result['user_data']['nombre'] ?? '',
+        'apellido' => $result['user_data']['apellido'] ?? '',
+        'email' => $result['user_data']['email'] ?? $email
     ];
 }
 

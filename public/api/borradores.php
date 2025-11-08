@@ -89,8 +89,36 @@ try {
             }
             $campos_extra_json = json_encode($campos_extra);
 
-            // Si se envía a validación, actualizamos la fecha de envío
-            $fecha_envio = ($estado === 'pendiente_validacion') ? date('Y-m-d H:i:s') : null;
+            // Si se envía a validación (estado='pendiente' o 'pendiente_validacion'), actualizamos la fecha de envío
+            $fecha_envio = ($estado === 'pendiente' || $estado === 'pendiente_validacion') ? date('Y-m-d H:i:s') : null;
+            
+            // Normalizar el estado 'pendiente' a 'pendiente_validacion'
+            if ($estado === 'pendiente') {
+                $estado = 'pendiente_validacion';
+            }
+
+            // Procesar multimedia (solo si hay archivos)
+            $multimedia_path = null;
+            if (isset($_FILES['multimedia']) && !empty($_FILES['multimedia']['tmp_name'][0])) {
+                require_once __DIR__ . '/../../backend/helpers/MultimediaValidator.php';
+                $validator = new MultimediaValidator();
+                
+                // Procesar primer archivo
+                $file_data = [
+                    'name' => $_FILES['multimedia']['name'][0],
+                    'type' => $_FILES['multimedia']['type'][0],
+                    'tmp_name' => $_FILES['multimedia']['tmp_name'][0],
+                    'error' => $_FILES['multimedia']['error'][0],
+                    'size' => $_FILES['multimedia']['size'][0]
+                ];
+                
+                $result = $validator->guardarArchivo($file_data, 'imagen');
+                if ($result['exitoso']) {
+                    $multimedia_path = $result['ruta'];
+                } else {
+                    throw new Exception("Error al guardar multimedia: " . ($result['mensaje'] ?: 'Error desconocido'));
+                }
+            }
 
             $pdo->beginTransaction();
 
@@ -109,11 +137,23 @@ try {
                         : 'Borrador actualizado con éxito.';
                 } else {
                     // CREAR nuevo borrador
-                    $stmt = $pdo->prepare(
-                        "INSERT INTO publicaciones (usuario_id, titulo, descripcion, categoria, campos_extra, estado, fecha_envio_validacion) 
-                         VALUES (?, ?, ?, ?, ?, ?, ?)"
-                    );
-                    $stmt->execute([$usuario_id, $titulo, $descripcion, $categoria, $campos_extra_json, $estado, $fecha_envio]);
+                    $sql = "INSERT INTO publicaciones (usuario_id, titulo, descripcion, categoria, campos_extra, estado, fecha_envio_validacion";
+                    if ($multimedia_path) {
+                        $sql .= ", multimedia";
+                    }
+                    $sql .= ") VALUES (?, ?, ?, ?, ?, ?, ?";
+                    if ($multimedia_path) {
+                        $sql .= ", ?";
+                    }
+                    $sql .= ")";
+                    
+                    $params = [$usuario_id, $titulo, $descripcion, $categoria, $campos_extra_json, $estado, $fecha_envio];
+                    if ($multimedia_path) {
+                        $params[] = $multimedia_path;
+                    }
+                    
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute($params);
                     
                     $message = ($estado === 'pendiente_validacion') 
                         ? 'Publicación creada y enviada a validación con éxito.' 

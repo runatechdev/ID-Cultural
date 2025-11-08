@@ -6,14 +6,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Buscar tbody de manera flexible (puede ser tabla-obras-pendientes-body o tabla-artistas-body con clase tabla-obras-body)
     let tbody = document.getElementById('tabla-obras-pendientes-body');
+    console.log('Buscando tbody con ID tabla-obras-pendientes-body:', tbody);
+    
     if (!tbody) {
         tbody = document.querySelector('tbody.tabla-obras-body');
+        console.log('Buscando tbody con selector .tabla-obras-body:', tbody);
     }
     
     if (!tbody) {
         console.error('No se encontró el elemento tbody para cargar las obras');
+        console.log('Elementos tbody disponibles:', document.querySelectorAll('tbody'));
         return;
     }
+    console.log('Tbody encontrado:', tbody.id, tbody.className);
     
     let obrasPendientes = [];
     let obrasFiltradas = [];
@@ -30,29 +35,43 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando obras pendientes...</p></td></tr>';
         
         try {
+            console.log('Fetching:', `${BASE_URL}api/get_publicaciones.php?estado=pendiente`);
             const response = await fetch(`${BASE_URL}api/get_publicaciones.php?estado=pendiente`);
+            console.log('Response status:', response.status, response.ok);
+            
             if (!response.ok) throw new Error('Error al obtener los datos.');
             
             obrasPendientes = await response.json();
+            console.log('Obras recibidas:', obrasPendientes);
+            console.log('Total de obras:', obrasPendientes.length);
+            
             obrasFiltradas = [...obrasPendientes];
             
             // Llenar select de municipios
             llenarSelectMunicipios();
             
             // Mostrar obras
+            console.log('Llamando mostrarObras con:', obrasFiltradas);
             mostrarObras(obrasFiltradas);
 
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error completo:', error);
+            console.error('Stack:', error.stack);
             tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle fs-1"></i><p class="mt-2">Error al cargar las obras pendientes.</p></td></tr>';
         }
     }
 
     function mostrarObras(obras) {
-        if (obras.length === 0) {
+        console.log('mostrarObras llamada con obras:', obras);
+        console.log('Longitud:', obras ? obras.length : 'undefined');
+        
+        if (!obras || obras.length === 0) {
+            console.log('No hay obras, mostrando mensaje vacío');
             tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><i class="bi bi-inbox fs-1 text-muted"></i><p class="mt-3 text-muted">No hay obras pendientes de validación</p></td></tr>';
             return;
         }
+        
+        console.log('Renderizando', obras.length, 'obras');
 
         tbody.innerHTML = obras.map(obra => `
             <tr id="obra-${obra.id}" class="obra-row">

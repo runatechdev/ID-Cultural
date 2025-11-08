@@ -39,7 +39,7 @@ try {
                 WHEN a.status = 'validado' THEN TRUE 
                 ELSE FALSE 
             END AS es_artista_validado,
-            v.nombre AS validador_nombre
+            COALESCE(v.nombre, 'Sistema') AS validador_nombre
         FROM publicaciones p
         INNER JOIN artistas a ON p.usuario_id = a.id
         LEFT JOIN users v ON p.validador_id = v.id
@@ -64,19 +64,15 @@ try {
             in_array($user_data['role'], ['validador', 'admin', 'editor']) || // Es staff
             $publicacion['estado'] == 'validado' // Es público
         );
-        
-        if (!$puede_ver) {
-            http_response_code(403);
-            echo json_encode(['error' => 'No tienes permiso para ver esta publicación.']);
-            exit;
-        }
     } else {
         // Si no está logueado, solo puede ver publicaciones validadas
-        if ($publicacion['estado'] !== 'validado') {
-            http_response_code(403);
-            echo json_encode(['error' => 'Debes iniciar sesión para ver esta publicación.']);
-            exit;
-        }
+        $puede_ver = ($publicacion['estado'] === 'validado');
+    }
+    
+    if (!$puede_ver) {
+        http_response_code(403);
+        echo json_encode(['error' => 'No tienes permiso para ver esta publicación.']);
+        exit;
     }
 
     // Convertir campos JSON a arrays

@@ -39,6 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('categoria', document.getElementById('categoria').value);
         formData.append('estado', estado);
 
+        // Agregar archivos multimedia
+        const multimediaFiles = document.getElementById('multimedia').files;
+        for (let i = 0; i < multimediaFiles.length; i++) {
+            formData.append('multimedia[]', multimediaFiles[i]);
+        }
+
         // Recolectar campos extra
         const extraFields = camposContainer.querySelectorAll('input, select, textarea');
         extraFields.forEach(field => {

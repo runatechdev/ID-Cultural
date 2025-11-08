@@ -8,7 +8,7 @@ $specific_css_files = ['wiki.css'];
 
 // Obtener categorías para el selector
 try {
-    $stmt = $pdo->prepare("SELECT DISTINCT categoria FROM publicaciones WHERE estado = 'publicada' ORDER BY categoria");
+    $stmt = $pdo->prepare("SELECT DISTINCT categoria FROM publicaciones WHERE estado = 'validado' ORDER BY categoria");
     $stmt->execute();
     $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -213,6 +213,7 @@ include(__DIR__ . '/../components/header.php');
     <meta name="base-url" content="<?php echo BASE_URL; ?>">
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
     <script src="<?php echo BASE_URL; ?>static/js/wiki.js"></script>
 </body>
 
