@@ -54,6 +54,23 @@ class EmailHelper {
     }
     
     /**
+     * Notifica al artista que su perfil fue rechazado
+     */
+    public function notificarPerfilRechazado($email, $nombre, $motivo = '') {
+        try {
+            $asunto = 'Tu perfil requiere ajustes en ID Cultural';
+            $html = $this->obtenerPlantilla('perfil_rechazado', [
+                'nombre' => $nombre,
+                'motivo' => $motivo
+            ]);
+            return $this->enviarMail($email, $asunto, $html);
+        } catch (Exception $e) {
+            error_log("Error notificando rechazo de perfil: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
      * Notifica al artista que su obra fue aprobada
      */
     public function notificarObraAprobada($email, $nombre, $titulo_obra) {
@@ -153,6 +170,22 @@ class EmailHelper {
                         <p>¡Excelente noticia! Tu perfil en ID Cultural ha sido <strong>validado y aprobado</strong>.</p>
                         <p>Ahora puedes publicar tus obras y ser descubierto por la comunidad cultural.</p>
                         <p style='margin-top: 30px;'><a href='https://idcultural.gob.ar/dashboard' style='background-color: #0066cc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;'>Ir a mi panel</a></p>
+                    </div>
+                </body>
+                </html>
+            ",
+            'perfil_rechazado' => "
+                <html>
+                <head><meta charset='UTF-8'></head>
+                <body style='font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;'>
+                    <div style='background-color: white; padding: 40px; border-radius: 8px; max-width: 600px; margin: 0 auto;'>
+                        <h2 style='color: #dc3545;'>Revisión requerida en tu perfil</h2>
+                        <p>Hola <strong>{$datos['nombre']}</strong>,</p>
+                        <p>Tu perfil en ID Cultural requiere algunos ajustes antes de ser aprobado.</p>
+                        " . (!empty($datos['motivo']) ? "<p><strong>Motivo:</strong></p><p style='background-color: #f9f9f9; padding: 15px; border-left: 4px solid #dc3545;'>{$datos['motivo']}</p>" : "") . "
+                        <p>Por favor, accede a tu panel y actualiza la información según lo indicado.</p>
+                        <p style='margin-top: 30px;'><a href='https://idcultural.gob.ar/src/views/pages/artista/editar_perfil_publico.php' style='background-color: #0066cc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;'>Editar mi perfil</a></p>
+                        <p><small style='color: #666;'>Una vez realices los cambios, tu perfil será revisado nuevamente.</small></p>
                     </div>
                 </body>
                 </html>
