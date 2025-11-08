@@ -192,10 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p>${escapeHtml(perfil.biografia || 'Sin biografía')}</p>
                     ${redesHTML}
                     ${motivoHTML}
-                    <hr>
-                    <p class="text-muted small mb-0">
-                        <i class="bi bi-clock"></i> Registrado: ${formatearFecha(perfil.fecha_registro)}
-                    </p>
                 </div>
             `,
             width: '700px',

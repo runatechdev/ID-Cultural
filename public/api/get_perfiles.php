@@ -60,9 +60,7 @@ try {
         a.twitter,
         a.sitio_web,
         a.status_perfil,
-        a.motivo_rechazo,
-        a.fecha_registro,
-        a.fecha_validacion
+        a.motivo_rechazo
     FROM artistas a
     WHERE 1=1";
     
@@ -80,10 +78,10 @@ try {
         $params[] = $provincia_filter;
     }
 
-    // Ordenar: pendientes primero, luego por fecha más reciente
+    // Ordenar: pendientes primero, luego por ID (más reciente si es autoincrement)
     $sql .= " ORDER BY 
         FIELD(a.status_perfil, 'pendiente', 'rechazado', 'validado') ASC,
-        a.fecha_registro DESC";
+        a.id DESC";
 
     // Contar total de registros (antes de agregar LIMIT)
     $count_params = $params; // Copiar parámetros
