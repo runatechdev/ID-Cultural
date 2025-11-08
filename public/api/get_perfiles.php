@@ -85,30 +85,22 @@ try {
         FIELD(a.status_perfil, 'pendiente', 'rechazado', 'validado') ASC,
         a.fecha_registro DESC";
 
-    // Contar total de registros
-    $sql_count = str_replace("SELECT 
-        a.id,
-        a.nombre,
-        a.apellido,
-        a.email,
-        a.provincia,
-        a.municipio,
-        a.especialidades,
-        a.biografia,
-        a.foto_perfil,
-        a.instagram,
-        a.facebook,
-        a.twitter,
-        a.sitio_web,
-        a.status_perfil,
-        a.motivo_rechazo,
-        a.fecha_registro,
-        a.fecha_validacion", "SELECT COUNT(*) as total", $sql);
-    $sql_count = preg_replace("/ORDER BY.*/i", "", $sql_count);
+    // Contar total de registros (antes de agregar LIMIT)
+    $count_params = $params; // Copiar parámetros
+    $sql_count = "SELECT COUNT(*) as total FROM artistas a WHERE 1=1";
+    
+    // Aplicar los mismos filtros a la consulta de conteo
+    if ($estado_filter !== 'todos') {
+        $sql_count .= " AND a.status_perfil = ?";
+    }
+    if ($provincia_filter) {
+        $sql_count .= " AND a.provincia = ?";
+    }
 
     $stmt_count = $pdo->prepare($sql_count);
-    $stmt_count->execute($params);
-    $total = $stmt_count->fetch(PDO::FETCH_ASSOC)['total'];
+    $stmt_count->execute($count_params);
+    $result_count = $stmt_count->fetch(PDO::FETCH_ASSOC);
+    $total = $result_count ? $result_count['total'] : 0;
 
     // Agregar paginación
     $sql .= " LIMIT ? OFFSET ?";
@@ -124,14 +116,6 @@ try {
     // 4. RESPUESTA
     // ============================================
 
-    $response = [
-        'perfiles' => $perfiles,
-        'total' => (int)$total,
-        'pagina' => $pagina,
-        'por_pagina' => $limite,
-        'total_paginas' => ceil($total / $limite)
-    ];
-
     // Si solo se requieren los perfiles (sin paginación info)
     if (count($perfiles) > 0) {
         echo json_encode($perfiles, JSON_UNESCAPED_UNICODE);
@@ -139,8 +123,17 @@ try {
         echo json_encode([], JSON_UNESCAPED_UNICODE);
     }
 
+} catch (PDOException $e) {
+    error_log("Error PDO al obtener perfiles: " . $e->getMessage());
+    error_log("SQL: " . $sql ?? "");
+    error_log("Params: " . json_encode($params ?? []));
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'Error al obtener los perfiles',
+        'debug' => 'Error de base de datos: ' . $e->getMessage()
+    ], JSON_UNESCAPED_UNICODE);
 } catch (Exception $e) {
-    error_log("Error al obtener perfiles: " . $e->getMessage());
+    error_log("Error general al obtener perfiles: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'error' => 'Error al obtener los perfiles',
