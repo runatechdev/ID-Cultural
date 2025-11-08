@@ -1,2 +1,8 @@
 docker/apache/000-default.conf
 docker/Docker/Dockerfile
+
+# Archivos generados
+public/uploads/
+vendor/
+.env
+*.log
