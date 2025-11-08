@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/connection.php';
+require_once __DIR__ . '/../helpers/EmailHelper.php';
 
 header('Content-Type: text/plain');
 
@@ -26,6 +27,15 @@ try {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     $stmt->execute([$nombre, $apellido, $fecha, $genero, $pais, $provincia, $municipio, $email, $hashedPassword]);
+
+    // Enviar email de bienvenida
+    try {
+        /** @var EmailHelper $emailHelper */
+        $emailHelper = new EmailHelper();
+        $emailHelper->enviarBienvenida($email, $nombre);
+    } catch (Exception $e) {
+        error_log("Error enviando email: " . $e->getMessage());
+    }
 
     echo "✅ Registro exitoso";
 } catch (Exception $e) {

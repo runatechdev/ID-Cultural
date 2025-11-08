@@ -25,9 +25,14 @@
     <a href="/src/views/pages/public/components/privacidad.html" target="_blank">Política de Privacidad</a>
     <a href="/src/views/pages/public/terminos_condiciones.html" target="_blank">Términos de Uso</a>
   </div>
-  <p class="copyright">
-    <img src="/static/img/logos/Itse.png" alt="ItseLogo" height="30">
-    © 2025 ID Cultural | Todos los derechos reservados
-  </p>
+ <p class="copyright">
+   © 2025 ID Cultural | Todos los derechos reservados
+   <br>
+  <img src="/static/img/logos/Itse.png" alt="ItseLogo" height="40" style="margin:0 100px;">
+  <img src="/static/img/logos/cultura.png" alt="culturaLogo" height="40" style="margin:0 100px;">
+  <img src="/static/img/logos/jefatura.png" alt="jefaturaLogo" height="40" style="margin:0 100px;">
+  <img src="/static/img/logos/gobierno.png" alt="sgoLogo" height="30" style="margin:0 100px;">
+</p>
+
 </footer>
 

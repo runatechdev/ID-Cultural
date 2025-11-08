@@ -44,9 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
             interesesSeleccionados.push(checkbox.value);
         });
         formData.append('intereses', JSON.stringify(interesesSeleccionados));
+        formData.append('action', 'register');
 
         try {
-            const response = await fetch(`${BASE_URL}api/register_artista.php`, {
+            const response = await fetch(`${BASE_URL}api/artistas.php`, {
                 method: 'POST',
                 body: formData
             });

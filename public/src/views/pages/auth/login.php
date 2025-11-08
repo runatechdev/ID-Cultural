@@ -36,7 +36,7 @@ include(__DIR__ . '/../../../../../components/header.php');
         </div>
         
         <div class="d-flex justify-content-between mt-3">
-            <a href="#">¿Olvidaste tu contraseña?</a>
+            <a href="/recuperar-clave.php">¿Olvidaste tu contraseña?</a>
             <a href="/src/views/pages/auth/registro.php">Crear una cuenta</a>
         </div>
       </form>

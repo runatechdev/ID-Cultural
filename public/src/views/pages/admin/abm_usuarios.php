@@ -210,7 +210,7 @@ include(__DIR__ . '/../../../../../components/header.php');
 
             async function cargarPersonal() {
                 try {
-                    const response = await fetch('<?php echo BASE_URL; ?>api/get_personal.php');
+                    const response = await fetch('<?php echo BASE_URL; ?>api/personal.php?action=get');
                     if (!response.ok) throw new Error('Error en la respuesta de la red.');
                     listaPersonal = await response.json();
                     renderizarTabla(listaPersonal);
@@ -228,7 +228,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                 formData.append('rol', document.getElementById('add-rol').value);
 
                 try {
-                    const response = await fetch('<?php echo BASE_URL; ?>api/add_personal.php', { method: 'POST', body: formData });
+                    const response = await fetch('<?php echo BASE_URL; ?>api/personal.php?action=add', { method: 'POST', body: formData });
                     const result = await response.json();
 
                     if (response.ok && result.status === 'ok') {
@@ -267,7 +267,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                         if (result.isConfirmed) {
                             const formData = new FormData();
                             formData.append('id', userId);
-                            const response = await fetch('<?php echo BASE_URL; ?>api/delete_personal.php', { method: 'POST', body: formData });
+                            const response = await fetch('<?php echo BASE_URL; ?>api/personal.php?action=delete', { method: 'POST', body: formData });
                             const res = await response.json();
                             if (response.ok && res.status === 'ok') {
                                 Swal.fire('¡Eliminado!', res.message, 'success');
@@ -308,7 +308,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                 }
 
                 try {
-                    const response = await fetch('<?php echo BASE_URL; ?>api/update_personal.php', { method: 'POST', body: formData });
+                    const response = await fetch('<?php echo BASE_URL; ?>api/personal.php?action=update', { method: 'POST', body: formData });
                     const result = await response.json();
                     
                     if (response.ok && result.status === 'ok') {

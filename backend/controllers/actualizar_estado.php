@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/connection.php'; // Incluye config y la conexión
+require_once __DIR__ . '/../helpers/EmailHelper.php';
 
 header('Content-Type: application/json');
 
@@ -19,21 +20,54 @@ if (!$id_artista || !$nuevo_estado) {
 }
 
 try {
-    // Opcional: obtener estado anterior para revertir en caso de error
-    $stmt = $pdo->prepare("SELECT estado FROM solicitudes WHERE id = ?"); // Asumiendo que la tabla se llama 'solicitudes'
+    // Obtener datos de la obra y artista
+    $stmt = $pdo->prepare("
+        SELECT p.id, p.titulo, a.email, CONCAT(a.nombre, ' ', a.apellido) as artista_nombre
+        FROM publicaciones p
+        INNER JOIN artistas a ON p.usuario_id = a.id
+        WHERE p.id = ?
+    ");
     $stmt->execute([$id_artista]);
-    $result = $stmt->fetch();
-    if ($result) {
-        $estado_anterior = $result['estado'];
+    $obra = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$obra) {
+        echo json_encode(['status' => 'error', 'message' => 'No se encontró la obra.']);
+        exit();
     }
 
     // 2. Preparamos la actualización
-    $fecha_validacion = ($nuevo_estado === 'Aprobado' || $nuevo_estado === 'Rechazado') ? date('Y-m-d H:i:s') : null;
+    $fecha_validacion = ($nuevo_estado === 'publicada' || $nuevo_estado === 'rechazada') ? date('Y-m-d H:i:s') : null;
 
-    $updateStmt = $pdo->prepare("UPDATE solicitudes SET estado = ?, fecha_validacion = ? WHERE id = ?");
+    $updateStmt = $pdo->prepare("UPDATE publicaciones SET estado = ?, fecha_validacion = ? WHERE id = ?");
     $success = $updateStmt->execute([$nuevo_estado, $fecha_validacion, $id_artista]);
 
     if ($success) {
+        // Enviar notificación por email
+        try {
+            /** @var EmailHelper $emailHelper */
+            $emailHelper = new EmailHelper();
+            
+            if ($nuevo_estado === 'publicada') {
+                // Obra aprobada
+                $emailHelper->notificarObraAprobada(
+                    $obra['email'],
+                    $obra['artista_nombre'],
+                    $obra['titulo']
+                );
+            } elseif ($nuevo_estado === 'rechazada') {
+                // Obra rechazada (sin motivo específico aquí, se podría agregar)
+                $emailHelper->notificarObraRechazada(
+                    $obra['email'],
+                    $obra['artista_nombre'],
+                    $obra['titulo'],
+                    'Revisar los criterios de publicación'
+                );
+            }
+        } catch (Exception $e) {
+            error_log("Error enviando email: " . $e->getMessage());
+            // Continuar aunque falle el email
+        }
+        
         echo json_encode([
             'status' => 'ok',
             'message' => 'Estado actualizado correctamente.',
