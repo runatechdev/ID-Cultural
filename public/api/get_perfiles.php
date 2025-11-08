@@ -102,10 +102,8 @@ try {
     $result_count = $stmt_count->fetch(PDO::FETCH_ASSOC);
     $total = $result_count ? $result_count['total'] : 0;
 
-    // Agregar paginación
-    $sql .= " LIMIT ? OFFSET ?";
-    $params[] = $limite;
-    $params[] = $offset;
+    // Agregar paginación DIRECTAMENTE (no como parámetro preparado)
+    $sql .= " LIMIT " . (int)$limite . " OFFSET " . (int)$offset;
 
     // Ejecutar consulta
     $stmt = $pdo->prepare($sql);
