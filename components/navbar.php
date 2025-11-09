@@ -12,26 +12,11 @@ if (!defined('BASE_URL')) {
 
 <!-- Material Icons - CDN -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-// Iniciar sesión si no está iniciada
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Asegurar que BASE_URL esté definido
-if (!defined('BASE_URL')) {
-    require_once __DIR__ . '/../config.php';
-}
-?>
-
-<!-- Material Icons - CDN -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
 <header class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container d-flex align-items-center justify-content-between">
 
     <!-- Logo y Nombre -->
-    <a href="<?php echo BASE_URL; ?>index.php" class="navbar-brand d-flex align-items-center text-decoration-none">
-      <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
     <a href="<?php echo BASE_URL; ?>index.php" class="navbar-brand d-flex align-items-center text-decoration-none">
       <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
       <h4 class="m-0 text-white fw-bold">ID Cultural</h4>
