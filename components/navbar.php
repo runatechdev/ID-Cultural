@@ -297,15 +297,51 @@ window.addEventListener('load', function() {
     document.body.style.position = 'static';
   }, 500);
   
-  // Tercer intento
-  setTimeout(() => {
-    document.body.style.top = '0px';
-    document.body.style.position = 'static';
-  }, 1000);
+// Tercer intento
+setTimeout(() => {
+  document.body.style.top = '0px';
+  document.body.style.position = 'static';
+}, 1000);
 });
-</script>
 
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+// Funcionalidad del botón de búsqueda
+document.addEventListener('DOMContentLoaded', function() {
+const openSearchBtn = document.getElementById('open-search-btn');
+const closeSearchBtn = document.getElementById('close-search-btn');
+const searchOverlay = document.getElementById('search-overlay');
+const searchForm = document.getElementById('search-form');
+const searchInput = document.querySelector('.form-control-search');
+
+if (openSearchBtn) {
+  openSearchBtn.addEventListener('click', function() {
+    searchOverlay.classList.add('active');
+    if (searchInput) searchInput.focus();
+  });
+}
+
+if (closeSearchBtn) {
+  closeSearchBtn.addEventListener('click', function() {
+    searchOverlay.classList.remove('active');
+  });
+}
+
+if (searchOverlay) {
+  searchOverlay.addEventListener('click', function(e) {
+    if (e.target === searchOverlay) {
+      searchOverlay.classList.remove('active');
+    }
+  });
+}
+
+if (searchInput) {
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Escape') {
+      searchOverlay.classList.remove('active');
+    }
+  });
+}
+});
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <style>
 /* Estilos para Material Icons en el navbar */
