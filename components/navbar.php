@@ -110,11 +110,9 @@
 // Función para cambiar el idioma
 function changeLanguage(lang) {
   if (lang === 'es') {
-    // Volver a español - eliminar traducción
     deleteCookie('googtrans');
     window.location.reload();
   } else {
-    // Cambiar a otro idioma
     setCookie('googtrans', '/es/' + lang, 1);
     setCookie('googtrans', '/es/' + lang, 1, window.location.hostname);
     window.location.reload();
@@ -157,25 +155,16 @@ function googleTranslateElementInit() {
 
 // Al cargar la página
 window.addEventListener('DOMContentLoaded', function() {
-  // Si no hay cookie de traducción, asegurar que esté en español
   const currentLang = getCookie('googtrans');
   if (!currentLang || currentLang === '/es/es' || currentLang === '') {
     deleteCookie('googtrans');
   }
   
-  // Inyectar CSS adicional para eliminar barra blanca
   const style = document.createElement('style');
   style.textContent = `
-    body {
-      top: 0px !important;
-      position: static !important;
-    }
-    .skiptranslate {
-      display: none !important;
-    }
-    body > .skiptranslate {
-      display: none !important;
-    }
+    body { top: 0px !important; position: static !important; }
+    .skiptranslate { display: none !important; }
+    body > .skiptranslate { display: none !important; }
   `;
   document.head.appendChild(style);
 });
@@ -183,23 +172,16 @@ window.addEventListener('DOMContentLoaded', function() {
 // Ocultar elementos de Google Translate
 window.addEventListener('load', function() {
   setTimeout(() => {
-    // Ocultar barra superior
     const frames = document.querySelectorAll('iframe.goog-te-banner-frame');
     frames.forEach(frame => {
       frame.style.display = 'none';
       frame.parentNode && frame.parentNode.removeChild(frame);
     });
-    
-    // Ajustar el body - CRÍTICO para eliminar la barra blanca
     document.body.style.top = '0px';
     document.body.style.position = 'static';
     document.body.classList.remove('translated-ltr', 'translated-rtl');
-    
-    // Ocultar el widget
     const widget = document.getElementById('google_translate_element');
     if (widget) widget.style.display = 'none';
-    
-    // Eliminar divs de Google que causan la barra blanca
     const skiptranslate = document.querySelectorAll('.skiptranslate');
     skiptranslate.forEach(elem => {
       if (elem.tagName === 'DIV' && !elem.querySelector('.goog-te-combo')) {
@@ -207,14 +189,12 @@ window.addEventListener('load', function() {
       }
     });
   }, 100);
-  
-  // Segundo intento después de más tiempo
+
   setTimeout(() => {
     document.body.style.top = '0px';
     document.body.style.position = 'static';
   }, 500);
-  
-  // Tercer intento
+
   setTimeout(() => {
     document.body.style.top = '0px';
     document.body.style.position = 'static';
@@ -225,110 +205,33 @@ window.addEventListener('load', function() {
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <style>
-/* Estilos adicionales para el dropdown de traducción */
-.dropdown-menu {
-  min-width: 200px;
-}
+.dropdown-menu { min-width: 200px; }
+.dropdown-item { padding: 0.5rem 1rem; transition: background-color 0.2s ease; cursor: pointer; }
+.dropdown-item:hover { background-color: rgba(0, 123, 255, 0.1); }
+.dropdown-item:active { background-color: rgba(0, 123, 255, 0.2); }
+.dropdown-header { font-weight: 600; color: #0d6efd; }
 
-.dropdown-item {
-  padding: 0.5rem 1rem;
-  transition: background-color 0.2s ease;
-  cursor: pointer;
-}
+#translateDropdown { position: relative; padding: 0.5rem; transition: all 0.3s ease; }
+#translateDropdown:hover { transform: scale(1.1); color: rgba(255, 255, 255, 0.9) !important; }
+#translateDropdown .bi-globe2 { animation: pulse 2s infinite; }
 
-.dropdown-item:hover {
-  background-color: rgba(0, 123, 255, 0.1);
-}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
-.dropdown-item:active {
-  background-color: rgba(0, 123, 255, 0.2);
-}
-
-.dropdown-header {
-  font-weight: 600;
-  color: #0d6efd;
-}
-
-/* Estilo del botón de idiomas */
-#translateDropdown {
-  position: relative;
-  padding: 0.5rem;
-  transition: all 0.3s ease;
-}
-
-#translateDropdown:hover {
-  transform: scale(1.1);
-  color: rgba(255, 255, 255, 0.9) !important;
-}
-
-#translateDropdown .bi-globe2 {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-/* Logo del navbar */
 .navbar-brand img {
-  filter: brightness(0) invert(1); /* Hace el logo blanco para que se vea en fondo azul */
+  filter: brightness(0) invert(1);
   transition: transform 0.3s ease;
 }
+.navbar-brand:hover img { transform: scale(1.1); }
 
-.navbar-brand:hover img {
-  transform: scale(1.1);
+body > .skiptranslate { display: none !important; }
+.goog-te-banner-frame, .goog-te-banner-frame.skiptranslate {
+  display: none !important; visibility: hidden !important;
 }
-
-/* Asegurar que NO aparezca la barra de Google */
-body > .skiptranslate {
-  display: none !important;
-}
-
-.goog-te-banner-frame,
-.goog-te-banner-frame.skiptranslate {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-#goog-gt-tt, .goog-te-balloon-frame {
-  display: none !important;
-}
-
-.goog-text-highlight {
-  background: none !important;
-  box-shadow: none !important;
-}
-
-/* Ocultar completamente cualquier elemento de Google Translate */
-body.translated-ltr,
-body.translated-rtl {
-  top: 0 !important;
-  margin-top: 0 !important;
-}
-
-.goog-te-gadget {
-  display: none !important;
-}
-
-iframe.skiptranslate {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-.goog-logo-link {
-  display: none !important;
-}
-
-.goog-te-gadget span {
-  display: none !important;
-}
-
-#google_translate_element {
+#goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
+.goog-text-highlight { background: none !important; box-shadow: none !important; }
+body.translated-ltr, body.translated-rtl { top: 0 !important; margin-top: 0 !important; }
+.goog-te-gadget, iframe.skiptranslate, .goog-logo-link,
+.goog-te-gadget span, #google_translate_element {
   display: none !important;
 }
 </style>

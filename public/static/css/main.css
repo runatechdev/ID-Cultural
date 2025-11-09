@@ -350,3 +350,113 @@ footer .copyright {
   text-align: center;
   font-family: 'Segoe UI', sans-serif;
 }
+.footer-socalo {
+  background-color: rgb(19, 92, 126); /* bordo */
+  padding: 20px 0;
+  text-align: center;
+}
+
+.footer-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px; /* espacio entre logos */
+  margin-bottom: 10px;
+}
+
+.footer-logos img {
+  max-height: 50px;
+  transition: transform 0.3s ease;
+}
+
+.footer-logos img:hover {
+  transform: scale(1.1); /* efecto sutil al pasar el mouse */
+}
+
+.footer-socalo .copyright {
+  color: #fff;
+  font-size: 14px;
+  margin: 0;
+}
+
+.footer-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap; /* permite que los logos bajen si no entran */
+  gap: 40px;
+  margin-bottom: 10px;
+  
+}
+
+.footer-logos img {
+  max-height: 50px;
+  flex: 0 1 auto;
+}
+
+.footer-socalo .copyright {
+  color: #fff;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* 📱 Pantallas chicas */
+@media (max-width: 768px) {
+  .footer-logos {
+    flex-direction: column; /* logos en columna */
+    gap: 20px;
+  }
+
+  .footer-logos img {
+    max-height: 40px;
+  }
+
+  .footer-socalo {
+    padding: 15px 10px;
+  }
+
+  .footer-socalo .copyright {
+    font-size: 12px;
+  }
+}
+.navbar-nav .nav-link {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: #ffffff !important;
+  position: relative;
+  padding: 6px 12px;
+  transition: color 0.3s ease;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-nav .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #FFD700;
+  transition: width 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #FFD700 !important;
+}
+
+.navbar-nav .nav-link:hover::after {
+  width: 100%;
+}
+.navbar-nav .btn-outline-light {
+  border: 2px solid #FFD700;
+  color: #FFD700;
+  font-weight: bold;
+  padding: 6px 14px;
+  transition: all 0.3s ease;
+}
+
+.navbar-nav .btn-outline-light:hover {
+  background-color: #FFD700;
+  color: #000;
+}
