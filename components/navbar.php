@@ -75,6 +75,9 @@ if (!defined('BASE_URL')) {
                 <a href="/index.php" class="dropdown-item">
                   <i class="material-icons">fingerprint</i> Inicio
                 </a>
+                <a href="/noticias.php" class="dropdown-item">
+                  <i class="material-icons">article</i> Noticias
+                </a>
                 <a href="/perfil_artista.php?id=<?php echo htmlspecialchars($_SESSION['user_data']['id']); ?>" class="dropdown-item">
                   <i class="material-icons">person</i> Mi Perfil
                 </a>
@@ -93,6 +96,9 @@ if (!defined('BASE_URL')) {
                 <a href="/index.php" class="dropdown-item">
                   <i class="material-icons">fingerprint</i> Inicio
                 </a>
+                <a href="/noticias.php" class="dropdown-item">
+                  <i class="material-icons">article</i> Noticias
+                </a>
                 <a href="/src/views/pages/admin/dashboard-adm.php" class="dropdown-item">
                   <i class="material-icons">dashboard</i> Panel de Control
                 </a>
@@ -104,6 +110,9 @@ if (!defined('BASE_URL')) {
                 <!-- Menú para Editores -->
                 <a href="/index.php" class="dropdown-item">
                   <i class="material-icons">fingerprint</i> Inicio
+                </a>
+                <a href="/noticias.php" class="dropdown-item">
+                  <i class="material-icons">article</i> Noticias
                 </a>
                 <a href="/src/views/pages/editor/panel_editor.php" class="dropdown-item">
                   <i class="material-icons">edit</i> Panel de Control
@@ -117,6 +126,9 @@ if (!defined('BASE_URL')) {
                 <a href="/index.php" class="dropdown-item">
                   <i class="material-icons">fingerprint</i> Inicio
                 </a>
+                <a href="/noticias.php" class="dropdown-item">
+                  <i class="material-icons">article</i> Noticias
+                </a>
                 <a href="/src/views/pages/validador/panel_validador.php" class="dropdown-item">
                   <i class="material-icons">verified</i> Panel de Control
                 </a>
@@ -129,8 +141,8 @@ if (!defined('BASE_URL')) {
                 <a href="/index.php" class="dropdown-item">
                   <i class="material-icons">fingerprint</i> Inicio
                 </a>
-                <a href="/wiki.php" class="dropdown-item">
-                  <i class="material-icons">library_books</i> Wiki de artistas
+                <a href="/noticias.php" class="dropdown-item">
+                  <i class="material-icons">article</i> Noticias
                 </a>
                 <div class="dropdown-divider"></div>
                 <a href="/src/views/pages/auth/login.php" class="dropdown-item">

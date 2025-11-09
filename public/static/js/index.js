@@ -130,7 +130,7 @@ async function cargarNoticias() {
 
         contenedor.innerHTML = noticias.map((noticia, index) => `
             <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="${index * 100}">
-                <article class="card noticia-card h-100" onclick="abrirModalNoticia(${noticia.id})">
+                <article class="card noticia-card h-100" onclick="window.location.href='${BASE_URL}noticias.php'" style="cursor: pointer;">
                     ${noticia.imagen_url ? `
                         <img src="${escapeHtml(noticia.imagen_url)}" 
                              class="card-img-top" 
