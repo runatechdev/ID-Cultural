@@ -25,17 +25,20 @@
     <a href="/src/views/pages/public/components/privacidad.html" target="_blank">Política de Privacidad</a>
     <a href="/src/views/pages/public/terminos_condiciones.html" target="_blank">Términos de Uso</a>
   </div>
-<p class="copyright">
-      © 2025 ID Cultural | Todos los derechos reservados
-    </p>
-  
-</footer>
-<div class="footer-socalo">
-    <div class="footer-logos">
-      <img src="/static/img/logos/Itse.png" alt="ItseLogo" height="50">
-      <img src="/static/img/logos/cultura.png" alt="culturaLogo" height="80   ">
-      <img src="/static/img/logos/jefatura.png" alt="jefaturaLogo" height="80">
-      <img src="/static/img/logos/gobierno.png" alt="sgoLogo" height="50">
-    </div>
-    
+
+  <p class="copyright">
+    © 2025 ID Cultural | Todos los derechos reservados
+  </p>
+
+  <!-- Logos integrados en el footer colorido -->
+  <div class="footer-logos">
+    <img src="/static/img/logos/Itse.png" alt="ItseLogo">
+    <img src="/static/img/logos/cultura.png" alt="culturaLogo">
+    <img src="/static/img/logos/jefatura.png" alt="jefaturaLogo">
+    <img src="/static/img/logos/gobierno.png" alt="sgoLogo">
   </div>
+
+  <p style="margin-top: 10px; font-size: 13px; opacity: 0.9;">
+    Gobierno de Santiago del Estero
+  </p>
+</footer>
