@@ -44,7 +44,7 @@ include(__DIR__ . '/../components/header.php');
               <div class="container">
                 <h1 class="display-3 fw-bold mb-3" data-aos="fade-up">Visibilizar y Preservar</h1>
                 <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">Un espacio para la identidad artística y cultural de Santiago del Estero</p>
-                <a href="/wiki.php" class="btn btn-light btn-lg rounded-pill px-5" data-aos="fade-up" data-aos-delay="200">
+                <a href="/wiki.php?tab=obras-validadas" class="btn btn-light btn-lg rounded-pill px-5" data-aos="fade-up" data-aos-delay="200">
                   <i class="bi bi-compass me-2"></i>Explorar Wiki
                 </a>
               </div>
@@ -60,7 +60,7 @@ include(__DIR__ . '/../components/header.php');
               <div class="container">
                 <h1 class="display-3 fw-bold mb-3" data-aos="fade-up">Nuestros Artistas</h1>
                 <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">Explora la trayectoria de talentos locales, actuales e históricos</p>
-                <a href="/wiki.php" class="btn btn-light btn-lg rounded-pill px-5" data-aos="fade-up" data-aos-delay="200">
+                <a href="/wiki.php?tab=artistas-validados" class="btn btn-light btn-lg rounded-pill px-5" data-aos="fade-up" data-aos-delay="200">
                   <i class="bi bi-people me-2"></i>Ver Artistas
                 </a>
               </div>
@@ -76,7 +76,7 @@ include(__DIR__ . '/../components/header.php');
               <div class="container">
                 <h1 class="display-3 fw-bold mb-3" data-aos="fade-up">Biblioteca Digital</h1>
                 <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">Accede a un archivo único con material exclusivo de nuestra región</p>
-                <a href="/wiki.php" class="btn btn-light btn-lg rounded-pill px-5" data-aos="fade-up" data-aos-delay="200">
+                <a href="/busqueda.php?categoria=Arte" class="btn btn-light btn-lg rounded-pill px-5" data-aos="fade-up" data-aos-delay="200">
                   <i class="bi bi-book me-2"></i>Explorar Biblioteca
                 </a>
               </div>

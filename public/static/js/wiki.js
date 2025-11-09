@@ -29,6 +29,26 @@ function initWiki() {
     setupSearch();
     setupFilters();
     setupCategoryNavigation();
+    
+    // Verificar si hay un tab específico en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabFromURL = urlParams.get('tab');
+    if (tabFromURL && document.getElementById(tabFromURL)) {
+        WIKI.currentTab = tabFromURL;
+        // Activar el botón correspondiente
+        const targetBtn = document.querySelector(`[data-tab="${tabFromURL}"]`);
+        if (targetBtn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            targetBtn.classList.add('active');
+            
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            const targetPane = document.getElementById(tabFromURL);
+            if (targetPane) {
+                targetPane.classList.add('active');
+            }
+        }
+    }
+    
     loadInitialData();
     setupResponsive();
 }
