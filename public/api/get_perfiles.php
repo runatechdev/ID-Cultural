@@ -4,6 +4,10 @@
  * Obtiene la lista de perfiles de artistas filtrados por estado
  */
 
+// Evitar que se muestren warnings/notices que rompan el JSON
+ini_set('display_errors', '0');
+error_reporting(E_ERROR | E_PARSE);
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
