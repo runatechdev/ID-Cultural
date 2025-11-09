@@ -150,7 +150,7 @@ main {
 
 /* --- SECCIÓN DE NOTICIAS CORREGIDA --- */
 .noticias-home {
-  max-width: 1200px; /* Ampliado para que quepan 3 tarjetas */
+  max-width: 1200px;
   margin: 30px auto;
   padding: 20px;
   background: #fff;
@@ -164,16 +164,12 @@ main {
   text-align: center;
 }
 
-/* DEJAMOS QUE BOOTSTRAP (.row) MANEJE EL CONTENEDOR */
-/* Se elimina el #contenedor-noticias conflictivo */
-
 .noticia-card {
   background: #fff;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  /* === CAMBIO CLAVE === */
-  height: 100%; /* Para que todas las tarjetas en una fila tengan la misma altura */
+  height: 100%;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
@@ -200,42 +196,27 @@ main {
 /* Estilos Globales del Footer                   */
 /* --------------------------------------------- */
 
-/* --------------------------------------------- */
-/* Estilos Globales del Footer                   */
-/* --------------------------------------------- */
-
-/*footer,
-footer.footer,
-body footer,
-body footer.footer {
-   background: linear-gradient(to right, #00BFFF 0%, #32CD32 20%, #FFD700 40%, #FF8C00 60%, #FF1493 80%);
-  
-  background-color: transparent !important;
-  color: white !important;
-  text-align: center;
-  padding: 20px 0 !important;
-  margin-top: auto !important;
-  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1) !important;
-}
-*/
 .footer-content h2 {
   margin: 0;
   font-size: 1.5rem;
   font-weight: bold;
   color: white !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .footer-content p {
   margin: 5px 0 15px 0;
   font-size: 0.9rem;
   color: white !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 footer p,
 footer .copyright {
-  margin: 10px 0 0 0;
+  margin: 10px 0;
   font-size: 14px;
   color: white !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .copyright img {
@@ -257,12 +238,14 @@ footer .copyright {
   font-weight: bold;
   font-size: 14px;
   transition: color 0.3s ease;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .footer-links a:hover {
   text-decoration: underline;
   color: #FFD700 !important;
 }
+
 /* --------------------------------------------- */
 /* Media Queries para Diseño Responsivo          */
 /* --------------------------------------------- */
@@ -296,16 +279,16 @@ footer .copyright {
 }
 
 .navbar {
-  padding-top: 15px !important;    /* Ajusta este valor para más/menos altura */
-  padding-bottom: 15px !important; /* Ajusta este valor para más/menos altura */
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
 }
-
 
 .navbar {
   background: linear-gradient(to right, #00BFFF, #32CD32, #FFD700, #FF8C00, #FF1493);
   color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
+
 .btn-crear-cuenta {
   background-color: #FF1493;
   color: white;
@@ -318,11 +301,10 @@ footer .copyright {
 .btn-crear-cuenta:hover {
   background-color: #FF8C00;
 }
+
 .logo-idcultural {
   max-height: 50px;
   width: auto;
-}
-.logo-idcultural {
   animation: fadeInLogo 0.6s ease-in-out;
 }
 
@@ -330,11 +312,12 @@ footer .copyright {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+
 .footer-zigzag {
   width: 100%;
   height: 100px;
   overflow: hidden;
-  margin-bottom: -1px; /* Elimina la línea divisoria */
+  margin-bottom: -1px;
 }
 
 .zigzag-svg {
@@ -346,7 +329,139 @@ footer .copyright {
 .footer {
   background: linear-gradient(to right, #00BFFF 0%, #32CD32 20%, #FFD700 40%, #FF8C00 60%, #FF1493 80%);
   color: white;
-  padding: 20px;
+  padding: 20px 20px 18px 20px;
   text-align: center;
   font-family: 'Segoe UI', sans-serif;
+}
+
+.footer-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 35px;
+  margin: 25px auto 18px auto;
+  padding: 12px 20px;
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.footer-logos img {
+  max-height: 48px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: brightness(1) contrast(1.1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+  transition: all 0.3s ease;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.footer-logos img:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.05) contrast(1.1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.footer p:last-child {
+  margin-top: 15px;
+  font-size: 13px;
+  opacity: 0.95;
+  font-weight: 500;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 📱 Pantallas medianas */
+@media (max-width: 992px) {
+  .footer-logos {
+    gap: 30px;
+    padding: 12px 18px;
+    margin: 20px auto 15px auto;
+    max-width: 600px;
+  }
+
+  .footer-logos img {
+    max-height: 44px;
+    padding: 7px 10px;
+  }
+}
+
+/* 📱 Pantallas chicas */
+@media (max-width: 768px) {
+  .footer {
+    padding: 18px 15px 15px 15px;
+  }
+
+  .footer-logos {
+    gap: 25px;
+    margin: 18px auto 12px auto;
+    padding: 12px 15px;
+    max-width: 500px;
+  }
+
+  .footer-logos img {
+    max-height: 40px;
+    padding: 6px 9px;
+  }
+}
+
+/* 📱 Pantallas muy chicas */
+@media (max-width: 480px) {
+  .footer-logos {
+    gap: 20px;
+    flex-direction: column;
+    padding: 12px;
+    max-width: 400px;
+  }
+
+  .footer-logos img {
+    max-height: 38px;
+    padding: 6px 10px;
+  }
+}
+
+.navbar-nav .nav-link {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: #ffffff !important;
+  position: relative;
+  padding: 6px 12px;
+  transition: color 0.3s ease;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-nav .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #FFD700;
+  transition: width 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #FFD700 !important;
+}
+
+.navbar-nav .nav-link:hover::after {
+  width: 100%;
+}
+
+.navbar-nav .btn-outline-light {
+  border: 2px solid #FFD700;
+  color: #FFD700;
+  font-weight: bold;
+  padding: 6px 14px;
+  transition: all 0.3s ease;
+}
+
+.navbar-nav .btn-outline-light:hover {
+  background-color: #FFD700;
+  color: #000;
 }

@@ -51,7 +51,6 @@
     color: var(--color-primario);
     display: inline-block;
     background: linear-gradient(90deg, var(--color-primario), #2a5a69);
-    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     padding-bottom: 5px;
@@ -144,109 +143,101 @@
     border-color: var(--color-acento);
 }
 
-/* ===== ESTILOS PARA TARJETAS DE OBRAS ===== */
+/* ==== ESTILO GEOMÉTRICO COLORIDO ==== */
 
-.obra-card {
-    transition: all 0.3s ease;
-    border-radius: 12px;
-    overflow: hidden;
+body {
+  background-color: #ffffff;
 }
 
-.obra-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 24px rgba(0, 191, 255, 0.2) !important;
+/* Patrón geométrico como fondo decorativo */
+.wiki-bg {
+  background: linear-gradient(135deg, #00BFFF 0%, #32CD32 25%, #FFD700 50%, #FF8C00 75%, #FF1493 100%);
+  -webkit-mask-image: url('/static/img/pattern.svg');
+  -webkit-mask-repeat: repeat;
+  -webkit-mask-size: 200px;
+  mask-image: url('/static/img/pattern.svg');
+  mask-repeat: repeat;
+  mask-size: 200px;
+  opacity: 0.1;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
 }
 
-.obra-imagen-container {
-    position: relative;
-    background: linear-gradient(135deg, #f5f5f5 0%, #e9e9e9 100%);
-    overflow: hidden;
+/* Contenedor principal */
+.container {
+  position: relative;
+  z-index: 2;
 }
 
-.obra-imagen-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
+/* Títulos */
+.section-title {
+  color: #003366;
+  font-weight: 700;
+  border-left: 6px solid #FF8C00;
+  padding-left: 10px;
 }
 
-.obra-card:hover .obra-imagen-container img {
-    transform: scale(1.08);
+/* Tarjetas de artistas */
+.artist-card img {
+  border-radius: 16px;
 }
 
-.obra-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+.artist-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #ffffff;
 }
 
-.obra-card:hover .obra-overlay {
-    opacity: 1;
+.artist-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-.obra-card .card-title {
-    color: #333;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
+/* Botones */
+.btn-primary {
+  background: linear-gradient(45deg, #FF8C00, #FF1493);
+  border: none;
 }
 
-.obra-card .card-text {
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: #666;
+.btn-outline-primary {
+  border-color: #00BFFF;
+  color: #00BFFF;
 }
 
-.obra-card .badge {
-    font-size: 0.8rem;
-    padding: 0.5rem 0.75rem;
-    background-color: var(--color-primario) !important;
+.btn-outline-primary:hover {
+  background-color: #00BFFF;
+  color: white;
+}
+/* ==== FONDO GEOMÉTRICO COLORIDO ==== */
+body {
+  position: relative;
+  background-color: #fff;
+  overflow-x: hidden;
 }
 
-/* Hover lift effect */
-.hover-lift {
-    position: relative;
+/* Capa del patrón */
+.wiki-pattern {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: url('/static/img/pattern.png');
+  background-repeat: repeat;
+  background-size: 400px;
+  opacity: 0.12; /* sutil para no distraer */
+  z-index: 0;
 }
 
-/* Grid responsive para obras */
-@media (max-width: 768px) {
-    .obra-card {
-        margin-bottom: 1rem;
-    }
-}
-
-/* ===== SECCIÓN DE OBRAS EN WIKI ===== */
-
-#contenedor-obras-wiki {
-    margin-top: 2rem;
-}
-
-.obras-seccion {
-    padding: 2rem 0;
-}
-
-.obras-seccion h2 {
-    color: var(--color-primario);
-    font-weight: 700;
-    margin-bottom: 2rem;
-    position: relative;
-    padding-bottom: 1rem;
-}
-
-.obras-seccion h2::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 60px;
-    height: 4px;
-    background: linear-gradient(90deg, var(--color-primario) 0%, var(--color-secundario) 100%);
-    border-radius: 2px;
+/* Asegura que el contenido quede por encima */
+main.container {
+  position: relative;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }

@@ -1,4 +1,3 @@
-<script src="<?php echo BASE_URL; ?>static/js/search.js"></script>
 <div class="footer-zigzag">
   <svg viewBox="0 0 1200 100" preserveAspectRatio="none" class="zigzag-svg">
     <defs>
@@ -20,19 +19,26 @@
     <h2>ID Cultural</h2>
     <p>Subsecretaría de Cultura de Santiago del Estero</p>
   </div>
+
   <div class="footer-links">
     <a href="/src/views/pages/public/components/contacto.html" target="_blank">Contacto</a>
     <a href="/src/views/pages/public/components/privacidad.html" target="_blank">Política de Privacidad</a>
     <a href="/src/views/pages/public/terminos_condiciones.html" target="_blank">Términos de Uso</a>
   </div>
- <p class="copyright">
-   © 2025 ID Cultural | Todos los derechos reservados
-   <br>
-  <img src="/static/img/logos/Itse.png" alt="ItseLogo" height="40" style="margin:0 100px;">
-  <img src="/static/img/logos/cultura.png" alt="culturaLogo" height="40" style="margin:0 100px;">
-  <img src="/static/img/logos/jefatura.png" alt="jefaturaLogo" height="40" style="margin:0 100px;">
-  <img src="/static/img/logos/gobierno.png" alt="sgoLogo" height="30" style="margin:0 100px;">
-</p>
 
+  <p class="copyright">
+    © 2025 ID Cultural | Todos los derechos reservados
+  </p>
+
+  <!-- Logos integrados en el footer colorido -->
+  <div class="footer-logos">
+    <img src="/static/img/logos/Itse.png" alt="ItseLogo">
+    <img src="/static/img/logos/cultura.png" alt="culturaLogo">
+    <img src="/static/img/logos/jefatura.png" alt="jefaturaLogo">
+    <img src="/static/img/logos/gobierno.png" alt="sgoLogo">
+  </div>
+
+  <p style="margin-top: 10px; font-size: 13px; opacity: 0.9;">
+    Gobierno de Santiago del Estero
+  </p>
 </footer>
-

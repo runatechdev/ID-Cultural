@@ -12,11 +12,26 @@ if (!defined('BASE_URL')) {
 
 <!-- Material Icons - CDN -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+// Iniciar sesión si no está iniciada
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Asegurar que BASE_URL esté definido
+if (!defined('BASE_URL')) {
+    require_once __DIR__ . '/../config.php';
+}
+?>
+
+<!-- Material Icons - CDN -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
 <header class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container d-flex align-items-center justify-content-between">
 
     <!-- Logo y Nombre -->
+    <a href="<?php echo BASE_URL; ?>index.php" class="navbar-brand d-flex align-items-center text-decoration-none">
+      <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
     <a href="<?php echo BASE_URL; ?>index.php" class="navbar-brand d-flex align-items-center text-decoration-none">
       <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
       <h4 class="m-0 text-white fw-bold">ID Cultural</h4>
@@ -158,8 +173,11 @@ if (!defined('BASE_URL')) {
           <?php if (isset($_SESSION['user_data'])): ?>
             <!-- Usuario logueado - no mostrar botón adicional, todo está en el menú -->
             <!-- El dropdown menu ya contiene todas las opciones para cada rol -->
+            <!-- Usuario logueado - no mostrar botón adicional, todo está en el menú -->
+            <!-- El dropdown menu ya contiene todas las opciones para cada rol -->
           <?php else: ?>
             <!-- Se muestra si el usuario NO ha iniciado sesión (invitado) -->
+            <!-- Las opciones de login/registro ahora están en el menú dinámico -->
             <!-- Las opciones de login/registro ahora están en el menú dinámico -->
           <?php endif; ?>
 
@@ -305,6 +323,66 @@ window.addEventListener('load', function() {
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <style>
+/* Estilos para Material Icons en el navbar */
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -moz-font-feature-settings: 'liga';
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  vertical-align: middle;
+}
+
+/* Estilos para el dropdown con iconos (Material Icons) */
+.dropdown-with-icons {
+  min-width: 250px;
+  padding: 5px 0;
+  border-radius: 4px;
+}
+
+.dropdown-with-icons .dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  position: relative;
+}
+
+.dropdown-with-icons .dropdown-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: #0d6efd;
+}
+
+.dropdown-with-icons .dropdown-item i {
+  margin-right: 16px;
+  font-size: 20px;
+  color: #666;
+  width: 24px;
+  text-align: center;
+}
+
+.dropdown-with-icons .dropdown-item:hover i {
+  color: #0d6efd;
+}
+
+.dropdown-with-icons .dropdown-divider {
+  margin: 5px 0;
+  background-color: #e9ecef;
+}
+
 /* Estilos para Material Icons en el navbar */
 .material-icons {
   font-family: 'Material Icons';
