@@ -19,7 +19,7 @@ if (!defined('BASE_URL')) {
     <!-- Logo y Nombre -->
     <a href="<?php echo BASE_URL; ?>index.php" class="navbar-brand d-flex align-items-center text-decoration-none">
       <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
-      <h4 class="m-0 text-white fw-bold">ID Cultural</h4>
+      <h4 class="m-0 text-white fw-bold typing-effect" id="navbar-title"></h4>
     </a>
 
     <div>
@@ -340,6 +340,29 @@ if (searchInput) {
     }
   });
 }
+
+// Efecto de escritura para el título del navbar
+const titleElement = document.getElementById('navbar-title');
+const fullText = 'ID Cultural';
+let currentIndex = 0;
+
+function typeEffect() {
+  if (currentIndex < fullText.length) {
+    titleElement.textContent = fullText.substring(0, currentIndex + 1) + '|';
+    currentIndex++;
+    setTimeout(typeEffect, 100); // Velocidad de escritura
+  } else {
+    // Efecto de cursor parpadeante al final
+    let cursorVisible = true;
+    setInterval(() => {
+      titleElement.textContent = fullText + (cursorVisible ? '|' : '');
+      cursorVisible = !cursorVisible;
+    }, 500);
+  }
+}
+
+// Iniciar efecto cuando se carga la página
+window.addEventListener('load', typeEffect);
 });
 </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
@@ -362,6 +385,30 @@ if (searchInput) {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   vertical-align: middle;
+}
+
+/* Efecto de escritura en el título */
+.typing-effect {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em;
+  min-width: 150px;
+  position: relative;
+}
+
+.typing-effect::after {
+  content: '';
+  display: inline;
+  animation: blink 0.7s infinite;
+  color: white;
+}
+
+@keyframes blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
 }
 
 /* Estilos para el dropdown con iconos (Material Icons) */
@@ -467,6 +514,7 @@ if (searchInput) {
 /* Estilos adicionales para el dropdown de traducción */
 .dropdown-menu {
   min-width: 200px;
+  z-index: 1100 !important; /* Mayor que search-overlay (1050) */
 }
 
 .dropdown-item {
@@ -515,12 +563,15 @@ if (searchInput) {
 
 /* Logo del navbar */
 .navbar-brand img {
-  filter: brightness(0) invert(1); /* Hace el logo blanco para que se vea en fondo azul */
-  transition: transform 0.3s ease;
+  filter: brightness(1) contrast(1.0) drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+  transition: transform 0.3s ease, filter 0.3s ease;
+  opacity: 1;
 }
 
 .navbar-brand:hover img {
   transform: scale(1.1);
+  filter: brightness(1.5) contrast(1.5) drop-shadow(0 0 4px rgba(255, 255, 255, 1));
+  opacity: 1;
 }
 
 /* Asegurar que NO aparezca la barra de Google */
