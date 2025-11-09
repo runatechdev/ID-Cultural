@@ -68,8 +68,11 @@ include(__DIR__ . '/../../../../../components/header.php');
                     </div>
                     <div class="card-body">
                         <div class="dashboard-menu">
+                            <a href="<?php echo BASE_URL; ?>src/views/pages/shared/gestion_perfiles.php" class="dashboard-item" data-bs-toggle="tooltip" title="Revisar y validar los perfiles de artistas para asegurar información apropiada.">
+                                <i class="bi bi-person-check dashboard-icon"></i> Validar Perfiles de Artistas
+                            </a>
                             <a href="<?php echo BASE_URL; ?>src/views/pages/validador/gestion_pendientes.php" class="dashboard-item" data-bs-toggle="tooltip" title="Revisar y procesar los artistas que esperan validación.">
-                                <i class="bi bi-person-exclamation dashboard-icon"></i> Ver Artistas Pendientes
+                                <i class="bi bi-person-exclamation dashboard-icon"></i> Ver Obras Pendientes
                             </a>
                             <a href="<?php echo BASE_URL; ?>src/views/pages/validador/log_validaciones.php" class="dashboard-item" data-bs-toggle="tooltip" title="Consultar el historial de artistas ya validados o rechazados.">
                                 <i class="bi bi-file-earmark-text-fill dashboard-icon"></i> Historial de Validaciones

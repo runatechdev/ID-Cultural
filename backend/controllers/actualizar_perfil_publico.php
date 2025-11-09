@@ -85,6 +85,10 @@ try {
     $campos[] = "sitio_web = ?";
     $valores[] = $sitio_web;
     
+    // Cambiar estado a pendiente de validación
+    $campos[] = "status_perfil = ?";
+    $valores[] = 'pendiente';
+    
     if ($foto_ruta) {
         $campos[] = "foto_perfil = ?";
         $valores[] = $foto_ruta;
@@ -100,7 +104,7 @@ try {
         http_response_code(200);
         echo json_encode([
             'success' => true, 
-            'mensaje' => 'Tu perfil público ha sido actualizado correctamente.'
+            'mensaje' => 'Tu perfil público ha sido actualizado correctamente. Está en revisión del equipo de validación.'
         ], JSON_UNESCAPED_UNICODE);
     } else {
         http_response_code(400);
