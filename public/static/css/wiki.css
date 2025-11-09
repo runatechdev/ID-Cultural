@@ -2,242 +2,261 @@
 /* ESTILOS MODERNOS PARA LA PÁGINA WIKI (wiki.css) */
 /* ================================================= */
 
-/* Estilo del Banner Principal */
+/* Variables de Color */
 :root {
-    --color-azul: #00BFFF;
-    --color-rosa: #FF1493;
-    --color-amarillo: #FFD700;
-    --color-cian: #00FFFF;
-    --color-negro: #000000;
-    --color-blanco: #FFFFFF;
-
-    /* Aplicaciones base */
-    --color-primario: var(--color-azul);
-    --color-secundario: var(--color-cian);
-    --color-acento: var(--color-rosa);
-    --color-texto-oscuro: var(--color-negro);
+    --color-azul: #0d6efd;
+    --color-primario: #0d6efd;
+    --color-secundario: #0dcaf0;
+    --color-acento: #fd7e14;
+    --color-texto-oscuro: #212529;
+    --color-blanco: #ffffff;
+    --color-gris-claro: #f8f9fa;
 }
 
+/* Fondo del Body con Patrón */
+body {
+    position: relative;
+    background-color: var(--color-blanco);
+    overflow-x: hidden;
+}
 
+/* Patrón de Fondo - Geométrico */
+.wiki-pattern {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: 
+        linear-gradient(135deg, rgba(13, 110, 253, 0.08) 0%, transparent 50%),
+        linear-gradient(45deg, rgba(13, 202, 240, 0.08) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(253, 126, 20, 0.05) 50%, transparent 100%);
+    background-size: 400px 400px, 300px 300px, 500px 500px;
+    background-attachment: fixed;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Contenedor Principal */
+main.container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Banner Principal */
 .banner {
     width: 100%;
     height: auto;
     object-fit: cover;
     max-height: 350px;
-    filter: brightness(0.9); /* Un toque sutil para oscurecer el banner */
+    filter: brightness(0.85) contrast(1.1);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 /* Sección de Búsqueda */
 .search-section {
-    background-color: #fff;
-    border: none;
-    border-radius: 0.5rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 1));
+    border: 2px solid var(--color-primario);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.search-section h2 {
+    color: var(--color-texto-oscuro);
+    font-weight: 700;
 }
 
 .search-section .input-group-text {
     background-color: transparent;
     border-right: none;
     color: var(--color-primario);
+    font-size: 1.3rem;
 }
 
 .search-section .form-control,
 .search-section .form-select {
     border-left: none;
+    border-color: var(--color-primario);
+    font-weight: 500;
 }
 
-/* Títulos de las secciones con gradiente */
+.search-section .form-control:focus,
+.search-section .form-select:focus {
+    border-color: var(--color-secundario);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.search-section .btn-primary {
+    background: linear-gradient(135deg, var(--color-primario), var(--color-acento));
+    border: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.search-section .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.35);
+}
+
+/* Títulos de Secciones */
 .section-title {
     font-weight: 700;
-    color: var(--color-primario);
+    color: var(--color-texto-oscuro);
     display: inline-block;
-    background: linear-gradient(90deg, var(--color-primario), #2a5a69);
+    background: linear-gradient(90deg, var(--color-primario), var(--color-acento));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    padding-bottom: 5px;
-    border-bottom: 3px solid var(--color-acento);
+    background-clip: text;
+    padding-bottom: 10px;
+    border-bottom: 4px solid var(--color-acento);
+    position: relative;
 }
 
-/* Tarjetas de Artista (Grid) con efecto hover mejorado */
+/* Tarjetas de Artista */
 .artist-card {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--color-blanco), var(--color-gris-claro));
 }
 
 .artist-card:hover {
-    transform: translateY(-10px); /* Efecto de "flotar" más pronunciado */
-    box-shadow: 0 12px 25px rgba(42, 90, 105, 0.2); /* Sombra con color primario */
+    transform: translateY(-12px);
+    box-shadow: 0 12px 35px rgba(13, 110, 253, 0.2);
 }
 
 .artist-card .card-img-top {
     height: 200px;
     object-fit: cover;
+    filter: brightness(0.9) contrast(1.05);
+    transition: filter 0.3s ease;
 }
 
-.card-title {
+.artist-card:hover .card-img-top {
+    filter: brightness(1) contrast(1.15);
+}
+
+.artist-card .card-body {
+    padding: 1.5rem;
+}
+
+.artist-card .card-title {
     color: var(--color-texto-oscuro);
-    font-weight: 600;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 
-/* Estilo para Acordeón Personalizado */
+.artist-card .card-text {
+    color: #6c757d;
+    font-size: 0.95rem;
+}
+
+/* Acordeón Personalizado */
 .accordion-item {
-    border: 1px solid #e0d9c7;
+    border: 2px solid #e0d9c7;
     margin-bottom: 10px;
-    border-radius: 0.5rem !important;
-    overflow: hidden; /* Para que los bordes redondeados se apliquen bien */
+    border-radius: 8px !important;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--color-blanco), var(--color-gris-claro));
 }
 
 .accordion-button {
     font-weight: 600;
-    color: var(--color-primario);
-    background-color: var(--color-secundario);
+    color: var(--color-texto-oscuro);
+    background-color: var(--color-gris-claro);
+    border-bottom: 2px solid #e0d9c7;
+    transition: all 0.3s ease;
+}
+
+.accordion-button:hover {
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
 }
 
 .accordion-button:not(.collapsed) {
-    background-color: var(--color-primario);
-    color: white;
+    background: linear-gradient(135deg, var(--color-primario), var(--color-acento));
+    color: var(--color-blanco);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .accordion-button:focus {
-    box-shadow: 0 0 0 0.25rem rgba(54, 119, 137, 0.25); /* Sombra de foco con tu color primario */
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    background-color: var(--color-primario);
 }
 
 .accordion-body {
-    background-color: #fff;
+    background-color: var(--color-gris-claro);
+    padding: 1.5rem;
 }
 
-/* Tarjetas dentro de la lista (acordeón) */
+/* Tarjetas dentro del Acordeón */
 .artist-list-card {
-    border: 1px solid #eee;
-    transition: box-shadow 0.3s ease;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: var(--color-blanco);
+    overflow: hidden;
 }
 
 .artist-list-card:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.15);
+    border-color: var(--color-primario);
+    transform: translateX(4px);
 }
 
 .artist-list-card img {
     height: 100%;
     object-fit: cover;
     max-height: 150px;
-}
-.section-title {
-    background: linear-gradient(90deg, var(--color-azul), var(--color-rosa), var(--color-cian));
-    border-bottom: 3px solid var(--color-amarillo);
-}
-.accordion-button {
-    background-color: var(--color-cian);
-    color: var(--color-texto-oscuro);
+    filter: brightness(0.9);
 }
 
-.accordion-button:not(.collapsed) {
-    background-color: var(--color-primario);
-    color: var(--color-blanco);
-}
-.btn-primary {
-    background-color: var(--color-primario);
-    border-color: var(--color-primario);
-}
-
-.btn-primary:hover {
-    background-color: var(--color-acento);
-    border-color: var(--color-acento);
-}
-
-/* ==== ESTILO GEOMÉTRICO COLORIDO ==== */
-
-body {
-  background-color: #ffffff;
-}
-
-/* Patrón geométrico como fondo decorativo */
-.wiki-bg {
-  background: linear-gradient(135deg, #00BFFF 0%, #32CD32 25%, #FFD700 50%, #FF8C00 75%, #FF1493 100%);
-  -webkit-mask-image: url('/static/img/pattern.svg');
-  -webkit-mask-repeat: repeat;
-  -webkit-mask-size: 200px;
-  mask-image: url('/static/img/pattern.svg');
-  mask-repeat: repeat;
-  mask-size: 200px;
-  opacity: 0.1;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: -1;
-}
-
-/* Contenedor principal */
-.container {
-  position: relative;
-  z-index: 2;
-}
-
-/* Títulos */
-.section-title {
-  color: #003366;
-  font-weight: 700;
-  border-left: 6px solid #FF8C00;
-  padding-left: 10px;
-}
-
-/* Tarjetas de artistas */
-.artist-card img {
-  border-radius: 16px;
-}
-
-.artist-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background-color: #ffffff;
-}
-
-.artist-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+.artist-list-card:hover img {
+    filter: brightness(1) contrast(1.1);
 }
 
 /* Botones */
 .btn-primary {
-  background: linear-gradient(45deg, #FF8C00, #FF1493);
-  border: none;
+    background: linear-gradient(135deg, var(--color-primario), var(--color-acento));
+    border: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.35);
+    background: linear-gradient(135deg, var(--color-acento), var(--color-primario));
 }
 
 .btn-outline-primary {
-  border-color: #00BFFF;
-  color: #00BFFF;
+    border: 2px solid var(--color-primario);
+    color: var(--color-primario);
+    font-weight: 600;
 }
 
 .btn-outline-primary:hover {
-  background-color: #00BFFF;
-  color: white;
-}
-/* ==== FONDO GEOMÉTRICO COLORIDO ==== */
-body {
-  position: relative;
-  background-color: #fff;
-  overflow-x: hidden;
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
 }
 
-/* Capa del patrón */
-.wiki-pattern {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-image: url('/static/img/pattern.png');
-  background-repeat: repeat;
-  background-size: 400px;
-  opacity: 0.12; /* sutil para no distraer */
-  z-index: 0;
-}
-
-/* Asegura que el contenido quede por encima */
-main.container {
-  position: relative;
-  z-index: 2;
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 0 20px rgba(0,0,0,0.05);
+/* Responsive */
+@media (max-width: 768px) {
+    main.container {
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .banner {
+        max-height: 250px;
+    }
 }
