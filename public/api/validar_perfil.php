@@ -97,8 +97,7 @@ try {
             $stmt_update = $pdo->prepare("
                 UPDATE artistas 
                 SET status_perfil = ?, 
-                    motivo_rechazo = NULL,
-                    fecha_validacion = CURRENT_TIMESTAMP
+                    motivo_rechazo = NULL
                 WHERE id = ?
             ");
             $stmt_update->execute([$nuevo_estado, $artista_id]);
@@ -108,8 +107,7 @@ try {
             $stmt_update = $pdo->prepare("
                 UPDATE artistas 
                 SET status_perfil = ?, 
-                    motivo_rechazo = ?,
-                    fecha_validacion = CURRENT_TIMESTAMP
+                    motivo_rechazo = ?
                 WHERE id = ?
             ");
             $stmt_update->execute([$nuevo_estado, $motivo, $artista_id]);
