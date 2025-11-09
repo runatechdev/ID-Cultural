@@ -9,25 +9,190 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../config.php';
+
+// Variables para el header
+$page_title = "Noticias Culturales - ID Cultural";
+$specific_css_files = ['index.css'];
+
+include(__DIR__ . '/../components/header.php');
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noticias Culturales | ID Cultural</title>
+
+<body>
+    <?php include __DIR__ . '/../components/navbar.php'; ?>
+
+    <!-- Hero Section -->
+    <section class="noticias-hero">
+        <div class="container text-center">
+            <div data-aos="fade-down">
+                <i class="bi bi-newspaper" style="font-size: 4rem; margin-bottom: 20px;"></i>
+                <h1>Noticias Culturales</h1>
+                <p>Mantente informado sobre las últimas novedades del mundo cultural santiagueño</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenedor de Noticias -->
+    <main class="container pb-5">
+        <div id="contenedor-noticias">
+            <!-- Loading -->
+            <div class="loading-container">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
+                        <span class="visually-hidden">Cargando noticias...</span>
+                    </div>
+                    <p class="mt-3 text-muted fs-5">Cargando noticias...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Botón Volver Arriba -->
+    <button class="btn-volver" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Volver arriba">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <?php include __DIR__ . '/../components/footer.php'; ?>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/navbar.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/footer.css">
-    
-    <!-- AOS Animation -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
+    <script>
+        const BASE_URL = '<?php echo BASE_URL; ?>';
+        
+        // Inicializar AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
+        // Función para escapar HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Función para formatear fecha
+        function formatearFecha(fecha) {
+            if (!fecha) return '';
+            const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(fecha).toLocaleDateString('es-AR', opciones);
+        }
+
+        // Función para renderizar el contenido preservando saltos de línea y formato
+        function renderizarContenido(contenido) {
+            if (!contenido) return '';
+            // Convertir saltos de línea en párrafos
+            return contenido
+                .split('\n\n')
+                .filter(p => p.trim())
+                .map(p => `<p>${escapeHtml(p.trim())}</p>`)
+                .join('');
+        }
+
+        // Cargar todas las noticias
+        async function cargarNoticias() {
+            const contenedor = document.getElementById('contenedor-noticias');
+            
+            try {
+                const response = await fetch(`${BASE_URL}api/noticias.php?action=get`);
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error('Error en API:', data.error);
+                    contenedor.innerHTML = `
+                        <div class="no-noticias">
+                            <i class="bi bi-exclamation-triangle text-danger"></i>
+                            <h3 class="text-danger">Error al cargar las noticias</h3>
+                            <p class="text-muted">${escapeHtml(data.error)}</p>
+                            <a href="${BASE_URL}index.php" class="btn btn-primary mt-3">
+                                <i class="bi bi-house-door me-2"></i>Volver al inicio
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const noticias = Array.isArray(data) ? data : (data.noticias || []);
+                
+                if (noticias.length === 0) {
+                    contenedor.innerHTML = `
+                        <div class="no-noticias">
+                            <i class="bi bi-inbox"></i>
+                            <h3>No hay noticias disponibles</h3>
+                            <p class="text-muted">Por el momento no hay noticias publicadas. Vuelve pronto para ver las novedades.</p>
+                            <a href="${BASE_URL}index.php" class="btn btn-primary mt-3">
+                                <i class="bi bi-house-door me-2"></i>Volver al inicio
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Renderizar noticias en formato completo
+                contenedor.innerHTML = noticias.map((noticia, index) => {
+                    const imagenHtml = noticia.imagen_url 
+                        ? `<img src="${escapeHtml(noticia.imagen_url)}" class="noticia-imagen" alt="${escapeHtml(noticia.titulo)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+                        : '';
+                    
+                    return `
+                        <article class="noticia-individual" data-aos="fade-up" data-aos-delay="${index * 100}">
+                            ${imagenHtml}
+                            <div class="noticia-placeholder" style="display: ${noticia.imagen_url ? 'none' : 'flex'};">
+                                <i class="bi bi-newspaper text-white" style="font-size: 5rem; opacity: 0.7;"></i>
+                            </div>
+                            <div class="noticia-contenido">
+                                <h2 class="noticia-titulo">${escapeHtml(noticia.titulo)}</h2>
+                                <div class="noticia-meta">
+                                    <span>
+                                        <i class="bi bi-calendar3"></i>
+                                        ${formatearFecha(noticia.fecha_creacion)}
+                                    </span>
+                                    ${noticia.autor ? `
+                                        <span>
+                                            <i class="bi bi-person"></i>
+                                            ${escapeHtml(noticia.autor)}
+                                        </span>
+                                    ` : ''}
+                                </div>
+                                <div class="noticia-texto">
+                                    ${renderizarContenido(noticia.contenido)}
+                                </div>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
+
+                // Re-inicializar AOS
+                AOS.refresh();
+
+            } catch (error) {
+                console.error('Error al cargar noticias:', error);
+                contenedor.innerHTML = `
+                    <div class="no-noticias">
+                        <i class="bi bi-exclamation-triangle text-danger"></i>
+                        <h3 class="text-danger">Error al cargar las noticias</h3>
+                        <p class="text-muted">Hubo un problema al conectar con el servidor. Por favor, intenta nuevamente más tarde.</p>
+                        <a href="${BASE_URL}index.php" class="btn btn-primary mt-3">
+                            <i class="bi bi-house-door me-2"></i>Volver al inicio
+                        </a>
+                    </div>
+                `;
+            }
+        }
+
+        // Cargar noticias al cargar la página
+        document.addEventListener('DOMContentLoaded', cargarNoticias);
+    </script>
+
     <style>
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -169,7 +334,6 @@ require_once __DIR__ . '/../config.php';
             background: #0a58ca;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .noticias-hero h1 {
                 font-size: 2rem;
@@ -193,181 +357,5 @@ require_once __DIR__ . '/../config.php';
             }
         }
     </style>
-</head>
-<body>
-    <?php include __DIR__ . '/../components/navbar.php'; ?>
-
-    <!-- Hero Section -->
-    <section class="noticias-hero">
-        <div class="container text-center">
-            <div data-aos="fade-down">
-                <i class="bi bi-newspaper" style="font-size: 4rem; margin-bottom: 20px;"></i>
-                <h1>Noticias Culturales</h1>
-                <p>Mantente informado sobre las últimas novedades del mundo cultural santiagueño</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contenedor de Noticias -->
-    <main class="container pb-5">
-        <div id="contenedor-noticias">
-            <!-- Loading -->
-            <div class="loading-container">
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
-                        <span class="visually-hidden">Cargando noticias...</span>
-                    </div>
-                    <p class="mt-3 text-muted fs-5">Cargando noticias...</p>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Botón Volver Arriba -->
-    <button class="btn-volver" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Volver arriba">
-        <i class="bi bi-arrow-up"></i>
-    </button>
-
-    <?php include __DIR__ . '/../components/footer.php'; ?>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
-    <script>
-        const BASE_URL = '<?php echo BASE_URL; ?>';
-        
-        // Inicializar AOS
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 100
-        });
-
-        // Función para escapar HTML
-        function escapeHtml(text) {
-            if (!text) return '';
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, m => map[m]);
-        }
-
-        // Función para formatear fecha
-        function formatearFecha(fecha) {
-            if (!fecha) return '';
-            const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date(fecha).toLocaleDateString('es-AR', opciones);
-        }
-
-        // Función para renderizar el contenido preservando saltos de línea y formato
-        function renderizarContenido(contenido) {
-            if (!contenido) return '';
-            // Convertir saltos de línea en párrafos
-            return contenido
-                .split('\n\n')
-                .filter(p => p.trim())
-                .map(p => `<p>${escapeHtml(p.trim())}</p>`)
-                .join('');
-        }
-
-        // Cargar todas las noticias
-        async function cargarNoticias() {
-            const contenedor = document.getElementById('contenedor-noticias');
-            
-            try {
-                const response = await fetch(`${BASE_URL}api/noticias.php?action=get`);
-                const data = await response.json();
-
-                if (data.error) {
-                    console.error('Error en API:', data.error);
-                    contenedor.innerHTML = `
-                        <div class="no-noticias">
-                            <i class="bi bi-exclamation-triangle text-danger"></i>
-                            <h3 class="text-danger">Error al cargar las noticias</h3>
-                            <p class="text-muted">${escapeHtml(data.error)}</p>
-                            <a href="${BASE_URL}index.php" class="btn btn-primary mt-3">
-                                <i class="bi bi-house-door me-2"></i>Volver al inicio
-                            </a>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const noticias = Array.isArray(data) ? data : (data.noticias || []);
-                
-                if (noticias.length === 0) {
-                    contenedor.innerHTML = `
-                        <div class="no-noticias">
-                            <i class="bi bi-inbox"></i>
-                            <h3>No hay noticias disponibles</h3>
-                            <p class="text-muted">Por el momento no hay noticias publicadas. Vuelve pronto para ver las novedades.</p>
-                            <a href="${BASE_URL}index.php" class="btn btn-primary mt-3">
-                                <i class="bi bi-house-door me-2"></i>Volver al inicio
-                            </a>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // Renderizar noticias en formato completo
-                contenedor.innerHTML = noticias.map((noticia, index) => `
-                    <article class="noticia-individual" data-aos="fade-up" data-aos-delay="${index * 100}">
-                        ${noticia.imagen_url ? `
-                            <img src="${escapeHtml(noticia.imagen_url)}" 
-                                 class="noticia-imagen" 
-                                 alt="${escapeHtml(noticia.titulo)}"
-                                 onerror="this.parentElement.innerHTML = '<div class=\\'noticia-placeholder\\'><i class=\\'bi bi-newspaper text-white\\' style=\\'font-size: 5rem; opacity: 0.7;\\'></i></div>'">
-                        ` : `
-                            <div class="noticia-placeholder">
-                                <i class="bi bi-newspaper text-white" style="font-size: 5rem; opacity: 0.7;"></i>
-                            </div>
-                        `}
-                        <div class="noticia-contenido">
-                            <h2 class="noticia-titulo">${escapeHtml(noticia.titulo)}</h2>
-                            <div class="noticia-meta">
-                                <span>
-                                    <i class="bi bi-calendar3"></i>
-                                    ${formatearFecha(noticia.fecha_creacion)}
-                                </span>
-                                ${noticia.autor ? `
-                                    <span>
-                                        <i class="bi bi-person"></i>
-                                        ${escapeHtml(noticia.autor)}
-                                    </span>
-                                ` : ''}
-                            </div>
-                            <div class="noticia-texto">
-                                ${renderizarContenido(noticia.contenido)}
-                            </div>
-                        </div>
-                    </article>
-                `).join('');
-
-                // Re-inicializar AOS
-                AOS.refresh();
-
-            } catch (error) {
-                console.error('Error al cargar noticias:', error);
-                contenedor.innerHTML = `
-                    <div class="no-noticias">
-                        <i class="bi bi-exclamation-triangle text-danger"></i>
-                        <h3 class="text-danger">Error al cargar las noticias</h3>
-                        <p class="text-muted">Hubo un problema al conectar con el servidor. Por favor, intenta nuevamente más tarde.</p>
-                        <a href="${BASE_URL}index.php" class="btn btn-primary mt-3">
-                            <i class="bi bi-house-door me-2"></i>Volver al inicio
-                        </a>
-                    </div>
-                `;
-            }
-        }
-
-        // Cargar noticias al cargar la página
-        document.addEventListener('DOMContentLoaded', cargarNoticias);
-    </script>
 </body>
 </html>
