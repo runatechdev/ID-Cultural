@@ -31,154 +31,300 @@ include(__DIR__ . '/../components/header.php');
 
     <?php include __DIR__ . '/../components/navbar.php'; ?>
 
-    <main class="container my-5">
-    <div class="wiki-pattern"></div>
-        <section class="text-center mb-5">
-            <h1 class="display-5 fw-bold">Bienvenidos a la Wiki de Artistas</h1>
-            <p class="lead text-muted">La biblioteca digital de los artistas locales de Santiago del Estero.</p>
-        </section>
+    <main class="container-fluid my-4">
+        <div class="wiki-pattern"></div>
         
-        <section class="search-section card p-4 mb-5 shadow-sm">
-            <h2 class="text-center mb-4">Buscar en la Biblioteca</h2>
-            <form id="form-busqueda" action="#" method="get">
-                <div class="input-group input-group-lg">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control" placeholder="Buscar por nombre o palabra clave..." name="search" id="search" required>
-
-                    <select name="categoria" id="categoria" class="form-select" style="max-width: 200px;">
-                        <option value="">Categorías</option>
-                        <option value="Artesania">Artesanía</option>
-                        <option value="Audiovisual">Audiovisual</option>
-                        <option value="Danza">Danza</option>
-                        <option value="Teatro">Teatro</option>
-                        <option value="Musica">Música</option>
-                        <option value="Literatura">Literatura</option>
-                        <option value="Escultura">Escultura</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary">Buscar</button>
+        <!-- Header de la Wiki -->
+        <div class="wiki-header text-center mb-5">
+            <h1 class="display-4 fw-bold text-gradient">Wiki Cultural de Santiago del Estero</h1>
+            <p class="lead">Descubre el talento artístico y cultural de nuestra provincia</p>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-number" id="total-artistas">0</div>
+                    <div class="stat-label">Artistas Registrados</div>
                 </div>
-            </form>
-        </section>
-
-        <section class="mb-5">
-            <h2 class="mb-4 section-title">Artistas Destacados</h2>
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                <div class="col">
-                    <div class="card h-100 text-center artist-card border-0">
-                        <img src="/static/img/merce.jpg" class="card-img-top" alt="Mercedes Sosa">
-                        <div class="card-body">
-                            <h5 class="card-title">Mercedes Sosa</h5>
-                            <p class="card-text">Cantante de folklore y referente cultural.</p>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="total-obras">0</div>
+                    <div class="stat-label">Obras Validadas</div>
                 </div>
-                <div class="col">
-                    <div class="card h-100 text-center artist-card border-0">
-                        <img src="/static/img/nocheros.jpg" class="card-img-top" alt="Los Nocheros">
-                        <div class="card-body">
-                            <h5 class="card-title">Los Nocheros</h5>
-                            <p class="card-text">Grupo de folklore muy popular en Argentina.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card h-100 text-center artist-card border-0">
-                        <img src="/static/img/chaqueno.jpg" class="card-img-top" alt="El Chaqueño Palavecino">
-                        <div class="card-body">
-                            <h5 class="card-title">El Chaqueño Palavecino</h5>
-                            <p class="card-text">Cantante de folklore reconocido nacionalmente.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card h-100 text-center artist-card border-0">
-                        <img src="/static/img/abel.jpg" class="card-img-top" alt="Abel Pintos">
-                        <div class="card-body">
-                            <h5 class="card-title">Abel Pintos</h5>
-                            <p class="card-text">Cantautor con fuerte influencia del folklore.</p>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="total-categorias">7</div>
+                    <div class="stat-label">Categorías Artísticas</div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section id="biografias">
-            <h2 class="mb-4 section-title">Artistas Registrados</h2>
-            <div class="accordion" id="accordionArtistas">
-
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingMusica">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMusica" aria-expanded="true" aria-controls="collapseMusica">
-                            Música
+        <!-- Barra de Búsqueda Mejorada -->
+        <div class="search-hero mb-5">
+            <div class="search-container">
+                <form id="form-busqueda" action="#" method="get">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" placeholder="Buscar artistas, obras, categorías..." name="search" id="search">
+                        <select name="categoria" id="categoria" class="search-select">
+                            <option value="">Todas las categorías</option>
+                            <option value="Artesania">Artesanía</option>
+                            <option value="Audiovisual">Audiovisual</option>
+                            <option value="Danza">Danza</option>
+                            <option value="Teatro">Teatro</option>
+                            <option value="Musica">Música</option>
+                            <option value="Literatura">Literatura</option>
+                            <option value="Escultura">Escultura</option>
+                        </select>
+                        <button type="submit" class="search-btn">
+                            <i class="bi bi-search"></i>
+                            Buscar
                         </button>
-                    </h2>
-                    <div id="collapseMusica" class="accordion-collapse collapse show" aria-labelledby="headingMusica" data-bs-parent="#accordionArtistas">
-                        <div class="accordion-body">
+                    </div>
+                </form>
+            </div>
+        </div>
 
-                            <div class="card artist-list-card mb-3">
-                                <div class="row g-0">
-                                    <div class="col-md-3">
-                                        <img src="/static/img/juanperez.jpg" class="img-fluid rounded-start" alt="Juan Pérez">
-                                    </div>
-                                    <div class="col-md-9">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Juan Pérez</h5>
-                                            <p class="card-text">Guitarrista y compositor de música folclórica.</p>
-                                            <a href="#" class="btn btn-outline-primary">Leer Biografía Completa</a>
-                                        </div>
-                                    </div>
-                                </div>
+        <!-- Layout Principal: Sidebar + Content -->
+        <div class="row g-4">
+            
+            <!-- Sidebar -->
+            <div class="col-lg-3 col-md-4">
+                <div class="wiki-sidebar">
+                    
+                    <!-- Artista Más Buscado -->
+                    <div class="sidebar-card featured-artist">
+                        <h4 class="sidebar-title">
+                            <i class="bi bi-star-fill"></i>
+                            Artista Destacado
+                        </h4>
+                        <div class="featured-content" id="featured-artist">
+                            <div class="featured-image">
+                                <img src="/static/img/merce.jpg" alt="Mercedes Sosa" class="img-fluid">
                             </div>
-
-                            <div class="card artist-list-card mb-3">
-                                <div class="row g-0">
-                                    <div class="col-md-3">
-                                        <img src="/static/img/froilan.jpg" class="img-fluid rounded-start" alt="Froilán Gonzales">
-                                    </div>
-                                    <div class="col-md-9">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Froilán Gonzales</h5>
-                                            <p class="card-text">Luthier santiagueño reconocido como 'El Indio Froilán', creador de bombos legüeros emblemáticos.</p>
-                                            <a href="#" class="btn btn-outline-primary">Leer Biografía Completa</a>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="featured-info">
+                                <h5>Mercedes Sosa</h5>
+                                <p class="featured-category">Música - Folklore</p>
+                                <p class="featured-description">La Negra, voz del pueblo argentino y embajadora cultural de Santiago del Estero.</p>
+                                <a href="#" class="btn-featured">Ver Perfil</a>
                             </div>
-
                         </div>
                     </div>
+
+                    <!-- Categorías -->
+                    <div class="sidebar-card categories">
+                        <h4 class="sidebar-title">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            Explorar por Categoría
+                        </h4>
+                        <div class="category-list">
+                            <a href="#musica" class="category-item" data-category="Musica">
+                                <i class="bi bi-music-note"></i>
+                                <span>Música</span>
+                                <span class="category-count" id="count-musica">0</span>
+                            </a>
+                            <a href="#literatura" class="category-item" data-category="Literatura">
+                                <i class="bi bi-book"></i>
+                                <span>Literatura</span>
+                                <span class="category-count" id="count-literatura">0</span>
+                            </a>
+                            <a href="#danza" class="category-item" data-category="Danza">
+                                <i class="bi bi-person-arms-up"></i>
+                                <span>Danza</span>
+                                <span class="category-count" id="count-danza">0</span>
+                            </a>
+                            <a href="#teatro" class="category-item" data-category="Teatro">
+                                <i class="bi bi-mask-happy"></i>
+                                <span>Teatro</span>
+                                <span class="category-count" id="count-teatro">0</span>
+                            </a>
+                            <a href="#artesania" class="category-item" data-category="Artesania">
+                                <i class="bi bi-palette"></i>
+                                <span>Artesanía</span>
+                                <span class="category-count" id="count-artesania">0</span>
+                            </a>
+                            <a href="#audiovisual" class="category-item" data-category="Audiovisual">
+                                <i class="bi bi-camera-video"></i>
+                                <span>Audiovisual</span>
+                                <span class="category-count" id="count-audiovisual">0</span>
+                            </a>
+                            <a href="#escultura" class="category-item" data-category="Escultura">
+                                <i class="bi bi-trophy"></i>
+                                <span>Escultura</span>
+                                <span class="category-count" id="count-escultura">0</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Filtros Rápidos -->
+                    <div class="sidebar-card quick-filters">
+                        <h4 class="sidebar-title">
+                            <i class="bi bi-funnel"></i>
+                            Filtros Rápidos
+                        </h4>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-filter="todos">Todos</button>
+                            <button class="filter-btn" data-filter="validados">Solo Validados</button>
+                            <button class="filter-btn" data-filter="famosos">Artistas Famosos</button>
+                            <button class="filter-btn" data-filter="recientes">Más Recientes</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="col-lg-9 col-md-8">
+                
+                <!-- Navegación por Pestañas -->
+                <div class="content-tabs">
+                    <nav class="tab-navigation">
+                        <button class="tab-btn active" data-tab="artistas-validados">
+                            <i class="bi bi-people-fill"></i>
+                            Artistas Validados
+                        </button>
+                        <button class="tab-btn" data-tab="obras-validadas">
+                            <i class="bi bi-collection"></i>
+                            Obras Validadas
+                        </button>
+                        <button class="tab-btn" data-tab="artistas-famosos">
+                            <i class="bi bi-star-fill"></i>
+                            Artistas Famosos
+                        </button>
+                    </nav>
                 </div>
 
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingLiteratura">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLiteratura" aria-expanded="false" aria-controls="collapseLiteratura">
-                            Literatura
-                        </button>
-                    </h2>
-                    <div id="collapseLiteratura" class="accordion-collapse collapse" aria-labelledby="headingLiteratura" data-bs-parent="#accordionArtistas">
-                        <div class="accordion-body">
+                <!-- Contenido de las Pestañas -->
+                <div class="tab-content">
+                    
+                    <!-- Artistas Validados -->
+                    <div class="tab-pane active" id="artistas-validados">
+                        <div class="content-header">
+                            <h3>Artistas Validados de Santiago del Estero</h3>
+                            <p>Artistas locales que han pasado por nuestro proceso de validación</p>
+                        </div>
+                        <div class="artists-grid" id="validated-artists">
+                            <!-- Contenido dinámico cargado por JS -->
+                            <div class="loading-placeholder">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p>Cargando artistas...</p>
+                            </div>
+                        </div>
+                    </div>
 
-                            <div class="card artist-list-card mb-3">
-                                <div class="row g-0">
-                                    <div class="col-md-3">
-                                        <img src="/static/img/dem.jpg" class="img-fluid rounded-start" alt="María González">
+                    <!-- Obras Validadas -->
+                    <div class="tab-pane" id="obras-validadas">
+                        <div class="content-header">
+                            <h3>Obras Culturales Validadas</h3>
+                            <p>Creaciones artísticas registradas y validadas en nuestra plataforma</p>
+                        </div>
+                        <div class="works-grid" id="validated-works">
+                            <!-- Contenido dinámico cargado por JS -->
+                            <div class="loading-placeholder">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p>Cargando obras...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Artistas Famosos -->
+                    <div class="tab-pane" id="artistas-famosos">
+                        <div class="content-header">
+                            <h3>Artistas Famosos de Santiago del Estero</h3>
+                            <p>Referentes culturales y artistas reconocidos de nuestra provincia</p>
+                        </div>
+                        <div class="famous-artists-grid">
+                            <div class="row g-4">
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="famous-artist-card">
+                                        <div class="famous-image">
+                                            <img src="/static/img/merce.jpg" alt="Mercedes Sosa">
+                                            <div class="famous-overlay">
+                                                <span class="famous-badge">Leyenda</span>
+                                            </div>
+                                        </div>
+                                        <div class="famous-content">
+                                            <h4>Mercedes Sosa</h4>
+                                            <p class="famous-category">Música - Folklore</p>
+                                            <p class="famous-bio">Cantante argentina conocida como "La Negra", embajadora mundial del folklore argentino.</p>
+                                            <div class="famous-achievements">
+                                                <span class="achievement">🏆 Grammy Latino</span>
+                                                <span class="achievement">🌎 Embajadora UNESCO</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-9">
-                                        <div class="card-body">
-                                            <h5 class="card-title">María González</h5>
-                                            <p class="card-text">Escritora y poeta contemporánea.</p>
-                                            <a href="#" class="btn btn-outline-primary">Leer Biografía Completa</a>
+                                </div>
+                                
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="famous-artist-card">
+                                        <div class="famous-image">
+                                            <img src="/static/img/nocheros.jpg" alt="Los Nocheros">
+                                            <div class="famous-overlay">
+                                                <span class="famous-badge">Nacional</span>
+                                            </div>
+                                        </div>
+                                        <div class="famous-content">
+                                            <h4>Los Nocheros</h4>
+                                            <p class="famous-category">Música - Folklore</p>
+                                            <p class="famous-bio">Grupo musical argentino formado en Salta, con fuerte presencia en Santiago del Estero.</p>
+                                            <div class="famous-achievements">
+                                                <span class="achievement">🎵 40+ años de carrera</span>
+                                                <span class="achievement">💿 20+ discos</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="famous-artist-card">
+                                        <div class="famous-image">
+                                            <img src="/static/img/chaqueno.jpg" alt="El Chaqueño Palavecino">
+                                            <div class="famous-overlay">
+                                                <span class="famous-badge">Regional</span>
+                                            </div>
+                                        </div>
+                                        <div class="famous-content">
+                                            <h4>El Chaqueño Palavecino</h4>
+                                            <p class="famous-category">Música - Folklore</p>
+                                            <p class="famous-bio">Cantante de folklore argentino, uno de los máximos exponentes de la música santiagueña.</p>
+                                            <div class="famous-achievements">
+                                                <span class="achievement">🎤 Voz emblemática</span>
+                                                <span class="achievement">🏛️ Declarado de interés cultural</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="famous-artist-card">
+                                        <div class="famous-image">
+                                            <img src="/static/img/abel.jpg" alt="Abel Pintos">
+                                            <div class="famous-overlay">
+                                                <span class="famous-badge">Contemporáneo</span>
+                                            </div>
+                                        </div>
+                                        <div class="famous-content">
+                                            <h4>Abel Pintos</h4>
+                                            <p class="famous-category">Música - Folk/Pop</p>
+                                            <p class="famous-bio">Cantautor argentino con raíces folclóricas, reconocido nacionalmente.</p>
+                                            <div class="famous-achievements">
+                                                <span class="achievement">🎼 Múltiples premios</span>
+                                                <span class="achievement">🎪 Estadios completos</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
+
+                </div>
+                
+                <!-- Paginación -->
+                <div class="pagination-container">
+                    <nav aria-label="Navegación de páginas">
+                        <ul class="pagination-custom" id="pagination">
+                            <!-- Generado dinámicamente por JS -->
+                        </ul>
+                    </nav>
                 </div>
 
             </div>
-        </section>
+        </div>
 
     </main>
 

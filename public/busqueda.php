@@ -45,14 +45,14 @@ include(__DIR__ . '/../components/header.php');
   <!-- 🎭 Resultados de Búsqueda -->
   <?php
   $categorias_db = [
-    "Danza" => "Danza",
-    "Música" => "Musica",
-    "Arte" => "Arte",
-    "Teatro" => "Teatro",
-    "Literatura" => "Literatura",
-    "Escultura" => "Escultura",
-    "Artesanía" => "Artesania",
-    "Audiovisual" => "Audiovisual"
+    "Danza" => "danza",
+    "Música" => "musica", 
+    "Arte" => "arte",
+    "Teatro" => "teatro",
+    "Literatura" => "literatura",
+    "Escultura" => "escultura", 
+    "Artesanía" => "artesania",
+    "Audiovisual" => "audiovisual"
   ];
 
   $obras = [];
@@ -71,7 +71,7 @@ include(__DIR__ . '/../components/header.php');
         SELECT COUNT(*) as total
         FROM publicaciones p
         INNER JOIN artistas a ON p.usuario_id = a.id
-        WHERE p.estado = 'publicada' AND a.status = 'validado' 
+        WHERE (p.estado = 'publicada' OR p.estado = 'validado') AND a.status = 'validado' 
         AND (p.titulo LIKE ? OR p.descripcion LIKE ? OR CONCAT(a.nombre, ' ', a.apellido) LIKE ?)
       ");
       $searchTerm = '%' . $busqueda . '%';
@@ -88,7 +88,7 @@ include(__DIR__ . '/../components/header.php');
                a.municipio
         FROM publicaciones p
         INNER JOIN artistas a ON p.usuario_id = a.id
-        WHERE p.estado = 'publicada' AND a.status = 'validado' 
+        WHERE (p.estado = 'publicada' OR p.estado = 'validado') AND a.status = 'validado' 
         AND (p.titulo LIKE ? OR p.descripcion LIKE ? OR CONCAT(a.nombre, ' ', a.apellido) LIKE ?)
         ORDER BY p.fecha_creacion DESC
         " . $pagination->getLimitSQL() . "
@@ -109,7 +109,7 @@ include(__DIR__ . '/../components/header.php');
         SELECT COUNT(*) as total
         FROM publicaciones p
         INNER JOIN artistas a ON p.usuario_id = a.id
-        WHERE p.estado = 'publicada' AND a.status = 'validado' AND p.categoria = ?
+        WHERE (p.estado = 'publicada' OR p.estado = 'validado') AND a.status = 'validado' AND p.categoria = ?
       ");
       $stmtCount->execute([$categoriaDB]);
       $totalObrasBusqueda = $stmtCount->fetch(PDO::FETCH_ASSOC)['total'];
@@ -124,7 +124,7 @@ include(__DIR__ . '/../components/header.php');
                a.municipio
         FROM publicaciones p
         INNER JOIN artistas a ON p.usuario_id = a.id
-        WHERE p.estado = 'publicada' AND a.status = 'validado' AND p.categoria = ?
+        WHERE (p.estado = 'publicada' OR p.estado = 'validado') AND a.status = 'validado' AND p.categoria = ?
         ORDER BY p.fecha_creacion DESC
         " . $pagination->getLimitSQL() . "
       ");
@@ -165,7 +165,7 @@ include(__DIR__ . '/../components/header.php');
                   <i class="bi bi-person"></i> <?= htmlspecialchars($obra['artista_nombre']) ?><br>
                   <i class="bi bi-geo-alt"></i> <?= htmlspecialchars($obra['municipio'] ?? 'Santiago del Estero') ?>
                 </small>
-                <a href="/wiki.php" class="btn-biografia">Ver en Wiki</a>
+                <a href="/perfil_artista.php?id=<?= $obra['artista_id'] ?>" class="btn-biografia">Ver Perfil del Artista</a>
               </div>
             </div>
           <?php endforeach; ?>

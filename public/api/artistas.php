@@ -48,7 +48,7 @@ try {
                 }
             } else {
                 // Obtener lista de artistas (con filtro opcional)
-                $sql = "SELECT id, nombre, apellido, email, status FROM artistas";
+                $sql = "SELECT id, nombre, apellido, email, status, foto_perfil, especialidades as categoria, biografia, municipio, provincia, fecha_nacimiento, genero, instagram, facebook, twitter, sitio_web FROM artistas";
                 $params = [];
 
                 if ($status_filter) {

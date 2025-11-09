@@ -1,134 +1,502 @@
 /**
- * Script para cargar obras en la Wiki
+ * Wiki Profesional - JavaScript para funcionalidad interactiva
  * Archivo: /public/static/js/wiki.js
  */
 
-const BASE_URL = document.querySelector('meta[name="base-url"]')?.content || '/';
+const WIKI = {
+    BASE_URL: document.querySelector('meta[name="base-url"]')?.content || '/',
+    currentTab: 'artistas-validados',
+    currentFilters: { categoria: '', filter: 'todos' },
+    currentPage: 1,
+    itemsPerPage: 9,
+    data: {
+        artists: [],
+        works: [],
+        stats: { artists: 0, works: 0, categories: 7 }
+    }
+};
 
-// Cargar obras al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    cargarObras();
-    configurarFiltros();
+// Inicialización cuando se carga el DOM
+document.addEventListener('DOMContentLoaded', function() {
+    initWiki();
 });
 
 /**
- * Cargar obras desde la API
+ * Inicializar la Wiki
  */
-async function cargarObras(filtros = {}) {
-    try {
-        // Construir parámetros de búsqueda
-        let url = BASE_URL + 'api/get_obras_wiki.php';
-        const params = new URLSearchParams();
+function initWiki() {
+    setupTabNavigation();
+    setupSearch();
+    setupFilters();
+    setupCategoryNavigation();
+    loadInitialData();
+    setupResponsive();
+}
 
-        if (filtros.categoria && filtros.categoria !== '') {
-            params.append('categoria', filtros.categoria);
-        }
-        if (filtros.municipio && filtros.municipio !== '') {
-            params.append('municipio', filtros.municipio);
-        }
-        if (filtros.busqueda && filtros.busqueda !== '') {
-            params.append('busqueda', filtros.busqueda);
-        }
+/**
+ * Configurar navegación por pestañas
+ */
+function setupTabNavigation() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanes = document.querySelectorAll('.tab-pane');
 
-        if (params.toString()) {
-            url += '?' + params.toString();
-        }
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
+            
+            // Actualizar botones
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
 
-        // Mostrar loading
-        const contenedor = document.getElementById('contenedor-obras-wiki');
-        if (contenedor) {
-            contenedor.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando obras...</span></div><p class="mt-3 text-muted">Cargando obras...</p></div>';
-        }
+            // Actualizar contenido
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+            const targetPane = document.getElementById(targetTab);
+            if (targetPane) {
+                targetPane.classList.add('active');
+            }
 
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            // Actualizar estado
+            WIKI.currentTab = targetTab;
+            loadTabContent(targetTab);
+        });
+    });
+}
 
-        const data = await response.json();
+/**
+ * Configurar búsqueda
+ */
+function setupSearch() {
+    const searchForm = document.getElementById('form-busqueda');
+    const searchInput = document.getElementById('search');
+    const categorySelect = document.getElementById('categoria');
 
-        if (data.status === 'success') {
-            mostrarObras(data.obras);
-        } else {
-            mostrarError('Error al cargar las obras');
-        }
+    if (searchForm) {
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            performSearch();
+        });
+    }
 
-    } catch (error) {
-        console.error('Error:', error);
-        mostrarError('No se pudieron cargar las obras. Intenta nuevamente.');
+    if (searchInput) {
+        let debounceTimer;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                if (searchInput.value.length > 2 || searchInput.value.length === 0) {
+                    performSearch();
+                }
+            }, 500);
+        });
+    }
+
+    if (categorySelect) {
+        categorySelect.addEventListener('change', performSearch);
     }
 }
 
 /**
- * Mostrar obras en el contenedor
+ * Configurar filtros rápidos
  */
-function mostrarObras(obras) {
-    const contenedor = document.getElementById('contenedor-obras-wiki');
+function setupFilters() {
+    const filterBtns = document.querySelectorAll('.filter-btn');
     
-    if (!contenedor) {
-        console.error('Contenedor de obras no encontrado');
-        return;
-    }
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.getAttribute('data-filter');
+            
+            // Actualizar botones
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
 
-    if (obras.length === 0) {
-        contenedor.innerHTML = `
-            <div class="alert alert-info text-center py-5">
-                <i class="bi bi-search"></i>
-                <p class="mt-3 mb-0">No se encontraron obras con los filtros seleccionados.</p>
+            // Actualizar estado y filtrar
+            WIKI.currentFilters.filter = filter;
+            applyFilters();
+        });
+    });
+}
+
+/**
+ * Configurar navegación por categorías
+ */
+function setupCategoryNavigation() {
+    const categoryItems = document.querySelectorAll('.category-item');
+    
+    categoryItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const category = item.getAttribute('data-category');
+            
+            // Actualizar estado
+            WIKI.currentFilters.categoria = category;
+            
+            // Actualizar select de búsqueda
+            const categorySelect = document.getElementById('categoria');
+            if (categorySelect) {
+                categorySelect.value = category;
+            }
+
+            // Aplicar filtro
+            applyFilters();
+        });
+    });
+}
+
+/**
+ * Cargar datos iniciales
+ */
+async function loadInitialData() {
+    // Primero cargar estadísticas desde la API
+    await loadStats();
+    // Luego cargar datos específicos
+    await loadArtists();
+    await loadWorks();
+    // Finalmente actualizar contadores y mostrar contenido
+    updateCategoryCounts();
+    loadTabContent(WIKI.currentTab);
+    
+    // Refrescar estadísticas con datos locales si es necesario
+    if (WIKI.data.stats.artists === 0 && WIKI.data.artists.length > 0) {
+        WIKI.data.stats.artists = WIKI.data.artists.length;
+        updateStatsDisplay();
+    }
+}
+
+/**
+ * Cargar estadísticas
+ */
+async function loadStats() {
+    try {
+        // Intentar cargar desde la API de estadísticas
+        const response = await fetch(WIKI.BASE_URL + 'api/get_estadisticas_inicio.php');
+        if (response.ok) {
+            const data = await response.json();
+            WIKI.data.stats = {
+                artists: data.artistas || 0,  // Usar 'artistas' de la API
+                works: data.obras || 0,       // Usar 'obras' de la API
+                categories: 7
+            };
+        } else {
+            // Si falla, usar los datos cargados
+            WIKI.data.stats = {
+                artists: WIKI.data.artists.length || 0,
+                works: WIKI.data.works.length || 0,
+                categories: 7
+            };
+        }
+        updateStatsDisplay();
+    } catch (error) {
+        console.warn('Error cargando estadísticas:', error);
+        // Usar los datos locales como fallback
+        WIKI.data.stats = {
+            artists: WIKI.data.artists.length || 0,
+            works: WIKI.data.works.length || 0,
+            categories: 7
+        };
+        updateStatsDisplay();
+    }
+}
+
+/**
+ * Actualizar visualización de estadísticas
+ */
+function updateStatsDisplay() {
+    const totalArtistas = document.getElementById('total-artistas');
+    const totalObras = document.getElementById('total-obras');
+
+    if (totalArtistas) {
+        animateNumber(totalArtistas, WIKI.data.stats.artists);
+    }
+    if (totalObras) {
+        animateNumber(totalObras, WIKI.data.stats.works);
+    }
+}
+
+/**
+ * Animar números
+ */
+function animateNumber(element, target) {
+    const currentValue = parseInt(element.textContent) || 0;
+    if (currentValue === target) return; // Ya está en el valor correcto
+    
+    let current = currentValue;
+    const difference = target - current;
+    const increment = difference / 30; // 30 pasos para la animación
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
+            element.textContent = target;
+            clearInterval(timer);
+        } else {
+            element.textContent = Math.floor(current);
+        }
+    }, 30);
+}
+
+/**
+ * Cargar artistas
+ */
+async function loadArtists() {
+    try {
+        const response = await fetch(WIKI.BASE_URL + 'api/artistas.php?action=get');
+        if (response.ok) {
+            const data = await response.json();
+            // La API devuelve un array directamente, no un objeto con propiedad 'artistas'
+            WIKI.data.artists = Array.isArray(data) ? data : [];
+        }
+    } catch (error) {
+        console.warn('Error cargando artistas:', error);
+        WIKI.data.artists = [];
+    }
+}
+
+/**
+ * Cargar obras
+ */
+async function loadWorks() {
+    try {
+        const response = await fetch(WIKI.BASE_URL + 'api/get_obras_wiki.php');
+        if (response.ok) {
+            const data = await response.json();
+            WIKI.data.works = data.obras || [];
+        }
+    } catch (error) {
+        console.warn('Error cargando obras:', error);
+        WIKI.data.works = [];
+    }
+}
+
+/**
+ * Actualizar contadores de categorías
+ */
+function updateCategoryCounts() {
+    const categories = ['musica', 'literatura', 'danza', 'teatro', 'artesania', 'audiovisual', 'escultura'];
+    
+    categories.forEach(cat => {
+        const countElement = document.getElementById(`count-${cat}`);
+        if (countElement) {
+            // Contar artistas y obras por categoría
+            const artistCount = WIKI.data.artists.filter(artist => 
+                artist.categoria && artist.categoria.toLowerCase().includes(cat.replace('musica', 'música'))
+            ).length;
+            
+            const workCount = WIKI.data.works.filter(work => 
+                work.categoria && work.categoria.toLowerCase().includes(cat.replace('musica', 'música'))
+            ).length;
+            
+            const totalCount = artistCount + workCount;
+            countElement.textContent = totalCount;
+        }
+    });
+}
+
+/**
+ * Cargar contenido de pestaña
+ */
+function loadTabContent(tab) {
+    switch(tab) {
+        case 'artistas-validados':
+            renderValidatedArtists();
+            break;
+        case 'obras-validadas':
+            renderValidatedWorks();
+            break;
+        case 'artistas-famosos':
+            // Los artistas famosos ya están en HTML estático
+            break;
+    }
+}
+
+/**
+ * Renderizar artistas validados
+ */
+function renderValidatedArtists() {
+    const container = document.getElementById('validated-artists');
+    if (!container) return;
+
+    let filteredArtists = WIKI.data.artists.filter(artist => artist.status === 'validado');
+    
+    // Aplicar filtros
+    filteredArtists = applyCurrentFilters(filteredArtists);
+
+    if (filteredArtists.length === 0) {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-info text-center py-5">
+                    <i class="bi bi-info-circle"></i>
+                    <p class="mt-3 mb-0">No se encontraron artistas validados con los criterios seleccionados.</p>
+                </div>
             </div>
         `;
         return;
     }
 
-    let html = '<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">';
+    // Paginación
+    const startIndex = (WIKI.currentPage - 1) * WIKI.itemsPerPage;
+    const endIndex = startIndex + WIKI.itemsPerPage;
+    const pageArtists = filteredArtists.slice(startIndex, endIndex);
 
-    obras.forEach(obra => {
-        html += crearTarjetaObra(obra);
+    let html = '<div class="validated-artists-grid"><div class="row g-4">';
+    pageArtists.forEach(artist => {
+        html += createArtistCard(artist);
     });
+    html += '</div></div>';
 
-    html += '</div>';
-    contenedor.innerHTML = html;
+    container.innerHTML = html;
+    updatePagination(filteredArtists.length);
 }
 
 /**
- * Crear tarjeta de obra
+ * Renderizar obras validadas
  */
-function crearTarjetaObra(obra) {
-    const imagenUrl = obra.imagen_url || BASE_URL + 'static/img/placeholder-obra.png';
-    const artistaUrl = BASE_URL + `api/artistas.php?action=get&id=${obra.artista_id}`;
+function renderValidatedWorks() {
+    const container = document.getElementById('validated-works');
+    if (!container) return;
+
+    let filteredWorks = WIKI.data.works.filter(work => work.status === 'validado' || work.estado === 'aprobado');
+    
+    // Aplicar filtros
+    filteredWorks = applyCurrentFilters(filteredWorks, 'works');
+
+    if (filteredWorks.length === 0) {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-info text-center py-5">
+                    <i class="bi bi-info-circle"></i>
+                    <p class="mt-3 mb-0">No se encontraron obras validadas con los criterios seleccionados.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // Paginación
+    const startIndex = (WIKI.currentPage - 1) * WIKI.itemsPerPage;
+    const endIndex = startIndex + WIKI.itemsPerPage;
+    const pageWorks = filteredWorks.slice(startIndex, endIndex);
+
+    let html = '<div class="row g-4">';
+    pageWorks.forEach(work => {
+        html += createWorkCard(work);
+    });
+    html += '</div>';
+
+    container.innerHTML = html;
+    updatePagination(filteredWorks.length);
+}
+
+/**
+ * Aplicar filtros actuales
+ */
+function applyCurrentFilters(items, type = 'artists') {
+    let filtered = [...items];
+
+    // Filtro de categoría
+    if (WIKI.currentFilters.categoria) {
+        filtered = filtered.filter(item => 
+            item.categoria && item.categoria.toLowerCase().includes(WIKI.currentFilters.categoria.toLowerCase())
+        );
+    }
+
+    // Filtro rápido
+    switch(WIKI.currentFilters.filter) {
+        case 'validados':
+            if (type === 'artists') {
+                filtered = filtered.filter(item => item.status === 'validado');
+            } else {
+                filtered = filtered.filter(item => item.status === 'validado' || item.estado === 'aprobado');
+            }
+            break;
+        case 'recientes':
+            filtered = filtered.sort((a, b) => new Date(b.fecha_registro || b.created_at || 0) - new Date(a.fecha_registro || a.created_at || 0));
+            break;
+        case 'famosos':
+            if (type === 'artists') {
+                // Criterio para artistas famosos (por ejemplo, con más obras)
+                filtered = filtered.filter(item => item.total_obras > 5);
+            }
+            break;
+    }
+
+    return filtered;
+}
+
+/**
+ * Crear card de artista
+ */
+function createArtistCard(artist) {
+    const imageSrc = artist.foto_perfil || '/static/img/perfil-del-usuario.png';
+    const artistName = [artist.nombre, artist.apellido].filter(Boolean).join(' ');
+    const location = [artist.municipio, artist.provincia].filter(Boolean).join(', ');
+    const categoria = artist.categoria || artist.especialidades || 'Artista';
+    const edad = artist.fecha_nacimiento ? calcularEdad(artist.fecha_nacimiento) : null;
     
     return `
-        <div class="col">
-            <div class="card h-100 obra-card shadow-sm border-0 hover-lift">
-                <div class="obra-imagen-container position-relative overflow-hidden" style="height: 250px;">
-                    <img src="${escaparHTML(imagenUrl)}" 
-                         class="card-img-top objeto-cover" 
-                         alt="${escaparHTML(obra.titulo)}"
-                         loading="lazy">
-                    <div class="obra-overlay">
-                        <a href="javascript:verDetalleObra(${obra.id})" class="btn btn-sm btn-light">
-                            <i class="bi bi-eye"></i> Ver Detalle
-                        </a>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="artist-card-professional border-0 shadow-sm h-100">
+                <div class="artist-image-container">
+                    <img src="${escaparHTML(imageSrc)}" class="artist-profile-image" alt="${escaparHTML(artistName)}">
+                    <div class="category-overlay">
+                        <span class="category-badge">${escaparHTML(categoria)}</span>
                     </div>
                 </div>
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-truncate">${escaparHTML(obra.titulo)}</h5>
-                    <p class="card-text text-muted small flex-grow-1">${escaparHTML(obra.descripcion.substring(0, 100))}...</p>
-                    
-                    <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
-                        <span class="badge bg-primary">${escaparHTML(obra.categoria)}</span>
-                        <small class="text-muted">${formatarFecha(obra.fecha_creacion)}</small>
+                <div class="artist-content">
+                    <div class="artist-header">
+                        <h3 class="artist-name">${escaparHTML(artistName)}</h3>
                     </div>
                     
-                    <div class="mt-3 pt-3 border-top">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
-                                 style="width: 32px; height: 32px; font-size: 14px; font-weight: bold;">
-                                ${escaparHTML(obra.artista_nombre.charAt(0).toUpperCase())}
+                    <div class="artist-details">
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <i class="bi bi-palette"></i>
+                                <span class="detail-label">Especialidad:</span>
+                                <span class="detail-value">${escaparHTML(categoria)}</span>
                             </div>
-                            <small>
-                                <strong>${escaparHTML(obra.artista_nombre)}</strong><br>
-                                <span class="text-muted">${escaparHTML(obra.municipio || 'Santiago del Estero')}</span>
-                            </small>
+                            ${edad ? `
+                            <div class="detail-item">
+                                <i class="bi bi-calendar-heart"></i>
+                                <span class="detail-label">Edad:</span>
+                                <span class="detail-value">${edad} años</span>
+                            </div>
+                            ` : ''}
                         </div>
+                        
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                <span class="detail-label">Ubicación:</span>
+                                <span class="detail-value">${escaparHTML(location || 'Santiago del Estero')}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-envelope-fill"></i>
+                                <span class="detail-label">Contacto:</span>
+                                <span class="detail-value">${escaparHTML(artist.email || 'No disponible')}</span>
+                            </div>
+                        </div>
+                        
+                        ${artist.biografia ? `
+                        <div class="artist-bio">
+                            <p><i class="bi bi-quote"></i> ${escaparHTML(artist.biografia)}</p>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="artist-social-links">
+                            ${artist.instagram ? `<a href="${escaparHTML(artist.instagram)}" target="_blank" class="social-link instagram"><i class="bi bi-instagram"></i></a>` : ''}
+                            ${artist.facebook ? `<a href="${escaparHTML(artist.facebook)}" target="_blank" class="social-link facebook"><i class="bi bi-facebook"></i></a>` : ''}
+                            ${artist.twitter ? `<a href="${escaparHTML(artist.twitter)}" target="_blank" class="social-link twitter"><i class="bi bi-twitter"></i></a>` : ''}
+                            ${artist.sitio_web ? `<a href="${escaparHTML(artist.sitio_web)}" target="_blank" class="social-link website"><i class="bi bi-globe"></i></a>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="artist-actions">
+                        <button class="btn btn-primary btn-view-profile" onclick="goToArtistProfile(${artist.id})">
+                            <i class="bi bi-person-circle"></i>
+                            Ver Perfil Completo
+                        </button>
+                        <button class="btn btn-outline-secondary btn-contact" onclick="contactArtist('${escaparHTML(artist.email)}', '${escaparHTML(artistName)}')">
+                            <i class="bi bi-chat-dots"></i>
+                            Contactar
+                        </button>
                     </div>
                 </div>
             </div>
@@ -137,142 +505,239 @@ function crearTarjetaObra(obra) {
 }
 
 /**
- * Configurar eventos de filtros
+ * Crear card de obra
  */
-function configurarFiltros() {
-    const formBusqueda = document.getElementById('form-busqueda-wiki');
-    const inputBusqueda = document.getElementById('busqueda-wiki');
-    const selectCategoria = document.getElementById('categoria-wiki');
-    const selectMunicipio = document.getElementById('municipio-wiki');
+function createWorkCard(work) {
+    const imageSrc = work.imagen_principal || '/static/img/default-artwork.png';
+    
+    return `
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 border-0 shadow-sm work-card" style="border-radius: 20px; overflow: hidden;">
+                <div class="position-relative" style="height: 200px;">
+                    <img src="${escaparHTML(imageSrc)}" class="card-img-top" style="height: 100%; object-fit: cover;" alt="${escaparHTML(work.titulo)}">
+                    <div class="position-absolute top-0 end-0 m-3">
+                        <span class="badge bg-primary">${escaparHTML(work.categoria || 'Obra')}</span>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <h5 class="card-title mb-2">${escaparHTML(work.titulo)}</h5>
+                    <p class="card-text text-muted small mb-2">Por: ${escaparHTML(work.artista_nombre || 'Artista Anónimo')}</p>
+                    <p class="card-text mb-3" style="font-size: 0.9rem; line-height: 1.4;">
+                        ${escaparHTML(work.descripcion ? work.descripcion.substring(0, 100) + '...' : 'Sin descripción disponible')}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar"></i> ${formatarFecha(work.fecha_creacion)}
+                        </small>
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewWorkDetail(${work.id})">
+                            Ver Detalle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
 
-    if (formBusqueda) {
-        formBusqueda.addEventListener('submit', (e) => {
-            e.preventDefault();
-            aplicarFiltros();
-        });
+/**
+ * Actualizar paginación
+ */
+function updatePagination(totalItems) {
+    const paginationContainer = document.getElementById('pagination');
+    if (!paginationContainer) return;
+
+    const totalPages = Math.ceil(totalItems / WIKI.itemsPerPage);
+    
+    if (totalPages <= 1) {
+        paginationContainer.innerHTML = '';
+        return;
     }
 
-    if (selectCategoria) {
-        selectCategoria.addEventListener('change', aplicarFiltros);
+    let html = '';
+    
+    // Página anterior
+    if (WIKI.currentPage > 1) {
+        html += `<li><a href="#" onclick="changePage(${WIKI.currentPage - 1})">« Anterior</a></li>`;
     }
 
-    if (selectMunicipio) {
-        selectMunicipio.addEventListener('change', aplicarFiltros);
+    // Páginas numeradas
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === WIKI.currentPage) {
+            html += `<li><span class="active">${i}</span></li>`;
+        } else {
+            html += `<li><a href="#" onclick="changePage(${i})">${i}</a></li>`;
+        }
     }
 
-    // Buscar mientras escribes (debounce)
-    if (inputBusqueda) {
-        let debounceTimer;
-        inputBusqueda.addEventListener('input', (e) => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                if (e.target.value.length > 2 || e.target.value.length === 0) {
-                    aplicarFiltros();
-                }
-            }, 500);
-        });
+    // Página siguiente
+    if (WIKI.currentPage < totalPages) {
+        html += `<li><a href="#" onclick="changePage(${WIKI.currentPage + 1})">Siguiente »</a></li>`;
     }
+
+    paginationContainer.innerHTML = html;
+}
+
+/**
+ * Cambiar página
+ */
+function changePage(page) {
+    WIKI.currentPage = page;
+    loadTabContent(WIKI.currentTab);
+}
+
+/**
+ * Realizar búsqueda
+ */
+function performSearch() {
+    const searchInput = document.getElementById('search');
+    const categorySelect = document.getElementById('categoria');
+
+    const searchTerm = searchInput?.value || '';
+    const category = categorySelect?.value || '';
+
+    // Actualizar filtros
+    WIKI.currentFilters.categoria = category;
+    
+    // Filtrar por término de búsqueda si existe
+    if (searchTerm.length > 0) {
+        // Aquí podrías implementar búsqueda más avanzada
+        console.log('Buscando:', searchTerm);
+    }
+
+    WIKI.currentPage = 1;
+    applyFilters();
 }
 
 /**
  * Aplicar filtros
  */
-function aplicarFiltros() {
-    const busqueda = document.getElementById('busqueda-wiki')?.value || '';
-    const categoria = document.getElementById('categoria-wiki')?.value || '';
-    const municipio = document.getElementById('municipio-wiki')?.value || '';
+function applyFilters() {
+    loadTabContent(WIKI.currentTab);
+}
 
-    cargarObras({
-        busqueda: busqueda,
-        categoria: categoria,
-        municipio: municipio
+/**
+ * Ver detalle de artista
+ */
+function viewArtistDetail(artistId) {
+    const artist = WIKI.data.artists.find(a => a.id == artistId);
+    if (!artist) {
+        alert('Artista no encontrado');
+        return;
+    }
+
+    const artistName = [artist.nombre, artist.apellido].filter(Boolean).join(' ');
+    const location = [artist.municipio, artist.provincia].filter(Boolean).join(', ');
+
+    Swal.fire({
+        title: artistName,
+        html: `
+            <div class="text-start">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <img src="${artist.foto_perfil || '/static/img/perfil-del-usuario.png'}" 
+                             class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                    </div>
+                    <div class="col-md-8">
+                        <p><strong>Email:</strong> ${escaparHTML(artist.email || 'No disponible')}</p>
+                        <p><strong>Ubicación:</strong> ${escaparHTML(location || 'No especificada')}</p>
+                        <p><strong>Fecha de nacimiento:</strong> ${escaparHTML(artist.fecha_nacimiento || 'No especificada')}</p>
+                        <p><strong>Género:</strong> ${escaparHTML(artist.genero || 'No especificado')}</p>
+                        <p><strong>Estado:</strong> <span class="badge bg-success">${escaparHTML(artist.status || 'No definido')}</span></p>
+                    </div>
+                </div>
+                ${artist.biografia ? `<hr><h6>Biografía:</h6><p>${escaparHTML(artist.biografia)}</p>` : ''}
+            </div>
+        `,
+        width: '600px',
+        confirmButtonText: 'Cerrar'
     });
 }
 
 /**
  * Ver detalle de obra
  */
-function verDetalleObra(obraId) {
-    fetch(BASE_URL + `api/get_publicacion_detalle.php?id=${obraId}`)
-        .then(r => {
-            if (!r.ok) throw new Error('No encontrada');
-            return r.json();
-        })
-        .then(data => mostrarModalObra(data))
-        .catch(error => {
-            console.error('Error:', error);
-            alert('No se pudo cargar la obra');
-        });
-}
-
-/**
- * Mostrar detalle de obra en modal
- */
-function mostrarModalObra(obra) {
-    if (!obra.id) {
-        alert('Error: Obra inválida');
+function viewWorkDetail(workId) {
+    const work = WIKI.data.works.find(w => w.id == workId);
+    if (!work) {
+        alert('Obra no encontrada');
         return;
     }
-    
-    // Construir galería de multimedia
-    let multimediaHTML = '';
-    if (obra.multimedia && obra.multimedia.length > 0) {
-        const multimedia = Array.isArray(obra.multimedia) ? obra.multimedia : [obra.multimedia];
-        multimediaHTML = '<div class="mt-3"><h6>Galería:</h6>';
-        multimedia.forEach(file => {
-            if (typeof file === 'string' && /\.(jpg|jpeg|png|gif|webp)$/i.test(file)) {
-                multimediaHTML += `<img src="${escaparHTML(file)}" style="max-width: 100%; margin: 5px 0; border-radius: 4px;" alt="Obra">`;
-            }
-        });
-        multimediaHTML += '</div>';
-    }
-    
-    // Construir campos extra
-    let camposHTML = '';
-    if (obra.campos_extra && Object.keys(obra.campos_extra).length > 0) {
-        camposHTML = '<div class="mt-3"><h6>Detalles:</h6><dl class="row">';
-        for (const [key, value] of Object.entries(obra.campos_extra)) {
-            if (value) {
-                const label = key.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
-                camposHTML += `<dt class="col-sm-4">${escaparHTML(label)}:</dt><dd class="col-sm-8">${escaparHTML(value)}</dd>`;
-            }
-        }
-        camposHTML += '</dl></div>';
-    }
-    
+
     Swal.fire({
-        title: escaparHTML(obra.titulo),
+        title: work.titulo,
         html: `
             <div class="text-start">
-                <p><strong>Artista:</strong> ${escaparHTML(obra.artista_nombre)}</p>
-                <p><strong>Ubicación:</strong> ${escaparHTML(obra.municipio)}, ${escaparHTML(obra.provincia)}</p>
-                <p><strong>Categoría:</strong> ${escaparHTML(obra.categoria)}</p>
-                <hr>
-                <p>${escaparHTML(obra.descripcion)}</p>
-                ${camposHTML}
-                ${multimediaHTML}
+                ${work.imagen_principal ? `<img src="${work.imagen_principal}" class="img-fluid rounded mb-3" style="max-height: 300px;">` : ''}
+                <p><strong>Artista:</strong> ${escaparHTML(work.artista_nombre || 'Desconocido')}</p>
+                <p><strong>Categoría:</strong> ${escaparHTML(work.categoria || 'No especificada')}</p>
+                <p><strong>Fecha:</strong> ${formatarFecha(work.fecha_creacion)}</p>
+                ${work.descripcion ? `<hr><p>${escaparHTML(work.descripcion)}</p>` : ''}
             </div>
         `,
-        width: '700px',
+        width: '600px',
         confirmButtonText: 'Cerrar'
     });
 }
 
 /**
- * Escapar HTML para prevenir XSS
+ * Configurar responsividad
  */
-function escaparHTML(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+function setupResponsive() {
+    window.addEventListener('resize', () => {
+        // Ajustes responsivos si es necesario
+    });
+}
+
+/**
+ * Calcular edad a partir de fecha de nacimiento
+ */
+function calcularEdad(fechaNacimiento) {
+    if (!fechaNacimiento) return null;
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const diferenciaMeses = hoy.getMonth() - nacimiento.getMonth();
+    
+    if (diferenciaMeses < 0 || (diferenciaMeses === 0 && hoy.getDate() < nacimiento.getDate())) {
+        edad--;
+    }
+    
+    return edad;
+}
+
+/**
+ * Ir al perfil público del artista
+ */
+function goToArtistProfile(artistId) {
+    // Redirigir al perfil público del artista
+    window.location.href = WIKI.BASE_URL + `perfil_artista.php?id=${artistId}`;
+}
+
+/**
+ * Contactar artista
+ */
+function contactArtist(email, artistName) {
+    if (!email || email === 'No disponible') {
+        Swal.fire({
+            title: 'Información de contacto no disponible',
+            text: 'Este artista no ha proporcionado información de contacto.',
+            icon: 'info',
+            confirmButtonText: 'Entendido'
+        });
+        return;
+    }
+    
+    const subject = encodeURIComponent(`Consulta sobre tu perfil en ID-Cultural`);
+    const body = encodeURIComponent(`Hola ${artistName},\n\nHe visto tu perfil en ID-Cultural y me gustaría conocer más sobre tu trabajo.\n\nSaludos!`);
+    
+    window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
 }
 
 /**
  * Formatear fecha
  */
 function formatarFecha(fecha) {
-    if (!fecha) return '';
+    if (!fecha) return 'Sin fecha';
     const date = new Date(fecha);
     return date.toLocaleDateString('es-AR', { 
         year: 'numeric', 
@@ -282,16 +747,11 @@ function formatarFecha(fecha) {
 }
 
 /**
- * Mostrar error
+ * Escapar HTML
  */
-function mostrarError(mensaje) {
-    const contenedor = document.getElementById('contenedor-obras-wiki');
-    if (contenedor) {
-        contenedor.innerHTML = `
-            <div class="alert alert-danger text-center py-5">
-                <i class="bi bi-exclamation-triangle"></i>
-                <p class="mt-3 mb-0">${escaparHTML(mensaje)}</p>
-            </div>
-        `;
-    }
+function escaparHTML(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
