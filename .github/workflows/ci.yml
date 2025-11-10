@@ -1,36 +1,35 @@
+ame: Integración Continua (CI)
+
 on:
-  push:
-    branches: [ "main", "develop", "sebas_test" ] # Añadimos 'sebas_test' para probar el CI
-  pull_request:
-    branches: [ "main", "develop" ]
-  workflow_dispatch: 
+push:
+# Esta acción se dispara al subir código a estas ramas
+branches: [ "main", "develop", "sebas_test" ]
+pull_request:
+# Esta acción se dispara al abrir un PR dirigido a estas ramas
+branches: [ "main", "develop" ]
+workflow_dispatch: # Permite ejecutar el workflow manualmente
 
 jobs:
-  build_and_test:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: 📥 Clonar Repositorio
-      uses: actions/checkout@v4
+build_and_test:
+runs-on: ubuntu-latest # Usamos el runner de GitHub
 
-    - name: 🏗️ Levantar la Aplicación y Servicios con Docker Compose
-      # Esto usa el docker-compose.yml que nos proporcionaste
-      run: docker-compose up -d --build --wait
+steps:
+- name: 📥 Clonar Repositorio
+  uses: actions/checkout@v4
 
-    - name: ⏳ Esperar un momento adicional para la inicialización de la BD
-      # Damos tiempo a MariaDB para que procese el SQL inicial
-      run: sleep 15
+- name: 🏗️ Levantar la Aplicación y Servicios con Docker Compose
+  # Este comando lee el docker-compose.yml, construye las imágenes y espera a que levanten
+  run: docker-compose up -d --build --wait
 
-    # ----------------------------------------------------
-    # PASO CLAVE: Ejecución de las Pruebas
-    # ----------------------------------------------------
-    - name: 🧪 Ejecutar Pruebas (AJUSTAR EL COMANDO)
-      # SERVICIO: 'web' (Confirmado en docker-compose.yml)
-      # COMANDO: Reemplaza 'vendor/bin/phpunit' por tu comando real (ej. 'php artisan test')
-      run: docker-compose exec -T web vendor/bin/phpunit
+- name: ⏳ Esperar un momento adicional para la inicialización de la BD
+  # Damos tiempo extra a MariaDB para la configuración inicial
+  run: sleep 15
+
+- name: 🧪 Ejecutar Pruebas (AJUSTAR COMANDO PHP)
+  # ⚠️ RECUERDA: Reemplaza 'vendor/bin/phpunit' por el comando correcto de tu framework.
+  run: docker-compose exec -T web vendor/bin/phpunit
       
-    # ----------------------------------------------------
-      
-    - name: 🛑 Limpiar y Detener Contenedores
-      if: always() 
-      run: docker-compose down
+- name: 🛑 Limpiar y Detener Contenedores
+  # El 'if: always()' garantiza que los contenedores se detengan para liberar recursos
+  if: always() 
+  run: docker-compose down
