@@ -154,6 +154,191 @@ INSERT INTO `artistas` VALUES (2,'nuevo','nuevo','2000-12-12','femenino','Argent
 UNLOCK TABLES;
 
 --
+-- Table structure for table `artistas_famosos`
+--
+
+DROP TABLE IF EXISTS `artistas_famosos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `artistas_famosos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre_completo` varchar(255) NOT NULL,
+  `nombre_artistico` varchar(255) DEFAULT NULL,
+  `fecha_nacimiento` date NOT NULL,
+  `fecha_fallecimiento` date DEFAULT NULL COMMENT 'NULL si está vivo',
+  `lugar_nacimiento` varchar(255) DEFAULT NULL,
+  `municipio` varchar(100) NOT NULL DEFAULT 'Santiago del Estero',
+  `provincia` varchar(100) NOT NULL DEFAULT 'Santiago del Estero',
+  `pais` varchar(100) NOT NULL DEFAULT 'Argentina',
+  `categoria` enum('musica','literatura','artes_plasticas','danza','teatro','cine','artesania','folklore') NOT NULL,
+  `subcategoria` varchar(100) DEFAULT NULL COMMENT 'Ej: Chacarera, Pintura, Escultura, etc',
+  `biografia` text NOT NULL,
+  `logros_premios` text DEFAULT NULL COMMENT 'Premios y reconocimientos',
+  `obras_destacadas` text DEFAULT NULL COMMENT 'Lista de obras principales',
+  `foto_perfil` varchar(255) DEFAULT NULL,
+  `foto_galeria` text DEFAULT NULL COMMENT 'JSON con array de fotos',
+  `videos_youtube` text DEFAULT NULL COMMENT 'JSON con links de YouTube',
+  `sitio_web` varchar(255) DEFAULT NULL,
+  `instagram` varchar(255) DEFAULT NULL,
+  `facebook` varchar(255) DEFAULT NULL,
+  `twitter` varchar(255) DEFAULT NULL,
+  `wikipedia_url` varchar(255) DEFAULT NULL,
+  `activo` tinyint(1) DEFAULT 1 COMMENT 'Para mostrar/ocultar',
+  `destacado` tinyint(1) DEFAULT 0 COMMENT 'Para artistas más importantes',
+  `orden_visualizacion` int(11) DEFAULT 0 COMMENT 'Para ordenar en la wiki',
+  `visitas` int(11) DEFAULT 0 COMMENT 'Contador de visitas al perfil',
+  `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `creado_por` int(11) DEFAULT NULL COMMENT 'ID del admin que lo creó',
+  `notas_admin` text DEFAULT NULL COMMENT 'Notas internas',
+  PRIMARY KEY (`id`),
+  KEY `idx_categoria` (`categoria`),
+  KEY `idx_municipio` (`municipio`),
+  KEY `idx_destacado` (`destacado`),
+  KEY `idx_activo` (`activo`),
+  KEY `idx_orden` (`orden_visualizacion`),
+  KEY `idx_categoria_activo` (`categoria`,`activo`),
+  KEY `idx_destacado_orden` (`destacado`,`orden_visualizacion`),
+  FULLTEXT KEY `idx_busqueda_nombre` (`nombre_completo`,`nombre_artistico`,`biografia`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `artistas_famosos`
+--
+
+LOCK TABLES `artistas_famosos` WRITE;
+/*!40000 ALTER TABLE `artistas_famosos` DISABLE KEYS */;
+INSERT INTO `artistas_famosos` VALUES (1,'Andrés Chazarreta','Don Andrés','1876-05-16','1960-10-24','Santiago del Estero','Santiago del Estero','Santiago del Estero','Argentina','musica','Folklore','Músico, compositor y folclorista argentino. Considerado el \"Patriarca del Folklore Argentino\". Fue el primero en llevar música folklórica argentina a Buenos Aires en 1911, revolucionando la cultura musical del país. Recopiló y difundió la música tradicional santiagueña.','Pionero del folklore argentino. Fundó la primera orquesta de música nativa. Reconocido como Padre del Folklore Nacional.','La Telesita, Añoranzas, Zamba de Vargas, Chacarera del Rancho, El Crespín',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,1,0,'2025-11-10 04:31:14','2025-11-10 04:31:14',NULL,NULL),(2,'Mercedes Sosa','La Negra','1935-07-09','2009-10-04','San Miguel de Tucumán','Santiago del Estero','Santiago del Estero','Argentina','musica','Folklore/Nuevo Cancionero','Cantante argentina considerada una de las máximas exponentes del folklore latinoamericano. Aunque nació en Tucumán, gran parte de su familia era santiagueña y su repertorio incluyó muchas obras del folklore de Santiago del Estero. Icono de la música argentina y latinoamericana.','6 Premios Grammy Latino. Premio Konex de Platino. Declarada Ciudadana Ilustre de América. Doctorado Honoris Causa.','Gracias a la Vida, Alfonsina y el Mar, Todo Cambia, Balderrama, Zamba para no morir, Como la cigarra',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,2,0,'2025-11-10 04:31:14','2025-11-10 04:31:14',NULL,NULL),(3,'Jacinto Piedra',NULL,'1920-03-15','2007-05-10','Loreto','Loreto','Santiago del Estero','Argentina','musica','Chacarera','Músico y compositor santiagueño, especializado en chacarera. Uno de los grandes exponentes del folklore de Santiago del Estero. Su música representa la esencia de la cultura rural santiagueña.','Reconocido por su virtuosismo en la guitarra y bombo. Cosechó múltiples premios en festivales folklóricos.','Chacarera del Rancho, La Arunguita, Nostalgias Santiagueñas',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,3,0,'2025-11-10 04:31:14','2025-11-10 04:31:14',NULL,NULL),(4,'Raly Barrionuevo',NULL,'1967-12-14',NULL,'Santiago del Estero','Santiago del Estero','Santiago del Estero','Argentina','musica','Folklore Contemporáneo','Cantautor argentino, exponente del folklore contemporáneo. Su música combina tradición santiagueña con elementos modernos. Uno de los artistas más reconocidos del nuevo folklore argentino.','Múltiples Premios Gardel. Disco de Oro. Reconocido internacionalmente.','Zamba del Laurel, Mariana, Melodía del Atardecer, Canto Versos',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,4,0,'2025-11-10 04:31:14','2025-11-10 04:31:14',NULL,NULL),(5,'Dúo Coplanacu',NULL,'1975-01-01',NULL,'Santiago del Estero','Santiago del Estero','Santiago del Estero','Argentina','musica','Copla','Dúo musical formado por Jorge Fandermole y Roxana Carabajal. Representan la copla y el folklore santiagueño con excelencia artística.','Premios Gardel. Reconocimiento Nacional e Internacional.','Coplas de mi País, Zamba Azul, La Pomeña',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,5,0,'2025-11-10 04:31:14','2025-11-10 04:31:14',NULL,NULL),(6,'Juan Carlos Dávalos',NULL,'1887-08-07','1959-12-06','Santiago del Estero','Santiago del Estero','Santiago del Estero','Argentina','literatura','Narrativa/Poesía','Escritor y poeta argentino. Sus obras retratan la vida rural del norte argentino, especialmente Santiago del Estero. Considerado uno de los grandes escritores regionalistas.','Premio Nacional de Literatura. Sus cuentos son clásicos de la literatura argentina.','Los Buscadores de Oro, Airampo, La Flor del Cardón, Salta',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,6,0,'2025-11-10 04:31:14','2025-11-10 04:31:14',NULL,NULL),(7,'Bernardo Canal Feijóo',NULL,'1897-09-04','1982-01-13','Santiago del Estero','Santiago del Estero','Santiago del Estero','Argentina','literatura','Ensayo/Historia','Escritor, ensayista, historiador y pensador argentino. Estudioso profundo de la cultura santiagueña y del noroeste argentino. Figura fundamental del pensamiento regionalista.','Doctor Honoris Causa. Premio Konex. Reconocido como intelectual fundamental del NOA.','Ensayo sobre la Expresión Popular Artística en Santiago, Burla, Credo, Culpa en la Creación Anónima',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,7,0,'2025-11-10 04:31:14','2025-11-10 04:31:14',NULL,NULL),(8,'Alfredo Gogna',NULL,'1878-01-15','1972-03-20','Santiago del Estero','Santiago del Estero','Santiago del Estero','Argentina','artes_plasticas','Pintura','Pintor argentino. Sus obras reflejan paisajes y costumbres de Santiago del Estero. Pionero de las artes plásticas en la provincia.','Exposiciones nacionales e internacionales. Reconocido maestro de la pintura regional.','Paisajes Santiagueños, Serie del Monte, Retratos de Gauchos',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,8,0,'2025-11-10 04:31:14','2025-11-10 04:31:14',NULL,NULL),(9,'Ricardo y Francisco Sola',NULL,'1940-05-10',NULL,'Santiago del Estero','Santiago del Estero','Santiago del Estero','Argentina','artes_plasticas','Escultura','Hermanos escultores reconocidos por sus obras monumentales en Santiago del Estero y Argentina.','Múltiples obras públicas y monumentos en la provincia.','Monumento a la Madre, Cristo del Cerro, Diversas esculturas urbanas',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,9,0,'2025-11-10 04:31:14','2025-11-10 04:31:14',NULL,NULL),(10,'Los Manseros Santiagueños',NULL,'1950-01-01',NULL,'Santiago del Estero','Santiago del Estero','Santiago del Estero','Argentina','musica','Folklore/Chacarera','Conjunto folklórico emblemático de Santiago del Estero. Formado en 1950, llevan décadas difundiendo la cultura santiagueña.','Referentes del folklore santiagueño. Múltiples discos y presentaciones internacionales.','Pa\' Santiago me Voy, Chacarera de un Triste, La Telesita',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,10,0,'2025-11-10 04:31:14','2025-11-10 04:31:14',NULL,NULL),(11,'Horacio Banegas',NULL,'1946-06-15','2021-02-11','Fernández','Fernández','Santiago del Estero','Argentina','musica','Folklore/Chacarera','Músico, compositor y poeta santiagueño. Figura fundamental del folklore argentino. Sus letras son poesía pura del monte santiagueño.','Considerado uno de los mejores letristas del folklore argentino. Cosechó innumerables premios.','La Olvidada, Zamba del Quebrachal, De Puro Guapo, El Antigal',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,11,0,'2025-11-10 04:31:14','2025-11-10 04:31:14',NULL,NULL);
+/*!40000 ALTER TABLE `artistas_famosos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Temporary table structure for view `artistas_famosos_con_edad`
+--
+
+DROP TABLE IF EXISTS `artistas_famosos_con_edad`;
+/*!50001 DROP VIEW IF EXISTS `artistas_famosos_con_edad`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8mb4;
+/*!50001 CREATE VIEW `artistas_famosos_con_edad` AS SELECT
+ 1 AS `id`,
+  1 AS `nombre_completo`,
+  1 AS `nombre_artistico`,
+  1 AS `fecha_nacimiento`,
+  1 AS `fecha_fallecimiento`,
+  1 AS `lugar_nacimiento`,
+  1 AS `municipio`,
+  1 AS `provincia`,
+  1 AS `pais`,
+  1 AS `categoria`,
+  1 AS `subcategoria`,
+  1 AS `biografia`,
+  1 AS `logros_premios`,
+  1 AS `obras_destacadas`,
+  1 AS `foto_perfil`,
+  1 AS `foto_galeria`,
+  1 AS `videos_youtube`,
+  1 AS `sitio_web`,
+  1 AS `instagram`,
+  1 AS `facebook`,
+  1 AS `twitter`,
+  1 AS `wikipedia_url`,
+  1 AS `activo`,
+  1 AS `destacado`,
+  1 AS `orden_visualizacion`,
+  1 AS `visitas`,
+  1 AS `fecha_creacion`,
+  1 AS `fecha_actualizacion`,
+  1 AS `creado_por`,
+  1 AS `notas_admin`,
+  1 AS `edad`,
+  1 AS `estado_vital` */;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary table structure for view `artistas_famosos_destacados`
+--
+
+DROP TABLE IF EXISTS `artistas_famosos_destacados`;
+/*!50001 DROP VIEW IF EXISTS `artistas_famosos_destacados`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8mb4;
+/*!50001 CREATE VIEW `artistas_famosos_destacados` AS SELECT
+ 1 AS `id`,
+  1 AS `nombre_completo`,
+  1 AS `nombre_artistico`,
+  1 AS `fecha_nacimiento`,
+  1 AS `fecha_fallecimiento`,
+  1 AS `lugar_nacimiento`,
+  1 AS `municipio`,
+  1 AS `provincia`,
+  1 AS `pais`,
+  1 AS `categoria`,
+  1 AS `subcategoria`,
+  1 AS `biografia`,
+  1 AS `logros_premios`,
+  1 AS `obras_destacadas`,
+  1 AS `foto_perfil`,
+  1 AS `foto_galeria`,
+  1 AS `videos_youtube`,
+  1 AS `sitio_web`,
+  1 AS `instagram`,
+  1 AS `facebook`,
+  1 AS `twitter`,
+  1 AS `wikipedia_url`,
+  1 AS `activo`,
+  1 AS `destacado`,
+  1 AS `orden_visualizacion`,
+  1 AS `visitas`,
+  1 AS `fecha_creacion`,
+  1 AS `fecha_actualizacion`,
+  1 AS `creado_por`,
+  1 AS `notas_admin` */;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary table structure for view `artistas_famosos_vivos`
+--
+
+DROP TABLE IF EXISTS `artistas_famosos_vivos`;
+/*!50001 DROP VIEW IF EXISTS `artistas_famosos_vivos`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8mb4;
+/*!50001 CREATE VIEW `artistas_famosos_vivos` AS SELECT
+ 1 AS `id`,
+  1 AS `nombre_completo`,
+  1 AS `nombre_artistico`,
+  1 AS `fecha_nacimiento`,
+  1 AS `fecha_fallecimiento`,
+  1 AS `lugar_nacimiento`,
+  1 AS `municipio`,
+  1 AS `provincia`,
+  1 AS `pais`,
+  1 AS `categoria`,
+  1 AS `subcategoria`,
+  1 AS `biografia`,
+  1 AS `logros_premios`,
+  1 AS `obras_destacadas`,
+  1 AS `foto_perfil`,
+  1 AS `foto_galeria`,
+  1 AS `videos_youtube`,
+  1 AS `sitio_web`,
+  1 AS `instagram`,
+  1 AS `facebook`,
+  1 AS `twitter`,
+  1 AS `wikipedia_url`,
+  1 AS `activo`,
+  1 AS `destacado`,
+  1 AS `orden_visualizacion`,
+  1 AS `visitas`,
+  1 AS `fecha_creacion`,
+  1 AS `fecha_actualizacion`,
+  1 AS `creado_por`,
+  1 AS `notas_admin` */;
+SET character_set_client = @saved_cs_client;
+
+--
 -- Table structure for table `intereses_artista`
 --
 
@@ -460,6 +645,60 @@ LOCK TABLES `users` WRITE;
 INSERT INTO `users` VALUES (1,'Administrador Principal','admin@idcultural.com','$2y$10$cv2EG9pZ/4y1H.z.QztN.OuGTO9x8resRsMrnJxdaKFPqreWtndf6','admin'),(2,'Editor de Contenidos','editor@idcultural.com','$2y$10$9/iW1.fVT0I8E2PiYzNGv.q5AKtnboEwl4rBAHuMgV2rVcDW6wd6W','editor'),(3,'Validador de Artistas','validador@idcultural.com','$2y$10$SFb4oh3S6IiTZ/LFr/e20uVodzb7n9u/I5OQu11A8AtoUNzns5QHW','validador');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Final view structure for view `artistas_famosos_con_edad`
+--
+
+/*!50001 DROP VIEW IF EXISTS `artistas_famosos_con_edad`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`runatechdev`@`%` SQL SECURITY DEFINER */
+/*!50001 VIEW `artistas_famosos_con_edad` AS select `artistas_famosos`.`id` AS `id`,`artistas_famosos`.`nombre_completo` AS `nombre_completo`,`artistas_famosos`.`nombre_artistico` AS `nombre_artistico`,`artistas_famosos`.`fecha_nacimiento` AS `fecha_nacimiento`,`artistas_famosos`.`fecha_fallecimiento` AS `fecha_fallecimiento`,`artistas_famosos`.`lugar_nacimiento` AS `lugar_nacimiento`,`artistas_famosos`.`municipio` AS `municipio`,`artistas_famosos`.`provincia` AS `provincia`,`artistas_famosos`.`pais` AS `pais`,`artistas_famosos`.`categoria` AS `categoria`,`artistas_famosos`.`subcategoria` AS `subcategoria`,`artistas_famosos`.`biografia` AS `biografia`,`artistas_famosos`.`logros_premios` AS `logros_premios`,`artistas_famosos`.`obras_destacadas` AS `obras_destacadas`,`artistas_famosos`.`foto_perfil` AS `foto_perfil`,`artistas_famosos`.`foto_galeria` AS `foto_galeria`,`artistas_famosos`.`videos_youtube` AS `videos_youtube`,`artistas_famosos`.`sitio_web` AS `sitio_web`,`artistas_famosos`.`instagram` AS `instagram`,`artistas_famosos`.`facebook` AS `facebook`,`artistas_famosos`.`twitter` AS `twitter`,`artistas_famosos`.`wikipedia_url` AS `wikipedia_url`,`artistas_famosos`.`activo` AS `activo`,`artistas_famosos`.`destacado` AS `destacado`,`artistas_famosos`.`orden_visualizacion` AS `orden_visualizacion`,`artistas_famosos`.`visitas` AS `visitas`,`artistas_famosos`.`fecha_creacion` AS `fecha_creacion`,`artistas_famosos`.`fecha_actualizacion` AS `fecha_actualizacion`,`artistas_famosos`.`creado_por` AS `creado_por`,`artistas_famosos`.`notas_admin` AS `notas_admin`,case when `artistas_famosos`.`fecha_fallecimiento` is null then timestampdiff(YEAR,`artistas_famosos`.`fecha_nacimiento`,curdate()) else timestampdiff(YEAR,`artistas_famosos`.`fecha_nacimiento`,`artistas_famosos`.`fecha_fallecimiento`) end AS `edad`,case when `artistas_famosos`.`fecha_fallecimiento` is null then 'Vivo' else concat('Fallecido hace ',timestampdiff(YEAR,`artistas_famosos`.`fecha_fallecimiento`,curdate()),' años') end AS `estado_vital` from `artistas_famosos` where `artistas_famosos`.`activo` = 1 */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `artistas_famosos_destacados`
+--
+
+/*!50001 DROP VIEW IF EXISTS `artistas_famosos_destacados`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`runatechdev`@`%` SQL SECURITY DEFINER */
+/*!50001 VIEW `artistas_famosos_destacados` AS select `artistas_famosos`.`id` AS `id`,`artistas_famosos`.`nombre_completo` AS `nombre_completo`,`artistas_famosos`.`nombre_artistico` AS `nombre_artistico`,`artistas_famosos`.`fecha_nacimiento` AS `fecha_nacimiento`,`artistas_famosos`.`fecha_fallecimiento` AS `fecha_fallecimiento`,`artistas_famosos`.`lugar_nacimiento` AS `lugar_nacimiento`,`artistas_famosos`.`municipio` AS `municipio`,`artistas_famosos`.`provincia` AS `provincia`,`artistas_famosos`.`pais` AS `pais`,`artistas_famosos`.`categoria` AS `categoria`,`artistas_famosos`.`subcategoria` AS `subcategoria`,`artistas_famosos`.`biografia` AS `biografia`,`artistas_famosos`.`logros_premios` AS `logros_premios`,`artistas_famosos`.`obras_destacadas` AS `obras_destacadas`,`artistas_famosos`.`foto_perfil` AS `foto_perfil`,`artistas_famosos`.`foto_galeria` AS `foto_galeria`,`artistas_famosos`.`videos_youtube` AS `videos_youtube`,`artistas_famosos`.`sitio_web` AS `sitio_web`,`artistas_famosos`.`instagram` AS `instagram`,`artistas_famosos`.`facebook` AS `facebook`,`artistas_famosos`.`twitter` AS `twitter`,`artistas_famosos`.`wikipedia_url` AS `wikipedia_url`,`artistas_famosos`.`activo` AS `activo`,`artistas_famosos`.`destacado` AS `destacado`,`artistas_famosos`.`orden_visualizacion` AS `orden_visualizacion`,`artistas_famosos`.`visitas` AS `visitas`,`artistas_famosos`.`fecha_creacion` AS `fecha_creacion`,`artistas_famosos`.`fecha_actualizacion` AS `fecha_actualizacion`,`artistas_famosos`.`creado_por` AS `creado_por`,`artistas_famosos`.`notas_admin` AS `notas_admin` from `artistas_famosos` where `artistas_famosos`.`destacado` = 1 and `artistas_famosos`.`activo` = 1 order by `artistas_famosos`.`orden_visualizacion` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `artistas_famosos_vivos`
+--
+
+/*!50001 DROP VIEW IF EXISTS `artistas_famosos_vivos`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`runatechdev`@`%` SQL SECURITY DEFINER */
+/*!50001 VIEW `artistas_famosos_vivos` AS select `artistas_famosos`.`id` AS `id`,`artistas_famosos`.`nombre_completo` AS `nombre_completo`,`artistas_famosos`.`nombre_artistico` AS `nombre_artistico`,`artistas_famosos`.`fecha_nacimiento` AS `fecha_nacimiento`,`artistas_famosos`.`fecha_fallecimiento` AS `fecha_fallecimiento`,`artistas_famosos`.`lugar_nacimiento` AS `lugar_nacimiento`,`artistas_famosos`.`municipio` AS `municipio`,`artistas_famosos`.`provincia` AS `provincia`,`artistas_famosos`.`pais` AS `pais`,`artistas_famosos`.`categoria` AS `categoria`,`artistas_famosos`.`subcategoria` AS `subcategoria`,`artistas_famosos`.`biografia` AS `biografia`,`artistas_famosos`.`logros_premios` AS `logros_premios`,`artistas_famosos`.`obras_destacadas` AS `obras_destacadas`,`artistas_famosos`.`foto_perfil` AS `foto_perfil`,`artistas_famosos`.`foto_galeria` AS `foto_galeria`,`artistas_famosos`.`videos_youtube` AS `videos_youtube`,`artistas_famosos`.`sitio_web` AS `sitio_web`,`artistas_famosos`.`instagram` AS `instagram`,`artistas_famosos`.`facebook` AS `facebook`,`artistas_famosos`.`twitter` AS `twitter`,`artistas_famosos`.`wikipedia_url` AS `wikipedia_url`,`artistas_famosos`.`activo` AS `activo`,`artistas_famosos`.`destacado` AS `destacado`,`artistas_famosos`.`orden_visualizacion` AS `orden_visualizacion`,`artistas_famosos`.`visitas` AS `visitas`,`artistas_famosos`.`fecha_creacion` AS `fecha_creacion`,`artistas_famosos`.`fecha_actualizacion` AS `fecha_actualizacion`,`artistas_famosos`.`creado_por` AS `creado_por`,`artistas_famosos`.`notas_admin` AS `notas_admin` from `artistas_famosos` where `artistas_famosos`.`fecha_fallecimiento` is null and `artistas_famosos`.`activo` = 1 order by `artistas_famosos`.`orden_visualizacion` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -470,4 +709,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-10  4:12:25
+-- Dump completed on 2025-11-10  4:32:54
