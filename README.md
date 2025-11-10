@@ -12,45 +12,63 @@ Proyecto desarrollado para la Subsecretaría de Cultura de Santiago del Estero c
 
 ## 🗂️ Estructura del Proyecto
 ```
+```
 ID_Cultural/
 │
-├── src/
-│ ├── controllers/ # Lógica del sistema y gestión de rutas
-│ ├── models/ # Representación de datos y lógica de interacción con la DB
-│ └── views/ # Interfaz HTML
-│ ├── components/ # Navbar, footer, etc.
-│ └── pages/
-│ ├── public/ # Inicio, búsqueda, Wiki de Artistas
-│ ├── auth/ # Login, registro
-│ ├── user/ # Panel de artistas (creación y gestión de borradores)
-│ └── admin/ # Administración de usuarios, validaciones y gestión general
+├── backend/ # 🔧 Backend PHP y configuraciones
+│ ├── config/ # Configuración de conexiones
+│ ├── controllers/ # Lógica del sistema
+│ └── helpers/ # Utilidades y validadores
 │
-├── static/
-│ ├── css/
-│ │ ├── main.css # Estilos generales
-│ │ ├── login.css # Estilos por página
-│ │ ├── admin.css
-│ │ └── wiki.css
-│ ├── js/
-│ │ ├── login.js
-│ │ └── admin.js
-│ └── img/
-│ └── logo.png
+├── public/ # 🌐 Frontend y archivos públicos
+│ ├── api/ # APIs REST del sistema
+│ ├── src/views/ # Vistas HTML organizadas
+│ ├── static/ # CSS, JS, imágenes
+│ └── [páginas principales] # index.php, wiki.php, etc.
 │
-├── database/
-│ ├── dump_idcultural.sql # Esquema de la base de datos y datos de ejemplo
+├── components/ # 🧩 Componentes reutilizables
+│ ├── header.php # Header común
+│ ├── navbar.php # Barra de navegación
+│ └── footer.php # Footer común
 │
-├── config/
-│ ├── db.php # Configuración de conexión a base de datos
-│ └── rutas.php # Definición de rutas del sistema
+├── database/ # 🗄️ Esquemas y backups de BD
+│ └── migrations/ # Scripts de migración
 │
-├── tests/
-│ ├── test-usuarios.js # Tests para la gestión de usuarios
-│ └── test-artistas.js # Tests para la gestión de artistas y sus publicaciones
+├── tests/ # 🧪 Tests automatizados (PHPUnit)
+│ ├── Unit/ # Tests unitarios
+│ │ ├── ArtistasTest.php
+│ │ ├── AuthTest.php
+│ │ └── [más tests...]
+│ └── phpunit.xml # Configuración PHPUnit
 │
-└── docs/
-├── manual-usuario.pdf # Guía para usuarios finales
-└── informe-tecnico.docx # Documentación técnica del proyecto
+├── testing/ # 🔍 Testing manual y scripts de prueba
+│ └── manual/ # Scripts de testing manual
+│ ├── test_apis.sh
+│ ├── test_db.php
+│ └── [más tests manuales...]
+│
+├── utils/ # 🛠️ Herramientas de mantenimiento
+│ ├── checks/ # Scripts de verificación
+│ │ ├── check_users.php
+│ │ └── check_obras.php
+│ ├── debug/ # Herramientas de debugging
+│ │ ├── inspect_db.php
+│ │ └── debug_session.php
+│ └── fixes/ # Scripts de corrección
+│ ├── cleanup_bd.php
+│ └── prepare_test.php
+│
+├── docs/ # 📚 Documentación técnica completa
+│ ├── README.md # Índice de toda la documentación
+│ ├── Manual_ID-Cultural.md # Guía completa para usuarios
+│ ├── ANALISIS_PLATAFORMA_COMPLETO.md # Análisis técnico
+│ ├── IMPLEMENTACION_COMPLETADA.md # Registro de implementaciones
+│ └── [más documentos técnicos...] # Ver docs/README.md para lista completa
+│
+└── scripts/ # 📜 Scripts de deployment y utilidades
+├── export_database.sh
+└── import_database.sh
+```
 ```
 ---
 
@@ -80,7 +98,29 @@ ID_Cultural/
 
 ---
 
-## 👥 Equipo de Desarrollo
+## � Documentación
+
+### 📖 **Documentación Completa**
+Toda la documentación técnica y de usuario se encuentra organizada en la carpeta **[`/docs`](./docs/)**:
+
+- **[📋 Índice de Documentación](./docs/README.md)** - Lista completa y organizada de todos los documentos
+- **[📖 Manual de Usuario](./docs/Manual_ID-Cultural.md)** - Guía completa para usuarios de la plataforma
+- **[🔧 Análisis Técnico](./docs/ANALISIS_PLATAFORMA_COMPLETO.md)** - Documentación técnica detallada
+- **[🧪 Guía de Testing](./docs/TESTS_DOCUMENTATION.md)** - Documentación de pruebas y testing
+
+### 🚀 **Enlaces Rápidos**
+- **API Documentation**: [`/public/api/API_DOCUMENTATION.md`](./public/api/API_DOCUMENTATION.md)
+- **Implementaciones**: [`/docs/IMPLEMENTACION_COMPLETADA.md`](./docs/IMPLEMENTACION_COMPLETADA.md)
+- **Base de Datos**: [`/docs/DATABASE_SYNC.md`](./docs/DATABASE_SYNC.md)
+
+### 🧪 **Testing y Desarrollo**
+- **Tests Automatizados**: [`/tests/`](./tests/) - PHPUnit tests para CI/CD
+- **Testing Manual**: [`/testing/`](./testing/) - Scripts de prueba manual
+- **Utilidades**: [`/utils/`](./utils/) - Herramientas de debugging y mantenimiento
+
+---
+
+## �👥 Equipo de Desarrollo
 
 **Runatech** – Estudiantes del ITSE Santiago del Estero
 

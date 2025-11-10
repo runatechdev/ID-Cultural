@@ -51,3 +51,29 @@ public/uploads/
 ## Temporal
 /tmp/*
 !tmp/.gitkeep
+
+# =============================================================================
+# ARCHIVOS DE TESTING Y DESARROLLO (mantener estructura pero ignorar outputs)
+# =============================================================================
+
+## Outputs de testing manual
+testing/manual/*.log
+testing/manual/output/
+testing/manual/results/
+
+## Outputs de verificaciones
+utils/checks/*.log
+utils/checks/output/
+utils/debug/*.log
+utils/debug/output/
+utils/fixes/*.log
+utils/fixes/output/
+
+## Archivos temporales de utils
+utils/**/*.tmp
+utils/**/*.bak
+
+## PHPUnit reports
+/tests/coverage/
+/tests/reports/
+.phpunit.result.cache
