@@ -1,0 +1,330 @@
+openapi: 3.0.0
+info:
+  title: ID Cultural API
+  description: API pública para acceso a datos de artistas y contenido cultural
+  version: 1.0.0
+  contact:
+    name: ID Cultural
+    email: soporte@idcultural.com
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor de desarrollo
+  - url: https://idcultural.com/api
+    description: Servidor de producción
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /artistas.php:
+    get:
+      summary: Obtener lista de artistas
+      description: Retorna lista de artistas validados
+      tags:
+        - Artistas
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [get]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [validado, pendiente]
+            default: validado
+        - name: categoria
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de artistas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Artista'
+  
+  /get_obras_wiki.php:
+    get:
+      summary: Obtener obras para wiki
+      description: Retorna obras validadas para mostrar en la wiki
+      tags:
+        - Obras
+      responses:
+        '200':
+          description: Lista de obras
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Obra'
+  
+  /get_publicaciones.php:
+    get:
+      summary: Obtener publicaciones
+      description: Retorna publicaciones de artistas
+      tags:
+        - Publicaciones
+      parameters:
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [validado, pendiente, rechazado]
+        - name: categoria
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de publicaciones
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Publicacion'
+  
+  /noticias.php:
+    get:
+      summary: Obtener noticias
+      description: Retorna lista de noticias publicadas
+      tags:
+        - Noticias
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [get_all]
+      responses:
+        '200':
+          description: Lista de noticias
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Noticia'
+  
+  /analytics.php:
+    post:
+      summary: Registrar evento de analytics
+      description: Permite registrar eventos, visitas y búsquedas
+      tags:
+        - Analytics
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/TrackPageRequest'
+                - $ref: '#/components/schemas/TrackEventRequest'
+                - $ref: '#/components/schemas/TrackSearchRequest'
+      responses:
+        '200':
+          description: Evento registrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '429':
+          description: Demasiadas solicitudes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key para autenticación (opcional para endpoints públicos)
+  
+  schemas:
+    Artista:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre_completo:
+          type: string
+        nombre_artistico:
+          type: string
+        municipio:
+          type: string
+        categoria:
+          type: string
+        biografia:
+          type: string
+        foto_perfil:
+          type: string
+        estado:
+          type: string
+          enum: [validado, pendiente, rechazado]
+        fecha_registro:
+          type: string
+          format: date-time
+    
+    Obra:
+      type: object
+      properties:
+        id:
+          type: integer
+        artista_id:
+          type: integer
+        titulo:
+          type: string
+        descripcion:
+          type: string
+        tipo:
+          type: string
+        fecha_creacion:
+          type: string
+          format: date
+        multimedia:
+          type: array
+          items:
+            type: string
+    
+    Publicacion:
+      type: object
+      properties:
+        id:
+          type: integer
+        artista_id:
+          type: integer
+        titulo:
+          type: string
+        contenido:
+          type: string
+        estado:
+          type: string
+        fecha_publicacion:
+          type: string
+          format: date-time
+    
+    Noticia:
+      type: object
+      properties:
+        id:
+          type: integer
+        titulo:
+          type: string
+        contenido:
+          type: string
+        autor_id:
+          type: integer
+        imagen:
+          type: string
+        fecha_publicacion:
+          type: string
+          format: date-time
+    
+    TrackPageRequest:
+      type: object
+      required:
+        - action
+        - pagina
+      properties:
+        action:
+          type: string
+          enum: [track_page]
+        pagina:
+          type: string
+        duracion:
+          type: integer
+    
+    TrackEventRequest:
+      type: object
+      required:
+        - action
+        - categoria
+        - accion
+      properties:
+        action:
+          type: string
+          enum: [track_event]
+        categoria:
+          type: string
+        accion:
+          type: string
+        etiqueta:
+          type: string
+        valor:
+          type: integer
+    
+    TrackSearchRequest:
+      type: object
+      required:
+        - action
+        - termino
+      properties:
+        action:
+          type: string
+          enum: [track_search]
+        termino:
+          type: string
+        resultados:
+          type: integer
+    
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+        code:
+          type: integer
+
+tags:
+  - name: Artistas
+    description: Endpoints relacionados con artistas
+  - name: Obras
+    description: Endpoints relacionados con obras de artistas
+  - name: Publicaciones
+    description: Endpoints relacionados con publicaciones
+  - name: Noticias
+    description: Endpoints relacionados con noticias
+  - name: Analytics
+    description: Endpoints para tracking y analytics

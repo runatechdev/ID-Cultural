@@ -40,21 +40,24 @@ class NotificationManager {
     /**
      * Obtener notificaciones del usuario
      */
-    public function getNotifications($limit = 20, $offset = 0, $leidas = null) {
+    public function getNotifications($userId, $limit = 20, $offset = 0, $leidas = null) {
         $query = "SELECT * FROM notificaciones WHERE usuario_id = ? ";
-        $params = [$this->conn->real_escape_string($userId)];
+        $types = 'i';
+        $params = [$userId];
 
         if ($leidas !== null) {
             $query .= "AND leida = ? ";
+            $types .= 'i';
             $params[] = (int)$leidas;
         }
 
         $query .= "ORDER BY created_at DESC LIMIT ?, ?";
+        $types .= 'ii';
         $params[] = (int)$offset;
         $params[] = (int)$limit;
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param(str_repeat('i', count($params)), ...$params);
+        $stmt->bind_param($types, ...$params);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -72,10 +75,10 @@ class NotificationManager {
     /**
      * Obtener notificaciones no leídas
      */
-    public function getUnreadCount() {
+    public function getUnreadCount($userId) {
         $query = "SELECT COUNT(*) as total FROM notificaciones WHERE usuario_id = ? AND leida = FALSE";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('i', $GLOBALS['userId']);
+        $stmt->bind_param('i', $userId);
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_assoc()['total'];
@@ -84,12 +87,12 @@ class NotificationManager {
     /**
      * Marcar como leída
      */
-    public function markAsRead($notificationId) {
+    public function markAsRead($userId, $notificationId) {
         // Verificar que pertenece al usuario
         $query = "UPDATE notificaciones SET leida = TRUE, fecha_lectura = NOW() 
                   WHERE id = ? AND usuario_id = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('ii', $notificationId, $GLOBALS['userId']);
+        $stmt->bind_param('ii', $notificationId, $userId);
 
         if (!$stmt->execute()) {
             throw new Exception('Error al marcar notificación');
@@ -101,11 +104,11 @@ class NotificationManager {
     /**
      * Marcar todas como leídas
      */
-    public function markAllAsRead() {
+    public function markAllAsRead($userId) {
         $query = "UPDATE notificaciones SET leida = TRUE, fecha_lectura = NOW() 
                   WHERE usuario_id = ? AND leida = FALSE";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('i', $GLOBALS['userId']);
+        $stmt->bind_param('i', $userId);
 
         if (!$stmt->execute()) {
             throw new Exception('Error al marcar notificaciones');
@@ -117,10 +120,10 @@ class NotificationManager {
     /**
      * Eliminar notificación
      */
-    public function deleteNotification($notificationId) {
+    public function deleteNotification($userId, $notificationId) {
         $query = "DELETE FROM notificaciones WHERE id = ? AND usuario_id = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('ii', $notificationId, $GLOBALS['userId']);
+        $stmt->bind_param('ii', $notificationId, $userId);
 
         if (!$stmt->execute()) {
             throw new Exception('Error al eliminar notificación');
@@ -132,10 +135,10 @@ class NotificationManager {
     /**
      * Eliminar todas las notificaciones leídas
      */
-    public function deleteReadNotifications() {
+    public function deleteReadNotifications($userId) {
         $query = "DELETE FROM notificaciones WHERE usuario_id = ? AND leida = TRUE";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('i', $GLOBALS['userId']);
+        $stmt->bind_param('i', $userId);
 
         if (!$stmt->execute()) {
             throw new Exception('Error al eliminar notificaciones');
@@ -147,9 +150,7 @@ class NotificationManager {
     /**
      * Crear notificación
      */
-    public static function create($userId, $tipo, $titulo, $mensaje, $urlAccion = null, $datosAdicionales = null) {
-        global $conn;
-
+    public static function create($conn, $userId, $tipo, $titulo, $mensaje, $urlAccion = null, $datosAdicionales = null) {
         $query = "INSERT INTO notificaciones (usuario_id, tipo, titulo, mensaje, url_accion, datos_adicionales) 
                   VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
@@ -167,16 +168,16 @@ class NotificationManager {
     /**
      * Obtener preferencias
      */
-    public function getPreferences() {
+    public function getPreferences($userId) {
         $query = "SELECT * FROM preferencias_notificaciones WHERE usuario_id = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('i', $GLOBALS['userId']);
+        $stmt->bind_param('i', $userId);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows === 0) {
             // Crear preferencias por defecto
-            $this->createDefaultPreferences();
+            $this->createDefaultPreferences($userId);
             return $result->fetch_assoc();
         }
 
@@ -186,7 +187,7 @@ class NotificationManager {
     /**
      * Actualizar preferencias
      */
-    public function updatePreferences($preferences) {
+    public function updatePreferences($userId, $preferences) {
         $query = "UPDATE preferencias_notificaciones SET 
                   notificaciones_email = ?,
                   notificaciones_perfil = ?,
@@ -205,7 +206,7 @@ class NotificationManager {
             $preferences['notificaciones_comentarios'] ?? true,
             $preferences['notificaciones_mensajes'] ?? true,
             $preferences['frecuencia_email'] ?? 'diario',
-            $GLOBALS['userId']
+            $userId
         );
 
         return $stmt->execute();
@@ -214,10 +215,10 @@ class NotificationManager {
     /**
      * Crear preferencias por defecto
      */
-    private function createDefaultPreferences() {
+    private function createDefaultPreferences($userId) {
         $query = "INSERT INTO preferencias_notificaciones (usuario_id) VALUES (?)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('i', $GLOBALS['userId']);
+        $stmt->bind_param('i', $userId);
         return $stmt->execute();
     }
 }
@@ -231,8 +232,8 @@ try {
             $offset = (int)($_GET['offset'] ?? 0);
             $leidas = isset($_GET['leidas']) ? (bool)$_GET['leidas'] : null;
 
-            $notifications = $manager->getNotifications($limit, $offset, $leidas);
-            $unreadCount = $manager->getUnreadCount();
+            $notifications = $manager->getNotifications($userId, $limit, $offset, $leidas);
+            $unreadCount = $manager->getUnreadCount($userId);
 
             ErrorHandler::success([
                 'notifications' => $notifications,
@@ -247,7 +248,7 @@ try {
                 ErrorHandler::validation(['notification_id' => 'Requerido']);
             }
 
-            $marked = $manager->markAsRead($notificationId);
+            $marked = $manager->markAsRead($userId, $notificationId);
 
             if ($marked) {
                 ErrorHandler::success(null, 'Notificación marcada como leída');
@@ -257,7 +258,7 @@ try {
             break;
 
         case 'mark_all_read':
-            $count = $manager->markAllAsRead();
+            $count = $manager->markAllAsRead($userId);
             ErrorHandler::success(['marked' => $count], 'Notificaciones marcadas como leídas');
             break;
 
@@ -268,7 +269,7 @@ try {
                 ErrorHandler::validation(['notification_id' => 'Requerido']);
             }
 
-            $deleted = $manager->deleteNotification($notificationId);
+            $deleted = $manager->deleteNotification($userId, $notificationId);
 
             if ($deleted) {
                 ErrorHandler::success(null, 'Notificación eliminada');
@@ -278,7 +279,7 @@ try {
             break;
 
         case 'delete_read':
-            $count = $manager->deleteReadNotifications();
+            $count = $manager->deleteReadNotifications($userId);
             ErrorHandler::success(['deleted' => $count], 'Notificaciones leídas eliminadas');
             break;
 
@@ -286,7 +287,7 @@ try {
             $method = $_SERVER['REQUEST_METHOD'];
 
             if ($method === 'GET') {
-                $preferences = $manager->getPreferences();
+                $preferences = $manager->getPreferences($userId);
                 ErrorHandler::success($preferences, 'Preferencias obtenidas');
             } elseif ($method === 'POST') {
                 $preferences = json_decode(file_get_contents('php://input'), true);
@@ -295,7 +296,7 @@ try {
                     ErrorHandler::validation(['preferences' => 'Datos requeridos']);
                 }
 
-                if ($manager->updatePreferences($preferences)) {
+                if ($manager->updatePreferences($userId, $preferences)) {
                     ErrorHandler::success(null, 'Preferencias actualizadas');
                 } else {
                     ErrorHandler::error('Error al actualizar preferencias');
