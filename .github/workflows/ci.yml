@@ -1,0 +1,36 @@
+on:
+  push:
+    branches: [ "main", "develop", "sebas_test" ] # Añadimos 'sebas_test' para probar el CI
+  pull_request:
+    branches: [ "main", "develop" ]
+  workflow_dispatch: 
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Clonar Repositorio
+      uses: actions/checkout@v4
+
+    - name: 🏗️ Levantar la Aplicación y Servicios con Docker Compose
+      # Esto usa el docker-compose.yml que nos proporcionaste
+      run: docker-compose up -d --build --wait
+
+    - name: ⏳ Esperar un momento adicional para la inicialización de la BD
+      # Damos tiempo a MariaDB para que procese el SQL inicial
+      run: sleep 15
+
+    # ----------------------------------------------------
+    # PASO CLAVE: Ejecución de las Pruebas
+    # ----------------------------------------------------
+    - name: 🧪 Ejecutar Pruebas (AJUSTAR EL COMANDO)
+      # SERVICIO: 'web' (Confirmado en docker-compose.yml)
+      # COMANDO: Reemplaza 'vendor/bin/phpunit' por tu comando real (ej. 'php artisan test')
+      run: docker-compose exec -T web vendor/bin/phpunit
+      
+    # ----------------------------------------------------
+      
+    - name: 🛑 Limpiar y Detener Contenedores
+      if: always() 
+      run: docker-compose down
