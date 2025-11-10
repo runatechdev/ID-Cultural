@@ -1,4 +1,4 @@
-openapi: 3.0.0
+http://localhost:8080/src/views/pages/admin/dashboard-adm.phpopenapi: 3.0.0
 info:
   title: ID Cultural API
   description: API pública para acceso a datos de artistas y contenido cultural

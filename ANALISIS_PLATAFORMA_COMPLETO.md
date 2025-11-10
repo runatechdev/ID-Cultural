@@ -423,21 +423,12 @@ scripts/
 
 ### **PRIORIDAD BAJA** 🟡
 
-9. **Agregar Comentarios y Calificaciones**
-   ```sql
-   CREATE TABLE comentarios (...)
-   CREATE TABLE calificaciones (...)
-   ```
-   **Tiempo:** 12-16 horas
 
 10. **Analytics Dashboard**
     - Google Analytics integrado
     - Dashboard personalizado
     **Tiempo:** 8-10 horas
-
-11. **2FA (Autenticación de Dos Factores)**
-    - TOTP o SMS
-    **Tiempo:** 10-15 horas
+¿
 
 12. **API Pública**
     - Documentación con Swagger
