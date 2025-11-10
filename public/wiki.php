@@ -74,6 +74,10 @@ include(__DIR__ . '/../components/header.php');
                             <i class="bi bi-search"></i>
                             Buscar
                         </button>
+                        <button type="button" class="clear-btn" onclick="clearFilters()">
+                            <i class="bi bi-x-circle"></i>
+                            Limpiar
+                        </button>
                     </div>
                 </form>
             </div>
@@ -116,36 +120,43 @@ include(__DIR__ . '/../components/header.php');
                                 <i class="bi bi-music-note"></i>
                                 <span>Música</span>
                                 <span class="category-count" id="count-musica">0</span>
+                                <i class="bi bi-x-circle-fill category-close-icon"></i>
                             </a>
                             <a href="#literatura" class="category-item" data-category="Literatura">
                                 <i class="bi bi-book"></i>
                                 <span>Literatura</span>
                                 <span class="category-count" id="count-literatura">0</span>
+                                <i class="bi bi-x-circle-fill category-close-icon"></i>
                             </a>
                             <a href="#danza" class="category-item" data-category="Danza">
                                 <i class="bi bi-person-arms-up"></i>
                                 <span>Danza</span>
                                 <span class="category-count" id="count-danza">0</span>
+                                <i class="bi bi-x-circle-fill category-close-icon"></i>
                             </a>
                             <a href="#teatro" class="category-item" data-category="Teatro">
                                 <i class="bi bi-mask-happy"></i>
                                 <span>Teatro</span>
                                 <span class="category-count" id="count-teatro">0</span>
+                                <i class="bi bi-x-circle-fill category-close-icon"></i>
                             </a>
                             <a href="#artesania" class="category-item" data-category="Artesania">
                                 <i class="bi bi-palette"></i>
                                 <span>Artesanía</span>
                                 <span class="category-count" id="count-artesania">0</span>
+                                <i class="bi bi-x-circle-fill category-close-icon"></i>
                             </a>
                             <a href="#audiovisual" class="category-item" data-category="Audiovisual">
                                 <i class="bi bi-camera-video"></i>
                                 <span>Audiovisual</span>
                                 <span class="category-count" id="count-audiovisual">0</span>
+                                <i class="bi bi-x-circle-fill category-close-icon"></i>
                             </a>
                             <a href="#escultura" class="category-item" data-category="Escultura">
                                 <i class="bi bi-trophy"></i>
                                 <span>Escultura</span>
                                 <span class="category-count" id="count-escultura">0</span>
+                                <i class="bi bi-x-circle-fill category-close-icon"></i>
                             </a>
                         </div>
                     </div>
@@ -227,9 +238,9 @@ include(__DIR__ . '/../components/header.php');
                             <h3>Artistas Famosos de Santiago del Estero</h3>
                             <p>Referentes culturales y artistas reconocidos de nuestra provincia</p>
                         </div>
-                        <div class="famous-artists-grid">
-                            <div class="row g-4">
-                                <div class="col-lg-6 col-md-6">
+                        <div class="famous-artists-grid" id="famous-artists-grid">
+                            <div class="row g-4" id="famous-artists-container">
+                                <div class="col-lg-6 col-md-6 famous-artist-item" data-category="Musica">
                                     <div class="famous-artist-card">
                                         <div class="famous-image">
                                             <img src="/static/img/merce.jpg" alt="Mercedes Sosa">
@@ -249,7 +260,7 @@ include(__DIR__ . '/../components/header.php');
                                     </div>
                                 </div>
                                 
-                                <div class="col-lg-6 col-md-6">
+                                <div class="col-lg-6 col-md-6 famous-artist-item" data-category="Musica">
                                     <div class="famous-artist-card">
                                         <div class="famous-image">
                                             <img src="/static/img/nocheros.jpg" alt="Los Nocheros">
@@ -269,7 +280,7 @@ include(__DIR__ . '/../components/header.php');
                                     </div>
                                 </div>
 
-                                <div class="col-lg-6 col-md-6">
+                                <div class="col-lg-6 col-md-6 famous-artist-item" data-category="Musica">
                                     <div class="famous-artist-card">
                                         <div class="famous-image">
                                             <img src="/static/img/chaqueno.jpg" alt="El Chaqueño Palavecino">
@@ -289,7 +300,7 @@ include(__DIR__ . '/../components/header.php');
                                     </div>
                                 </div>
 
-                                <div class="col-lg-6 col-md-6">
+                                <div class="col-lg-6 col-md-6 famous-artist-item" data-category="Musica">
                                     <div class="famous-artist-card">
                                         <div class="famous-image">
                                             <img src="/static/img/abel.jpg" alt="Abel Pintos">
@@ -304,6 +315,47 @@ include(__DIR__ . '/../components/header.php');
                                             <div class="famous-achievements">
                                                 <span class="achievement">🎼 Múltiples premios</span>
                                                 <span class="achievement">🎪 Estadios completos</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Agregar algunos artistas de otras categorías para demostrar filtros -->
+                                <div class="col-lg-6 col-md-6 famous-artist-item" data-category="Literatura">
+                                    <div class="famous-artist-card">
+                                        <div class="famous-image">
+                                            <img src="/static/img/perfil-del-usuario.png" alt="Artista Literario">
+                                            <div class="famous-overlay">
+                                                <span class="famous-badge">Regional</span>
+                                            </div>
+                                        </div>
+                                        <div class="famous-content">
+                                            <h4>Escritores Santiagueños</h4>
+                                            <p class="famous-category">Literatura - Narrativa</p>
+                                            <p class="famous-bio">Representantes de la literatura regional con obras que reflejan la identidad santiagueña.</p>
+                                            <div class="famous-achievements">
+                                                <span class="achievement">📚 Tradición oral</span>
+                                                <span class="achievement">✍️ Cultura regional</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 famous-artist-item" data-category="Danza">
+                                    <div class="famous-artist-card">
+                                        <div class="famous-image">
+                                            <img src="/static/img/perfil-del-usuario.png" alt="Artista de Danza">
+                                            <div class="famous-overlay">
+                                                <span class="famous-badge">Tradicional</span>
+                                            </div>
+                                        </div>
+                                        <div class="famous-content">
+                                            <h4>Bailarines Folclóricos</h4>
+                                            <p class="famous-category">Danza - Folklore</p>
+                                            <p class="famous-bio">Cultores de las danzas tradicionales santiagueñas, preservadores de la cultura ancestral.</p>
+                                            <div class="famous-achievements">
+                                                <span class="achievement">💃 Chacarera</span>
+                                                <span class="achievement">🕺 Gato</span>
                                             </div>
                                         </div>
                                     </div>
