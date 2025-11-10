@@ -14,10 +14,11 @@ if ($is_local) {
     // Desarrollo local (Docker)
     define('BASE_URL', 'http://localhost:8080/');
 } elseif ($is_tailscale) {
-    // Tailscale Funnel en puerto 8443
+    // Tailscale Funnel con path /idcultural
     $protocol = 'https';
     $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'];
-    define('BASE_URL', $protocol . '://' . $host . '/');
+    $base_path = '/idcultural/'; // Path específico
+    define('BASE_URL', $protocol . '://' . $host . $base_path);
 } else {
     // Producción (otro servidor)
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
