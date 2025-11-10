@@ -14,8 +14,8 @@ if ($is_local) {
     // Desarrollo local (Docker)
     define('BASE_URL', 'http://localhost:8080/');
 } elseif ($is_tailscale) {
-    // Tailscale Funnel con path /idcultural (puerto 443 público)
-    define('BASE_URL', 'https://server-itse.tail0ce263.ts.net/idcultural/');
+    // Tailscale Funnel - raíz del dominio
+    define('BASE_URL', 'https://server-itse.tail0ce263.ts.net/');
 } else {
     // Producción (otro servidor)
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
