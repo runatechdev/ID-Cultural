@@ -22,9 +22,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td class="ps-3"><strong>${borrador.titulo}</strong></td>
                         <td>${fecha}</td>
                         <td class="text-end pe-3">
-                            <button class="btn btn-sm btn-outline-secondary btn-edit" data-id="${borrador.id}" title="Editar"><i class="bi bi-pencil-fill"></i></button>
-                            <button class="btn btn-sm btn-primary btn-enviar" data-id="${borrador.id}" title="Enviar a Validación"><i class="bi bi-send-fill"></i></button>
-                            <button class="btn btn-sm btn-outline-danger btn-delete" data-id="${borrador.id}" title="Eliminar"><i class="bi bi-trash-fill"></i></button>
+                            <div class="btn-group" role="group" aria-label="Acciones del borrador">
+                                <button class="btn btn-sm btn-outline-primary btn-edit" data-id="${borrador.id}" title="Editar borrador">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </button>
+                                <button class="btn btn-sm btn-success btn-enviar" data-id="${borrador.id}" title="Enviar a validación">
+                                    <i class="bi bi-send-fill"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger btn-delete" data-id="${borrador.id}" title="Eliminar borrador">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -38,6 +46,13 @@ document.addEventListener('DOMContentLoaded', () => {
     tbody.addEventListener('click', (e) => {
         const deleteBtn = e.target.closest('.btn-delete');
         const sendBtn = e.target.closest('.btn-enviar');
+        const editBtn = e.target.closest('.btn-edit');
+
+        if (editBtn) {
+            const id = editBtn.dataset.id;
+            // Redirigir a la página de edición
+            window.location.href = `${BASE_URL}src/views/pages/artista/editar-borrador.php?id=${id}`;
+        }
 
         if (deleteBtn) {
             const id = deleteBtn.dataset.id;
@@ -47,20 +62,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
-                confirmButtonText: 'Sí, ¡eliminar!',
+                confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar'
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    const formData = new FormData();
-                    formData.append('id', id);
-                    formData.append('action', 'delete');
-                    const response = await fetch(`${BASE_URL}api/borradores.php`, { method: 'POST', body: formData });
-                    const res = await response.json();
-                    if (response.ok && res.status === 'ok') {
-                        Swal.fire('¡Eliminado!', res.message, 'success');
-                        cargarBorradores();
-                    } else {
-                        Swal.fire('Error', res.message, 'error');
+                    try {
+                        const formData = new FormData();
+                        formData.append('id', id);
+                        formData.append('action', 'delete');
+                        
+                        const response = await fetch(`${BASE_URL}api/borradores.php`, { 
+                            method: 'POST', 
+                            body: formData 
+                        });
+                        
+                        const res = await response.json();
+                        
+                        if (response.ok && res.status === 'ok') {
+                            Swal.fire('¡Eliminado!', res.message, 'success');
+                            cargarBorradores();
+                        } else {
+                            Swal.fire('Error', res.message || 'Error al eliminar', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'No se pudo conectar con el servidor', 'error');
                     }
                 }
             });
@@ -68,8 +93,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (sendBtn) {
             const id = sendBtn.dataset.id;
-            // Aquí iría la lógica para llamar a una API que cambie el estado a 'pendiente_validacion'
-            Swal.fire('Enviado', 'Tu borrador ha sido enviado a validación (simulación).', 'success');
+            Swal.fire({
+                title: '¿Enviar a validación?',
+                text: "Tu borrador será enviado a validación y no podrás editarlo hasta que sea revisado.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: 'Sí, enviar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('id', id);
+                        formData.append('action', 'submit');
+                        
+                        const response = await fetch(`${BASE_URL}api/borradores.php`, { 
+                            method: 'POST', 
+                            body: formData 
+                        });
+                        
+                        const res = await response.json();
+                        
+                        if (response.ok && res.status === 'ok') {
+                            Swal.fire('¡Enviado!', res.message, 'success');
+                            cargarBorradores(); // Recargar la lista
+                        } else {
+                            Swal.fire('Error', res.message || 'Error al enviar a validación', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'No se pudo conectar con el servidor', 'error');
+                    }
+                }
+            });
         }
     });
 

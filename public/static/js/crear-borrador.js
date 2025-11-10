@@ -32,33 +32,78 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const estado = e.submitter.id === 'btn-enviar-validacion' ? 'pendiente' : 'borrador';
         
+        // Validaciones básicas
+        const titulo = document.getElementById('titulo').value.trim();
+        const descripcion = document.getElementById('descripcion').value.trim();
+        const categoria = document.getElementById('categoria').value;
+        
+        if (!titulo || !descripcion || !categoria) {
+            Swal.fire('Error', 'Por favor completa todos los campos obligatorios.', 'error');
+            return;
+        }
+        
         const formData = new FormData();
         formData.append('action', 'save');
-        formData.append('titulo', document.getElementById('titulo').value);
-        formData.append('descripcion', document.getElementById('descripcion').value);
-        formData.append('categoria', document.getElementById('categoria').value);
+        formData.append('titulo', titulo);
+        formData.append('descripcion', descripcion);
+        formData.append('categoria', categoria);
         formData.append('estado', estado);
 
-        // Agregar archivos multimedia
+        // Agregar archivos multimedia (si los hay)
         const multimediaFiles = document.getElementById('multimedia').files;
-        for (let i = 0; i < multimediaFiles.length; i++) {
-            formData.append('multimedia[]', multimediaFiles[i]);
+        if (multimediaFiles.length > 0) {
+            for (let i = 0; i < multimediaFiles.length; i++) {
+                formData.append('multimedia[]', multimediaFiles[i]);
+            }
         }
 
         // Recolectar campos extra
         const extraFields = camposContainer.querySelectorAll('input, select, textarea');
         extraFields.forEach(field => {
-            formData.append(field.id, field.value);
+            if (field.value.trim()) {
+                formData.append(field.id, field.value.trim());
+            }
+        });
+
+        // Mostrar indicador de carga
+        Swal.fire({
+            title: 'Procesando...',
+            text: 'Guardando tu borrador',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
 
         try {
+            console.log('Enviando formulario a:', `${BASE_URL}api/borradores.php`);
+            
             const response = await fetch(`${BASE_URL}api/borradores.php`, {
                 method: 'POST',
                 body: formData
             });
-            const result = await response.json();
+            
+            console.log('Response status:', response.status);
+            console.log('Response headers:', [...response.headers.entries()]);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const responseText = await response.text();
+            console.log('Raw response:', responseText);
+            
+            let result;
+            try {
+                result = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('JSON parse error:', parseError);
+                throw new Error('La respuesta del servidor no es JSON válido');
+            }
+            
+            console.log('Parsed response:', result);
 
-            if (response.ok && result.status === 'ok') {
+            if (result.status === 'ok') {
                 Swal.fire({
                     title: '¡Éxito!',
                     text: result.message,
@@ -67,10 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.location.href = `${BASE_URL}src/views/pages/artista/dashboard-artista.php`;
                 });
             } else {
-                Swal.fire('Error', result.message, 'error');
+                Swal.fire('Error', result.message || 'Error desconocido del servidor', 'error');
             }
         } catch (error) {
-            Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+            console.error('Error details:', error);
+            Swal.fire({
+                title: 'Error de Conexión',
+                text: 'No se pudo conectar con el servidor. Error: ' + error.message,
+                icon: 'error'
+            });
         }
     });
 });
