@@ -17,6 +17,97 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `analytics_busquedas`
+--
+
+DROP TABLE IF EXISTS `analytics_busquedas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `analytics_busquedas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usuario_id` int(11) DEFAULT NULL,
+  `termino_busqueda` varchar(255) NOT NULL,
+  `resultados_encontrados` int(11) DEFAULT 0,
+  `fecha_busqueda` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_termino` (`termino_busqueda`),
+  KEY `idx_fecha` (`fecha_busqueda`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `analytics_busquedas`
+--
+
+LOCK TABLES `analytics_busquedas` WRITE;
+/*!40000 ALTER TABLE `analytics_busquedas` DISABLE KEYS */;
+/*!40000 ALTER TABLE `analytics_busquedas` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `analytics_eventos`
+--
+
+DROP TABLE IF EXISTS `analytics_eventos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `analytics_eventos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usuario_id` int(11) DEFAULT NULL,
+  `categoria` varchar(100) NOT NULL,
+  `accion` varchar(100) NOT NULL,
+  `etiqueta` varchar(255) DEFAULT NULL,
+  `valor` int(11) DEFAULT NULL,
+  `fecha_evento` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_categoria` (`categoria`),
+  KEY `idx_accion` (`accion`),
+  KEY `idx_fecha` (`fecha_evento`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `analytics_eventos`
+--
+
+LOCK TABLES `analytics_eventos` WRITE;
+/*!40000 ALTER TABLE `analytics_eventos` DISABLE KEYS */;
+/*!40000 ALTER TABLE `analytics_eventos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `analytics_visitas`
+--
+
+DROP TABLE IF EXISTS `analytics_visitas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `analytics_visitas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usuario_id` int(11) DEFAULT NULL,
+  `pagina` varchar(255) NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `referrer` varchar(500) DEFAULT NULL,
+  `duracion_segundos` int(11) DEFAULT 0,
+  `fecha_visita` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_pagina` (`pagina`),
+  KEY `idx_fecha` (`fecha_visita`),
+  KEY `idx_usuario` (`usuario_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `analytics_visitas`
+--
+
+LOCK TABLES `analytics_visitas` WRITE;
+/*!40000 ALTER TABLE `analytics_visitas` DISABLE KEYS */;
+/*!40000 ALTER TABLE `analytics_visitas` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `artistas`
 --
 
@@ -58,7 +149,7 @@ CREATE TABLE `artistas` (
 
 LOCK TABLES `artistas` WRITE;
 /*!40000 ALTER TABLE `artistas` DISABLE KEYS */;
-INSERT INTO `artistas` VALUES (2,'nuevo','nuevo','2000-12-12','femenino','Argentina','Buenos Aires','La Plata','nuevo@gmail.com','$2y$10$7nxg3IMycH8sDjm0RbHDaO3DlYedW8ZOdsX4dXcJ3vV/K9IA.o8rq','artista','rechazado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'rechazado','hbgb'),(3,'prueba','prueba','2001-02-21','masculino','Argentina','Buenos Aires','La Plata','prueba@gmail.com','$2y$10$Swtb6xK8KSKsuNXFLfcJtOZPfLgqUKYeWMBDJqVFqCO/c7C8UYDwi','artista','validado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'rechazado','jnn'),(5,'Carlos','Gomez','1995-03-15','masculino','Argentina','Santiago del Estero','La Banda','carlos@gmail.com','$2y$10$...','artista','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(6,'Maria','Ledezma','1988-07-22','femenino','Argentina','Santiago del Estero','Termas de Río Hondo','maria@gmail.com','$2y$10$...','artista','rechazado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(7,'Marcos','Romano','1999-03-10','masculino','Argentina','Santiago del Estero','Santiago del Estero','ejemplo@ejemplo.com','$2y$10$59P2kCjWBNm4xTkxCzTr9O45Jv5B2e/b2.e5U2R/lvyNX/8wTIhwe','artista','validado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(8,'Marcos','Romano','1949-05-15','Masculino','Argentina','Santiago del Estero','Tintina','tralalero@tralala.com','$2y$10$QWpJ6kpCFoLzBNN3TXOP7uqXmpqsL7SsF6XqCKHDrqaukbKJrraLu','artista','validado','Un buen pibe (sera?)','Escultor de carne','@marcos_romano_updated','marcos.romano.updated','@marcos_romano_updated','https://marcos-romano-updated.com','/uploads/imagens/media_690f8d41bdf2f6.84231658.jpeg','validado',NULL);
+INSERT INTO `artistas` VALUES (2,'nuevo','nuevo','2000-12-12','femenino','Argentina','Buenos Aires','La Plata','nuevo@gmail.com','$2y$10$7nxg3IMycH8sDjm0RbHDaO3DlYedW8ZOdsX4dXcJ3vV/K9IA.o8rq','artista','rechazado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'rechazado','hbgb'),(3,'prueba','prueba','2001-02-21','masculino','Argentina','Buenos Aires','La Plata','prueba@gmail.com','$2y$10$Swtb6xK8KSKsuNXFLfcJtOZPfLgqUKYeWMBDJqVFqCO/c7C8UYDwi','artista','validado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'rechazado','jnn'),(5,'Carlos','Gomez','1995-03-15','masculino','Argentina','Santiago del Estero','La Banda','carlos@gmail.com','$2y$10$...','artista','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(6,'Maria','Ledezma','1988-07-22','femenino','Argentina','Santiago del Estero','Termas de Río Hondo','maria@gmail.com','$2y$10$...','artista','rechazado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(7,'Marcos','Romano','1999-03-10','masculino','Argentina','Santiago del Estero','Santiago del Estero','ejemplo@ejemplo.com','$2y$10$59P2kCjWBNm4xTkxCzTr9O45Jv5B2e/b2.e5U2R/lvyNX/8wTIhwe','artista','validado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(8,'Marcos','Romano','1949-05-15','Masculino','Argentina','Santiago del Estero','Tintina','tralalero@tralala.com','$2y$10$QWpJ6kpCFoLzBNN3TXOP7uqXmpqsL7SsF6XqCKHDrqaukbKJrraLu','artista','validado','Un buen pibe (sera?)','Escultor de carne','@marcos_romano_updated','marcos.romano.updated','@marcos_romano_updated','https://marcos-romano-updated.com','/uploads/imagens/media_690f8d41bdf2f6.84231658.jpeg','pendiente',NULL);
 /*!40000 ALTER TABLE `artistas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -148,6 +239,106 @@ LOCK TABLES `noticias` WRITE;
 /*!40000 ALTER TABLE `noticias` DISABLE KEYS */;
 INSERT INTO `noticias` VALUES (1,'¡Gran Apertura del Festival de Arte!','Este fin de semana se celebra el festival anual de arte con más de 50 artistas locales...','http://localhost:8080/static/uploads/noticias/noticia_1761572259_68ff75a35a30c.jpeg',2,'2025-08-14 19:38:03'),(7,'Evento','Test','http://localhost:8080/static/uploads/noticias/noticia_1761540083_68fef7f38e1ad.jpeg',2,'2025-10-27 04:31:57');
 /*!40000 ALTER TABLE `noticias` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `notificaciones`
+--
+
+DROP TABLE IF EXISTS `notificaciones`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `notificaciones` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usuario_id` int(11) NOT NULL,
+  `tipo` enum('info','success','warning','error') DEFAULT 'info',
+  `titulo` varchar(255) NOT NULL,
+  `mensaje` text NOT NULL,
+  `leida` tinyint(1) DEFAULT 0,
+  `url_accion` varchar(500) DEFAULT NULL,
+  `datos_adicionales` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`datos_adicionales`)),
+  `fecha_lectura` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_usuario` (`usuario_id`),
+  KEY `idx_leida` (`leida`),
+  KEY `idx_fecha` (`created_at`),
+  CONSTRAINT `notificaciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `notificaciones`
+--
+
+LOCK TABLES `notificaciones` WRITE;
+/*!40000 ALTER TABLE `notificaciones` DISABLE KEYS */;
+/*!40000 ALTER TABLE `notificaciones` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `password_reset_tokens`
+--
+
+DROP TABLE IF EXISTS `password_reset_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `password_reset_tokens` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usuario_id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_expiracion` datetime NOT NULL,
+  `usado` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `token` (`token`),
+  KEY `idx_token` (`token`),
+  KEY `idx_usuario_usado` (`usuario_id`,`usado`),
+  KEY `idx_fecha_expiracion` (`fecha_expiracion`),
+  CONSTRAINT `password_reset_tokens_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `artistas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `password_reset_tokens`
+--
+
+LOCK TABLES `password_reset_tokens` WRITE;
+/*!40000 ALTER TABLE `password_reset_tokens` DISABLE KEYS */;
+/*!40000 ALTER TABLE `password_reset_tokens` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `preferencias_notificaciones`
+--
+
+DROP TABLE IF EXISTS `preferencias_notificaciones`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `preferencias_notificaciones` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usuario_id` int(11) NOT NULL,
+  `notificaciones_email` tinyint(1) DEFAULT 1,
+  `notificaciones_perfil` tinyint(1) DEFAULT 1,
+  `notificaciones_validacion` tinyint(1) DEFAULT 1,
+  `notificaciones_comentarios` tinyint(1) DEFAULT 1,
+  `notificaciones_mensajes` tinyint(1) DEFAULT 1,
+  `frecuencia_email` enum('inmediato','diario','semanal','nunca') DEFAULT 'diario',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `usuario_id` (`usuario_id`),
+  CONSTRAINT `preferencias_notificaciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `preferencias_notificaciones`
+--
+
+LOCK TABLES `preferencias_notificaciones` WRITE;
+/*!40000 ALTER TABLE `preferencias_notificaciones` DISABLE KEYS */;
+/*!40000 ALTER TABLE `preferencias_notificaciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -279,4 +470,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-10  1:40:29
+-- Dump completed on 2025-11-10  4:12:25

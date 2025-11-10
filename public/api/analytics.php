@@ -11,7 +11,9 @@ require_once '../../backend/helpers/RateLimiter.php';
 
 // Inicializar
 ErrorHandler::init();
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 Analytics::init($conn);
 
 $action = $_GET['action'] ?? $_POST['action'] ?? null;
