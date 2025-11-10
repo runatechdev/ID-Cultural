@@ -70,39 +70,42 @@ try {
     
     $obras = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Procesar URLs de imágenes desde multimedia (JSON o ruta)
-    foreach ($obras as &$obra) {
-        // Si multimedia contiene JSON, extraer primera imagen
-        $imagen_url = '/static/img/placeholder-obra.png';
-        
-        if (!empty($obra['multimedia'])) {
-            // Intentar decodificar como JSON
-            $multimedia = json_decode($obra['multimedia'], true);
-            if (is_array($multimedia) && !empty($multimedia)) {
-                // Si es un array de imágenes, tomar la primera
-                $imagen_url = $multimedia[0];
-            } else {
-                // Si es una ruta directa
-                $imagen_url = $obra['multimedia'];
+        // Procesar URLs de imágenes desde multimedia (JSON o ruta)
+        foreach ($obras as &$obra) {
+            // Si multimedia contiene JSON, extraer primera imagen
+            $imagen_url = '/static/img/placeholder-obra.png';
+            
+            if (!empty($obra['multimedia'])) {
+                // Intentar decodificar como JSON
+                $multimedia = json_decode($obra['multimedia'], true);
+                if (is_array($multimedia) && !empty($multimedia)) {
+                    // Si es un array de imágenes, tomar la primera
+                    $imagen_url = $multimedia[0];
+                } else {
+                    // Si es una ruta directa
+                    $imagen_url = $obra['multimedia'];
+                }
             }
+            
+            $obra['imagen_url'] = $imagen_url;
         }
         
-        $obra['imagen_url'] = $imagen_url;
-    }
-    
-    echo json_encode([
-        'status' => 'success',
-        'total' => count($obras),
-        'obras' => $obras
-    ]);
+        // Log para depuración
+        error_log("get_obras_wiki.php: Encontradas " . count($obras) . " obras");
+        
+        echo json_encode([
+            'status' => 'success',
+            'total' => count($obras),
+            'obras' => $obras
+        ]);
 
-} catch (PDOException $e) {
-    error_log("Error en get_obras_wiki.php: " . $e->getMessage());
-    http_response_code(500);
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Error al consultar las obras.',
-        'error' => $e->getMessage()
-    ]);
-}
-?>
+    } catch (PDOException $e) {
+        error_log("Error en get_obras_wiki.php: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Error al consultar las obras.',
+            'error' => $e->getMessage()
+        ]);
+    }
+    ?>

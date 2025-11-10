@@ -74,6 +74,10 @@ include(__DIR__ . '/../components/header.php');
                             <i class="bi bi-search"></i>
                             Buscar
                         </button>
+                        <button type="button" class="clear-btn" onclick="clearFilters()">
+                            <i class="bi bi-x-circle"></i>
+                            Limpiar
+                        </button>
                     </div>
                 </form>
             </div>

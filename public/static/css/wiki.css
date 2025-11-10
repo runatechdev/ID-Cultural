@@ -156,6 +156,26 @@
     box-shadow: 0 8px 20px rgba(0, 191, 255, 0.3);
 }
 
+.clear-btn {
+    background: #6c757d;
+    color: var(--white);
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 0.5rem;
+}
+
+.clear-btn:hover {
+    background: #5a6268;
+    transform: scale(1.05);
+}
+
 /* Sidebar */
 .wiki-sidebar {
     position: sticky;

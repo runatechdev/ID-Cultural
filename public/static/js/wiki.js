@@ -146,6 +146,8 @@ function setupCategoryNavigation() {
             e.preventDefault();
             const category = item.getAttribute('data-category');
             
+            console.log('Categoría seleccionada:', category); // Debug
+            
             // Actualizar estado
             WIKI.currentFilters.categoria = category;
             
@@ -155,8 +157,13 @@ function setupCategoryNavigation() {
                 categorySelect.value = category;
             }
 
-            // Aplicar filtro
-            applyFilters();
+            // Resetear página y aplicar filtro
+            WIKI.currentPage = 1;
+            loadTabContent(WIKI.currentTab);
+            
+            // Resaltar categoría seleccionada
+            categoryItems.forEach(cat => cat.classList.remove('active'));
+            item.classList.add('active');
         });
     });
 }
@@ -165,20 +172,65 @@ function setupCategoryNavigation() {
  * Cargar datos iniciales
  */
 async function loadInitialData() {
-    // Primero cargar estadísticas desde la API
-    await loadStats();
-    // Luego cargar datos específicos
-    await loadArtists();
-    await loadWorks();
-    // Finalmente actualizar contadores y mostrar contenido
-    updateCategoryCounts();
-    loadTabContent(WIKI.currentTab);
+    // Mostrar loading
+    showLoadingState();
     
-    // Refrescar estadísticas con datos locales si es necesario
-    if (WIKI.data.stats.artists === 0 && WIKI.data.artists.length > 0) {
-        WIKI.data.stats.artists = WIKI.data.artists.length;
+    try {
+        // Cargar datos en paralelo
+        await Promise.all([
+            loadStats(),
+            loadArtists(),
+            loadWorks()
+        ]);
+        
+        // Actualizar contadores y mostrar contenido
+        updateCategoryCounts();
+        loadTabContent(WIKI.currentTab);
+        
+        // Refrescar estadísticas con datos locales si es necesario
+        if (WIKI.data.stats.artists === 0 && WIKI.data.artists.length > 0) {
+            WIKI.data.stats.artists = WIKI.data.artists.length;
+        }
+        if (WIKI.data.stats.works === 0 && WIKI.data.works.length > 0) {
+            WIKI.data.stats.works = WIKI.data.works.length;
+        }
         updateStatsDisplay();
+        
+        console.log('Datos cargados:', {
+            artistas: WIKI.data.artists.length,
+            obras: WIKI.data.works.length
+        });
+        
+    } catch (error) {
+        console.error('Error cargando datos iniciales:', error);
+    } finally {
+        hideLoadingState();
     }
+}
+
+/**
+ * Mostrar estado de carga
+ */
+function showLoadingState() {
+    const containers = ['validated-artists', 'validated-works'];
+    containers.forEach(containerId => {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = `
+                <div class="loading-placeholder text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-3">Cargando contenido...</p>
+                </div>
+            `;
+        }
+    });
+}
+
+/**
+ * Ocultar estado de carga
+ */
+function hideLoadingState() {
+    // Los contenidos se actualizarán con loadTabContent()
 }
 
 /**
@@ -278,10 +330,15 @@ async function loadWorks() {
         const response = await fetch(WIKI.BASE_URL + 'api/get_obras_wiki.php');
         if (response.ok) {
             const data = await response.json();
+            console.log('Respuesta API obras:', data); // Debug
             WIKI.data.works = data.obras || [];
+            console.log('Obras cargadas:', WIKI.data.works.length); // Debug
+        } else {
+            console.error('Error HTTP al cargar obras:', response.status);
+            WIKI.data.works = [];
         }
     } catch (error) {
-        console.warn('Error cargando obras:', error);
+        console.error('Error cargando obras:', error);
         WIKI.data.works = [];
     }
 }
@@ -373,10 +430,20 @@ function renderValidatedWorks() {
     const container = document.getElementById('validated-works');
     if (!container) return;
 
-    let filteredWorks = WIKI.data.works.filter(work => work.status === 'validado' || work.estado === 'aprobado');
+    console.log('Todas las obras disponibles:', WIKI.data.works.length); // Debug
     
-    // Aplicar filtros
+    let filteredWorks = WIKI.data.works.filter(work => {
+        // Verificar que la obra esté validada
+        return work.estado === 'validado' || work.estado === 'aprobado' || work.estado === 'publicado';
+    });
+    
+    console.log('Obras antes de filtrar:', WIKI.data.works.length); // Debug
+    console.log('Obras validadas:', filteredWorks.length); // Debug
+    
+    // Aplicar filtros adicionales
     filteredWorks = applyCurrentFilters(filteredWorks, 'works');
+    
+    console.log('Obras después de filtros:', filteredWorks.length); // Debug
 
     if (filteredWorks.length === 0) {
         container.innerHTML = `
@@ -384,6 +451,7 @@ function renderValidatedWorks() {
                 <div class="alert alert-info text-center py-5">
                     <i class="bi bi-info-circle"></i>
                     <p class="mt-3 mb-0">No se encontraron obras validadas con los criterios seleccionados.</p>
+                    <small class="text-muted">Total obras en base: ${WIKI.data.works.length}</small>
                 </div>
             </div>
         `;
@@ -411,11 +479,70 @@ function renderValidatedWorks() {
 function applyCurrentFilters(items, type = 'artists') {
     let filtered = [...items];
 
+    // Filtro de búsqueda por texto
+    const searchTerm = document.getElementById('search')?.value?.trim();
+    if (searchTerm && searchTerm.length > 0) {
+        filtered = filtered.filter(item => {
+            const searchText = searchTerm.toLowerCase();
+            if (type === 'artists') {
+                const nombre = `${item.nombre || ''} ${item.apellido || ''}`.toLowerCase();
+                const email = (item.email || '').toLowerCase();
+                const categoria = (item.categoria || '').toLowerCase();
+                const municipio = (item.municipio || '').toLowerCase();
+                const biografia = (item.biografia || '').toLowerCase();
+                
+                return nombre.includes(searchText) || 
+                       email.includes(searchText) || 
+                       categoria.includes(searchText) || 
+                       municipio.includes(searchText) ||
+                       biografia.includes(searchText);
+            } else {
+                const titulo = (item.titulo || '').toLowerCase();
+                const descripcion = (item.descripcion || '').toLowerCase();
+                const categoria = (item.categoria || '').toLowerCase();
+                const artista = (item.artista_nombre || '').toLowerCase();
+                
+                return titulo.includes(searchText) || 
+                       descripcion.includes(searchText) || 
+                       categoria.includes(searchText) ||
+                       artista.includes(searchText);
+            }
+        });
+    }
+
     // Filtro de categoría
     if (WIKI.currentFilters.categoria) {
-        filtered = filtered.filter(item => 
-            item.categoria && item.categoria.toLowerCase().includes(WIKI.currentFilters.categoria.toLowerCase())
-        );
+        filtered = filtered.filter(item => {
+            if (!item.categoria) return false;
+            
+            const itemCategory = item.categoria.toLowerCase();
+            const filterCategory = WIKI.currentFilters.categoria.toLowerCase();
+            
+            // Mapeo de categorías para coincidencias
+            const categoryMapping = {
+                'musica': ['música', 'musica'],
+                'literatura': ['literatura'],
+                'danza': ['danza'],
+                'teatro': ['teatro'],
+                'artesania': ['artesanía', 'artesania'],
+                'audiovisual': ['audiovisual'],
+                'escultura': ['escultura']
+            };
+            
+            // Verificar coincidencia exacta o por mapeo
+            if (itemCategory === filterCategory) {
+                return true;
+            }
+            
+            // Verificar mapeo
+            for (const [key, values] of Object.entries(categoryMapping)) {
+                if (filterCategory === key || values.includes(filterCategory)) {
+                    return values.some(v => itemCategory.includes(v));
+                }
+            }
+            
+            return itemCategory.includes(filterCategory);
+        });
     }
 
     // Filtro rápido
@@ -424,16 +551,25 @@ function applyCurrentFilters(items, type = 'artists') {
             if (type === 'artists') {
                 filtered = filtered.filter(item => item.status === 'validado');
             } else {
-                filtered = filtered.filter(item => item.status === 'validado' || item.estado === 'aprobado');
+                filtered = filtered.filter(item => 
+                    item.status === 'validado' || 
+                    item.estado === 'validado' || 
+                    item.estado === 'aprobado' ||
+                    item.estado === 'publicado'
+                );
             }
             break;
         case 'recientes':
-            filtered = filtered.sort((a, b) => new Date(b.fecha_registro || b.created_at || 0) - new Date(a.fecha_registro || a.created_at || 0));
+            filtered = filtered.sort((a, b) => {
+                const dateA = new Date(a.fecha_registro || a.fecha_creacion || a.created_at || 0);
+                const dateB = new Date(b.fecha_registro || b.fecha_creacion || b.created_at || 0);
+                return dateB - dateA;
+            });
             break;
         case 'famosos':
             if (type === 'artists') {
                 // Criterio para artistas famosos (por ejemplo, con más obras)
-                filtered = filtered.filter(item => item.total_obras > 5);
+                filtered = filtered.filter(item => (item.total_obras || 0) > 2);
             }
             break;
     }
@@ -528,7 +664,8 @@ function createArtistCard(artist) {
  * Crear card de obra
  */
 function createWorkCard(work) {
-    const imageSrc = work.imagen_principal || '/static/img/default-artwork.png';
+    // Usar el campo imagen_url que viene procesado desde la API
+    const imageSrc = work.imagen_url || work.imagen_principal || work.multimedia || '/static/img/placeholder-obra.png';
     
     return `
         <div class="col-lg-4 col-md-6">
@@ -615,17 +752,16 @@ function performSearch() {
     const searchTerm = searchInput?.value || '';
     const category = categorySelect?.value || '';
 
+    console.log('Realizando búsqueda:', { searchTerm, category }); // Debug
+
     // Actualizar filtros
     WIKI.currentFilters.categoria = category;
     
-    // Filtrar por término de búsqueda si existe
-    if (searchTerm.length > 0) {
-        // Aquí podrías implementar búsqueda más avanzada
-        console.log('Buscando:', searchTerm);
-    }
-
+    // Resetear página
     WIKI.currentPage = 1;
-    applyFilters();
+    
+    // Recargar contenido con filtros aplicados
+    loadTabContent(WIKI.currentTab);
 }
 
 /**
@@ -774,4 +910,38 @@ function escaparHTML(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+/**
+ * Limpiar todos los filtros
+ */
+function clearFilters() {
+    // Limpiar campos de búsqueda
+    const searchInput = document.getElementById('search');
+    const categorySelect = document.getElementById('categoria');
+    
+    if (searchInput) searchInput.value = '';
+    if (categorySelect) categorySelect.value = '';
+    
+    // Resetear filtros internos
+    WIKI.currentFilters.categoria = '';
+    WIKI.currentFilters.filter = 'todos';
+    WIKI.currentPage = 1;
+    
+    // Activar botón "Todos" en filtros rápidos
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+        if (btn.getAttribute('data-filter') === 'todos') {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    // Limpiar categorías seleccionadas
+    const categoryItems = document.querySelectorAll('.category-item');
+    categoryItems.forEach(item => item.classList.remove('active'));
+    
+    // Recargar contenido
+    loadTabContent(WIKI.currentTab);
 }
