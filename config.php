@@ -7,16 +7,22 @@
 
 // Detectar si estamos en desarrollo local o producción
 $is_local = in_array($_SERVER['SERVER_NAME'] ?? '', ['localhost', '127.0.0.1', 'idcultural_web']);
-$server_ip = $_SERVER['SERVER_NAME'] ?? $_SERVER['SERVER_ADDR'] ?? 'localhost';
-$server_port = $_SERVER['SERVER_PORT'] ?? '80';
+$is_tailscale = strpos($_SERVER['HTTP_HOST'] ?? '', '.ts.net') !== false;
 
 // Configurar BASE_URL según el entorno
 if ($is_local) {
     // Desarrollo local (Docker)
     define('BASE_URL', 'http://localhost:8080/');
+} elseif ($is_tailscale) {
+    // Tailscale Funnel en puerto 8443
+    $protocol = 'https';
+    $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'];
+    define('BASE_URL', $protocol . '://' . $host . '/');
 } else {
-    // Producción (Tailscale u otro servidor)
+    // Producción (otro servidor)
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $server_ip = $_SERVER['SERVER_NAME'] ?? $_SERVER['SERVER_ADDR'] ?? 'localhost';
+    $server_port = $_SERVER['SERVER_PORT'] ?? '80';
     $port_suffix = ($server_port == '80' || $server_port == '443') ? '' : ':' . $server_port;
     define('BASE_URL', $protocol . '://' . $server_ip . $port_suffix . '/');
 }
