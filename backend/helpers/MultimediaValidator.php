@@ -1,19 +1,25 @@
 <?php
 /**
- * MultimediaValidator.php
+ * MultimediaValidator.php - Validación mejorada de multimedia
  * Valida archivos multimedia (imágenes, videos) antes de guardarlos
  */
 
 class MultimediaValidator {
     // Límites de tamaño (en bytes)
-    const MAX_IMAGE_SIZE = 5242880;      // 5 MB
-    const MAX_VIDEO_SIZE = 104857600;    // 100 MB
-    const MAX_AUDIO_SIZE = 52428800;     // 50 MB
+    const MAX_IMAGE_SIZE = 10485760;     // 10 MB
+    const MAX_VIDEO_SIZE = 524288000;    // 500 MB
+    const MAX_AUDIO_SIZE = 104857600;    // 100 MB
     
-    // Tipos MIME permitidos
+    // Tipos MIME permitidos (más estricto)
     const ALLOWED_IMAGES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     const ALLOWED_VIDEOS = ['video/mp4', 'video/webm', 'video/quicktime'];
     const ALLOWED_AUDIO = ['audio/mpeg', 'audio/wav', 'audio/ogg'];
+    
+    // Dimensiones de imagen permitidas
+    const MAX_IMAGE_WIDTH = 4000;
+    const MAX_IMAGE_HEIGHT = 4000;
+    const MIN_IMAGE_WIDTH = 100;
+    const MIN_IMAGE_HEIGHT = 100;
     
     /**
      * Obtiene el tipo MIME de un archivo
