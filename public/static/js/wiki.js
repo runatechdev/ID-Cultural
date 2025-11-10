@@ -51,6 +51,9 @@ function initWiki() {
     
     loadInitialData();
     setupResponsive();
+    
+    // Aplicar filtros iniciales si es necesario
+    updateTabFilterIndicators();
 }
 
 /**
@@ -78,7 +81,34 @@ function setupTabNavigation() {
             // Actualizar estado
             WIKI.currentTab = targetTab;
             loadTabContent(targetTab);
+            
+            // Actualizar indicadores de filtro en pestañas
+            updateTabFilterIndicators();
         });
+    });
+}
+
+/**
+ * Actualizar indicadores de filtro en pestañas
+ */
+function updateTabFilterIndicators() {
+    const hasFilters = WIKI.currentFilters.categoria !== '' || WIKI.currentFilters.filter !== 'todos';
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    
+    tabBtns.forEach(btn => {
+        // Remover indicador anterior si existe
+        const existingIndicator = btn.querySelector('.filter-indicator');
+        if (existingIndicator) {
+            existingIndicator.remove();
+        }
+        
+        // Agregar nuevo indicador si hay filtros activos
+        if (hasFilters) {
+            const indicator = document.createElement('span');
+            indicator.className = 'filter-indicator';
+            indicator.innerHTML = '<i class="bi bi-funnel-fill"></i>';
+            btn.appendChild(indicator);
+        }
     });
 }
 
@@ -145,27 +175,135 @@ function setupCategoryNavigation() {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const category = item.getAttribute('data-category');
+            const isCurrentlyActive = item.classList.contains('active');
             
-            console.log('Categoría seleccionada:', category); // Debug
+            console.log('Categoría clickeada:', category, 'Activa:', isCurrentlyActive); // Debug
             
-            // Actualizar estado
-            WIKI.currentFilters.categoria = category;
-            
-            // Actualizar select de búsqueda
-            const categorySelect = document.getElementById('categoria');
-            if (categorySelect) {
-                categorySelect.value = category;
+            // Si ya está activa, deseleccionar
+            if (isCurrentlyActive) {
+                // Deseleccionar categoría
+                WIKI.currentFilters.categoria = '';
+                
+                // Limpiar select de búsqueda
+                const categorySelect = document.getElementById('categoria');
+                if (categorySelect) {
+                    categorySelect.value = '';
+                }
+                
+                // Remover clase activa
+                item.classList.remove('active');
+                
+                console.log('Categoría deseleccionada'); // Debug
+            } else {
+                // Seleccionar nueva categoría
+                WIKI.currentFilters.categoria = category;
+                
+                // Actualizar select de búsqueda
+                const categorySelect = document.getElementById('categoria');
+                if (categorySelect) {
+                    categorySelect.value = category;
+                }
+                
+                // Resaltar categoría seleccionada
+                categoryItems.forEach(cat => cat.classList.remove('active'));
+                item.classList.add('active');
+                
+                console.log('Categoría seleccionada:', category); // Debug
             }
 
-            // Resetear página y aplicar filtro
+            // Resetear página y aplicar filtro en TODAS las pestañas
             WIKI.currentPage = 1;
-            loadTabContent(WIKI.currentTab);
+            refreshAllTabs();
             
-            // Resaltar categoría seleccionada
-            categoryItems.forEach(cat => cat.classList.remove('active'));
-            item.classList.add('active');
+            // Actualizar indicadores de filtro
+            updateTabFilterIndicators();
         });
     });
+}
+
+/**
+ * Refrescar todas las pestañas con los filtros actuales
+ */
+function refreshAllTabs() {
+    // Forzar recarga de contenido para todas las pestañas
+    loadTabContent('artistas-validados');
+    loadTabContent('obras-validadas');
+    filterFamousArtists(); // Filtrar artistas famosos también
+    
+    // Recargar la pestaña actual
+    loadTabContent(WIKI.currentTab);
+}
+
+/**
+ * Filtrar artistas famosos por categoría
+ */
+function filterFamousArtists() {
+    const famousArtistItems = document.querySelectorAll('.famous-artist-item');
+    const currentCategory = WIKI.currentFilters.categoria;
+    
+    console.log('Filtrando artistas famosos por categoría:', currentCategory); // Debug
+    
+    famousArtistItems.forEach(item => {
+        const itemCategory = item.getAttribute('data-category');
+        
+        if (!currentCategory || currentCategory === '') {
+            // Mostrar todos si no hay filtro
+            item.style.display = 'block';
+        } else {
+            // Aplicar mismo mapeo que en otros filtros
+            const categoryMapping = {
+                'Musica': ['música', 'musica'],
+                'Literatura': ['literatura'],
+                'Danza': ['danza'],
+                'Teatro': ['teatro'],
+                'Artesania': ['artesanía', 'artesania'],
+                'Audiovisual': ['audiovisual'],
+                'Escultura': ['escultura']
+            };
+            
+            let shouldShow = false;
+            
+            // Verificar coincidencia exacta
+            if (itemCategory === currentCategory) {
+                shouldShow = true;
+            } else {
+                // Verificar mapeo
+                for (const [key, values] of Object.entries(categoryMapping)) {
+                    if ((currentCategory === key || values.includes(currentCategory.toLowerCase())) &&
+                        (itemCategory === key || values.includes(itemCategory.toLowerCase()))) {
+                        shouldShow = true;
+                        break;
+                    }
+                }
+            }
+            
+            item.style.display = shouldShow ? 'block' : 'none';
+        }
+    });
+    
+    // Mostrar mensaje si no hay artistas famosos visibles
+    const visibleArtists = Array.from(famousArtistItems).filter(item => item.style.display !== 'none');
+    const container = document.getElementById('famous-artists-container');
+    
+    if (container) {
+        // Remover mensaje anterior si existe
+        const existingMessage = container.querySelector('.no-famous-artists-message');
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+        
+        if (visibleArtists.length === 0 && currentCategory) {
+            const message = document.createElement('div');
+            message.className = 'col-12 no-famous-artists-message';
+            message.innerHTML = `
+                <div class="alert alert-info text-center py-4">
+                    <i class="bi bi-info-circle"></i>
+                    <p class="mt-2 mb-0">No hay artistas famosos registrados en la categoría "${currentCategory}".</p>
+                </div>
+            `;
+            container.appendChild(message);
+        }
+    }
 }
 
 /**
@@ -661,34 +799,85 @@ function createArtistCard(artist) {
 }
 
 /**
- * Crear card de obra
+ * Crear card profesional de obra
  */
 function createWorkCard(work) {
     // Usar el campo imagen_url que viene procesado desde la API
     const imageSrc = work.imagen_url || work.imagen_principal || work.multimedia || '/static/img/placeholder-obra.png';
+    const artistName = work.artista_nombre || 'Artista Anónimo';
+    const categoria = work.categoria || 'Obra Cultural';
+    const descripcionCorta = work.descripcion ? 
+        (work.descripcion.length > 120 ? work.descripcion.substring(0, 120) + '...' : work.descripcion) : 
+        'Sin descripción disponible';
+    
+    // Determinar el estado visual
+    const estadoBadge = work.estado === 'validado' ? 
+        '<span class="status-badge status-validated"><i class="bi bi-check-circle-fill"></i> Validado</span>' :
+        '<span class="status-badge status-pending"><i class="bi bi-clock-fill"></i> En Proceso</span>';
     
     return `
-        <div class="col-lg-4 col-md-6">
-            <div class="card h-100 border-0 shadow-sm work-card" style="border-radius: 20px; overflow: hidden;">
-                <div class="position-relative" style="height: 200px;">
-                    <img src="${escaparHTML(imageSrc)}" class="card-img-top" style="height: 100%; object-fit: cover;" alt="${escaparHTML(work.titulo)}">
-                    <div class="position-absolute top-0 end-0 m-3">
-                        <span class="badge bg-primary">${escaparHTML(work.categoria || 'Obra')}</span>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="work-card-professional border-0 shadow-sm h-100">
+                <div class="work-image-container">
+                    <img src="${escaparHTML(imageSrc)}" class="work-main-image" alt="${escaparHTML(work.titulo)}">
+                    <div class="work-overlay">
+                        <div class="work-category-badge">
+                            <i class="bi bi-palette-fill"></i>
+                            ${escaparHTML(categoria)}
+                        </div>
+                        ${estadoBadge}
+                    </div>
+                    <div class="work-hover-actions">
+                        <button class="btn btn-light btn-sm work-action-btn" onclick="viewWorkDetail(${work.id})" title="Ver detalles completos">
+                            <i class="bi bi-eye-fill"></i>
+                        </button>
+                        <button class="btn btn-light btn-sm work-action-btn" onclick="contactWorkArtist('${escaparHTML(work.artista_email || '')}', '${escaparHTML(artistName)}', '${escaparHTML(work.titulo)}')" title="Contactar artista">
+                            <i class="bi bi-chat-dots-fill"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="card-body p-3">
-                    <h5 class="card-title mb-2">${escaparHTML(work.titulo)}</h5>
-                    <p class="card-text text-muted small mb-2">Por: ${escaparHTML(work.artista_nombre || 'Artista Anónimo')}</p>
-                    <p class="card-text mb-3" style="font-size: 0.9rem; line-height: 1.4;">
-                        ${escaparHTML(work.descripcion ? work.descripcion.substring(0, 100) + '...' : 'Sin descripción disponible')}
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            <i class="bi bi-calendar"></i> ${formatarFecha(work.fecha_creacion)}
-                        </small>
-                        <button class="btn btn-sm btn-outline-primary" onclick="viewWorkDetail(${work.id})">
-                            Ver Detalle
+                
+                <div class="work-content">
+                    <div class="work-header">
+                        <h3 class="work-title">${escaparHTML(work.titulo)}</h3>
+                        <div class="work-artist-info">
+                            <i class="bi bi-person-circle"></i>
+                            <span class="artist-name">${escaparHTML(artistName)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="work-description">
+                        <p>${escaparHTML(descripcionCorta)}</p>
+                    </div>
+                    
+                    <div class="work-metadata">
+                        <div class="metadata-row">
+                            <div class="metadata-item">
+                                <i class="bi bi-calendar-event"></i>
+                                <span class="metadata-label">Creada:</span>
+                                <span class="metadata-value">${formatarFecha(work.fecha_creacion)}</span>
+                            </div>
+                            <div class="metadata-item">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                <span class="metadata-label">Origen:</span>
+                                <span class="metadata-value">${escaparHTML(work.municipio || 'Santiago del Estero')}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="work-actions">
+                        <button class="btn btn-primary btn-view-work" onclick="viewWorkDetail(${work.id})">
+                            <i class="bi bi-collection-fill"></i>
+                            Ver Obra Completa
                         </button>
+                        <div class="work-secondary-actions">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="shareWork(${work.id})" title="Compartir obra">
+                                <i class="bi bi-share-fill"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="favoriteWork(${work.id})" title="Agregar a favoritos">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -810,28 +999,156 @@ function viewArtistDetail(artistId) {
 }
 
 /**
- * Ver detalle de obra
+ * Ver detalle profesional de obra
  */
 function viewWorkDetail(workId) {
     const work = WIKI.data.works.find(w => w.id == workId);
     if (!work) {
-        alert('Obra no encontrada');
+        Swal.fire({
+            title: 'Error',
+            text: 'Obra no encontrada',
+            icon: 'error',
+            confirmButtonText: 'Entendido'
+        });
         return;
     }
 
+    const imageSrc = work.imagen_url || work.imagen_principal || work.multimedia || '/static/img/placeholder-obra.png';
+    const artistName = work.artista_nombre || 'Artista Anónimo';
+    
+    // Crear multimedia gallery si hay múltiples archivos
+    let mediaGallery = '';
+    if (work.multimedia) {
+        try {
+            const multimediaArray = JSON.parse(work.multimedia);
+            if (Array.isArray(multimediaArray) && multimediaArray.length > 1) {
+                mediaGallery = `
+                    <div class="multimedia-gallery mt-3">
+                        <h6><i class="bi bi-images"></i> Galería de la Obra</h6>
+                        <div class="gallery-grid">
+                            ${multimediaArray.map((media, index) => `
+                                <img src="${media}" class="gallery-thumb" onclick="showFullImage('${media}')" alt="Imagen ${index + 1}">
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        } catch (e) {
+            // Si no es JSON, usar imagen simple
+        }
+    }
+
     Swal.fire({
-        title: work.titulo,
+        title: '',
         html: `
-            <div class="text-start">
-                ${work.imagen_principal ? `<img src="${work.imagen_principal}" class="img-fluid rounded mb-3" style="max-height: 300px;">` : ''}
-                <p><strong>Artista:</strong> ${escaparHTML(work.artista_nombre || 'Desconocido')}</p>
-                <p><strong>Categoría:</strong> ${escaparHTML(work.categoria || 'No especificada')}</p>
-                <p><strong>Fecha:</strong> ${formatarFecha(work.fecha_creacion)}</p>
-                ${work.descripcion ? `<hr><p>${escaparHTML(work.descripcion)}</p>` : ''}
+            <div class="work-detail-modal">
+                <!-- Header con imagen principal -->
+                <div class="modal-work-header">
+                    <div class="work-main-image-container">
+                        <img src="${escaparHTML(imageSrc)}" class="work-modal-image" alt="${escaparHTML(work.titulo)}" onclick="showFullImage('${escaparHTML(imageSrc)}')">
+                        <div class="image-overlay">
+                            <button class="btn btn-light btn-sm expand-image-btn" onclick="showFullImage('${escaparHTML(imageSrc)}')" title="Ver imagen completa">
+                                <i class="bi bi-arrows-fullscreen"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Información de la obra -->
+                <div class="modal-work-content">
+                    <div class="work-title-section">
+                        <h3 class="modal-work-title">${escaparHTML(work.titulo)}</h3>
+                        <div class="work-status-badges">
+                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Validado</span>
+                            <span class="badge bg-primary"><i class="bi bi-palette"></i> ${escaparHTML(work.categoria || 'Obra Cultural')}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Información del artista -->
+                    <div class="artist-info-card">
+                        <div class="artist-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <div class="artist-details">
+                            <h5 class="artist-name">${escaparHTML(artistName)}</h5>
+                            <p class="artist-location">
+                                <i class="bi bi-geo-alt"></i> 
+                                ${escaparHTML([work.municipio, work.provincia].filter(Boolean).join(', ') || 'Santiago del Estero')}
+                            </p>
+                            ${work.artista_email ? `
+                                <button class="btn btn-outline-primary btn-sm contact-artist-btn" onclick="contactWorkArtist('${escaparHTML(work.artista_email)}', '${escaparHTML(artistName)}', '${escaparHTML(work.titulo)}')">
+                                    <i class="bi bi-envelope"></i> Contactar Artista
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Descripción de la obra -->
+                    ${work.descripcion ? `
+                        <div class="work-description-section">
+                            <h6><i class="bi bi-journal-text"></i> Sobre esta Obra</h6>
+                            <p class="work-description-full">${escaparHTML(work.descripcion)}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Metadatos -->
+                    <div class="work-metadata-section">
+                        <div class="metadata-grid">
+                            <div class="metadata-card">
+                                <i class="bi bi-calendar-event text-primary"></i>
+                                <div>
+                                    <span class="metadata-label">Fecha de Creación</span>
+                                    <span class="metadata-value">${formatarFecha(work.fecha_creacion)}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="metadata-card">
+                                <i class="bi bi-eye text-success"></i>
+                                <div>
+                                    <span class="metadata-label">Estado</span>
+                                    <span class="metadata-value">Obra Validada</span>
+                                </div>
+                            </div>
+                            
+                            <div class="metadata-card">
+                                <i class="bi bi-hash text-info"></i>
+                                <div>
+                                    <span class="metadata-label">ID de Obra</span>
+                                    <span class="metadata-value">#${work.id}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${mediaGallery}
+                    
+                    <!-- Acciones -->
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="shareWork(${work.id})">
+                            <i class="bi bi-share"></i> Compartir Obra
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="favoriteWork(${work.id})">
+                            <i class="bi bi-heart"></i> Favorito
+                        </button>
+                        <button class="btn btn-outline-info" onclick="goToArtistProfile(${work.artista_id || 0})">
+                            <i class="bi bi-person"></i> Ver Perfil del Artista
+                        </button>
+                    </div>
+                </div>
             </div>
         `,
-        width: '600px',
-        confirmButtonText: 'Cerrar'
+        width: '900px',
+        padding: '0',
+        showConfirmButton: false,
+        showCloseButton: true,
+        customClass: {
+            popup: 'work-detail-popup',
+            closeButton: 'work-modal-close'
+        },
+        didOpen: () => {
+            // Agregar clase para estilos específicos del modal
+            document.querySelector('.swal2-popup').classList.add('work-modal');
+        }
     });
 }
 
@@ -942,6 +1259,93 @@ function clearFilters() {
     const categoryItems = document.querySelectorAll('.category-item');
     categoryItems.forEach(item => item.classList.remove('active'));
     
+    // Mostrar todos los artistas famosos
+    filterFamousArtists();
+    
     // Recargar contenido
     loadTabContent(WIKI.currentTab);
+    
+    // Actualizar indicadores de filtro
+    updateTabFilterIndicators();
+}
+
+/**
+ * Contactar artista de una obra específica
+ */
+function contactWorkArtist(email, artistName, workTitle) {
+    if (!email || email === 'No disponible') {
+        Swal.fire({
+            title: 'Información de contacto no disponible',
+            text: 'Este artista no ha proporcionado información de contacto.',
+            icon: 'info',
+            confirmButtonText: 'Entendido'
+        });
+        return;
+    }
+    
+    const subject = encodeURIComponent(`Consulta sobre "${workTitle}" en ID-Cultural`);
+    const body = encodeURIComponent(`Hola ${artistName},\n\nHe visto tu obra "${workTitle}" en ID-Cultural y me gustaría conocer más detalles sobre ella.\n\n¿Podrías contarme más sobre tu proceso creativo?\n\nSaludos!`);
+    
+    window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+}
+
+/**
+ * Mostrar imagen en tamaño completo
+ */
+function showFullImage(imageSrc) {
+    Swal.fire({
+        html: `<img src="${imageSrc}" class="img-fluid" style="max-width: 100%; max-height: 80vh; border-radius: 8px;">`,
+        showConfirmButton: false,
+        showCloseButton: true,
+        width: 'auto',
+        padding: '1rem',
+        background: 'rgba(0,0,0,0.9)',
+        customClass: {
+            popup: 'image-viewer-popup'
+        }
+    });
+}
+
+/**
+ * Compartir obra
+ */
+function shareWork(workId) {
+    const work = WIKI.data.works.find(w => w.id == workId);
+    if (!work) return;
+    
+    const shareUrl = `${window.location.origin}${WIKI.BASE_URL}wiki.php?obra=${workId}`;
+    const shareText = `Mira esta increíble obra: "${work.titulo}" por ${work.artista_nombre} en ID-Cultural`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: work.titulo,
+            text: shareText,
+            url: shareUrl
+        });
+    } else {
+        // Fallback: copiar al portapapeles
+        navigator.clipboard.writeText(`${shareText} - ${shareUrl}`).then(() => {
+            Swal.fire({
+                title: '¡Enlace copiado!',
+                text: 'El enlace de la obra ha sido copiado al portapapeles.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        });
+    }
+}
+
+/**
+ * Agregar a favoritos
+ */
+function favoriteWork(workId) {
+    // Aquí podrías implementar la lógica de favoritos
+    // Por ahora, mostrar mensaje
+    Swal.fire({
+        title: 'Favoritos',
+        text: 'Función de favoritos próximamente disponible.',
+        icon: 'info',
+        confirmButtonText: 'Entendido'
+    });
 }
