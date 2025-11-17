@@ -387,7 +387,12 @@ include(__DIR__ . '/../components/header.php');
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+    <script>
+        // Pasar BASE_URL a los scripts
+        window.BASE_URL = "<?php echo BASE_URL; ?>";
+    </script>
     <script src="<?php echo BASE_URL; ?>static/js/wiki.js"></script>
+    <script src="<?php echo BASE_URL; ?>static/js/artistas-famosos.js"></script>
 </body>
 
 </html>

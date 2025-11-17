@@ -1,4 +1,4 @@
-#!/bin/bash
+x#!/bin/bash
 
 ###############################################################################
 # Script de Despliegue Automático - ID Cultural
