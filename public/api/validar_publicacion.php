@@ -105,17 +105,22 @@ try {
         $log_details = "Publicación ID: {$publicacion_id} del artista '{$usuario_nombre}' (ID: {$usuario_id}) ha sido rechazada. Motivo: {$motivo}";
     }
 
-    // 4. Registrar en el log del sistema
-    $stmt = $pdo->prepare("
-        INSERT INTO system_logs (user_id, user_name, action, details)
-        VALUES (?, ?, ?, ?)
-    ");
-    $stmt->execute([
-        $validador_id,
-        $validador_nombre,
-        $log_action,
-        $log_details
-    ]);
+    // 4. Registrar en el log del sistema (opcional - si la tabla existe)
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO system_logs (user_id, user_name, action, details)
+            VALUES (?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $validador_id,
+            $validador_nombre,
+            $log_action,
+            $log_details
+        ]);
+    } catch (PDOException $log_error) {
+        // Si la tabla de logs no existe, continuamos sin error
+        error_log("Advertencia: No se pudo insertar en system_logs - " . $log_error->getMessage());
+    }
 
     // 5. Confirmar transacción
     $pdo->commit();
