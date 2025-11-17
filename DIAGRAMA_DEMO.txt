@@ -1,0 +1,218 @@
+```
+╔════════════════════════════════════════════════════════════════════════════╗
+║                  🎬 FLUJO DEMO CON NGROK - ID CULTURAL                    ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+PASO 1: Verificación (2 min)
+═══════════════════════════════════════════════════════════════════════════
+$ bash pre-demo-check.sh
+
+[OUTPUT]
+✅ Docker instalado
+✅ Contenedores corriendo
+✅ localhost:8080 OK
+✅ ngrok instalado
+✅ BD conectada
+✅ LISTO PARA DEMO
+
+
+PASO 2: Iniciar ngrok (1 min)
+═══════════════════════════════════════════════════════════════════════════
+$ bash deploy-ngrok.sh
+
+[OUTPUT]
+ngrok                                       (Ctrl+C to quit)
+Session Status                online
+Account                       [tu cuenta]
+Version                        3.27.0
+Region                         us
+Forwarding    https://abc123def456.ngrok.io -> http://localhost:8080
+
+
+PASO 3: Compartir URL (durante demo)
+═══════════════════════════════════════════════════════════════════════════
+https://abc123def456.ngrok.io
+
+Puedes:
+  ✅ Compartir por email
+  ✅ Mostrar en proyector/pantalla
+  ✅ Enviar por WhatsApp/Telegram
+  ✅ Usar QR code (generador online)
+  ✅ Abrir desde móvil/tablet
+
+
+ARQUITECTURA
+═══════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         🌍 INTERNET PÚBLICA                            │
+│                                                                         │
+│  https://abc123def456.ngrok.io ←──────────────────┐                    │
+│  (Accesible desde cualquier navegador)            │                    │
+└─────────────────────────────────────────────────────────────────────────┘
+                                                     │
+                                    ┌────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────┐
+│              🔧 NGROK (Tu computadora - localhost)                      │
+│                                                                         │
+│  ngrok http 8080                                                        │
+│  ↓                                                                      │
+│  http://localhost:8080 ←──┐                                            │
+│                           │                                            │
+└───────────────────────────┼─────────────────────────────────────────────┘
+                            │
+                            ↓
+┌─────────────────────────────────────────────────────────────────────────┐
+│                   🐳 DOCKER COMPOSE (Tu PC)                           │
+│                                                                         │
+│  ┌─────────────────┐        ┌──────────────┐                          │
+│  │ Web Container   │        │ phpMyAdmin   │                          │
+│  │ (PHP/Apache)    │        │              │                          │
+│  │ :8080           │        │ :8081        │                          │
+│  └────────┬────────┘        └──────────────┘                          │
+│           │                                                            │
+│           ↓                                                            │
+│  ┌─────────────────────────────────────────┐                          │
+│  │ MariaDB (BD)                            │                          │
+│  │ idcultural database                     │                          │
+│  │ - artistas_famosos (datos demo)        │                          │
+│  │ - artistas, obras, usuarios, etc.       │                          │
+│  └─────────────────────────────────────────┘                          │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+
+
+FLUJO DE DATOS (Editor → Wiki)
+═══════════════════════════════════════════════════════════════════════════
+
+EDITOR                              BASE DE DATOS                WIKI (Público)
+  │                                       │                           │
+  ├─→ Accede a ngrok URL          ├─ artistas_famosos         ├─ Carga API
+  │   https://xxx.ngrok.io/...     │   (tabla actualizada)     │ (datos público)
+  │                                │                           │
+  ├─→ Login (editor@test.com)      │                           │
+  │                                │                           │
+  ├─→ Gestión Artistas Famosos     │                           │
+  │   - Agregar artista            │                           │
+  │   - Nombre, categoría          │                           │
+  │   - Especialidad, biografía    │                           │
+  │                                │                           │
+  ├─→ Guardar →─────────────────→  ├─ INSERT/UPDATE            │
+  │                                │   (emoji automático)      │
+  │                                │                           │
+  │                                ├─────────────────────────→ ├─ Wiki actualizada
+  │                                │   (visible al público)    │ (en tiempo real)
+  │                                │                           │
+  └─────────────────────────────────────────────────────────────┘
+
+
+LÍNEA DE TIEMPO
+═══════════════════════════════════════════════════════════════════════════
+
+⏱️  09:00 - Ejecutar pre-demo-check.sh (2 min)
+    Verifica que todo funciona
+
+⏱️  09:02 - Ejecutar deploy-ngrok.sh (1 min)
+    Inicia ngrok, obtén la URL
+
+⏱️  09:03 - Compartir URL (tiempo de demo)
+    Abre en navegador y demuestra:
+    - Login como editor
+    - Gestión de artistas
+    - Actualización en Wiki
+    - Editor de inicio
+
+
+CHECKLIST FINAL
+═══════════════════════════════════════════════════════════════════════════
+
+ANTES:
+  ☐ Docker corriendo: docker ps | grep idcultural
+  ☐ localhost:8080 OK: curl http://localhost:8080
+  ☐ ngrok instalado: which ngrok
+
+DURANTE:
+  ☐ pre-demo-check.sh pasó todas las verificaciones
+  ☐ ngrok está corriendo sin errores
+  ☐ Tengo la URL copiada
+  ☐ Navegador abierto en URL ngrok
+  ☐ Login funciona
+
+DEMOSTRACIÓN:
+  ☐ Mostré login como editor
+  ☐ Mostré gestión de artistas
+  ☐ Mostré agregar artista
+  ☐ Mostré en Wiki (datos actualizados)
+  ☐ Mostré editor de inicio
+
+DESPUÉS:
+  ☐ Presioné Ctrl+C en ngrok
+  ☐ Guardé URLs/screenshots de respaldo
+  ☐ Documenté feedback recibido
+
+
+EJEMPLOS DE URLS FINALES
+═══════════════════════════════════════════════════════════════════════════
+
+Tu URL será algo como:
+  https://1234-5678-90ab-cdef.ngrok.io
+
+Rutas en la demo:
+  Home:              https://1234-5678-90ab-cdef.ngrok.io/
+  Wiki:              https://1234-5678-90ab-cdef.ngrok.io/wiki.php
+  Login:             https://1234-5678-90ab-cdef.ngrok.io/src/views/pages/auth/login.php
+  Panel Editor:      https://1234-5678-90ab-cdef.ngrok.io/src/views/pages/editor/panel_editor.php
+  Artistas:          https://1234-5678-90ab-cdef.ngrok.io/src/views/pages/editor/gestion_artistas_famosos.php
+  Editor Inicio:     https://1234-5678-90ab-cdef.ngrok.io/src/views/pages/editor/gestion_inicio.php
+
+
+CREDENCIALES
+═══════════════════════════════════════════════════════════════════════════
+
+Para la demo, usa:
+
+📧 EDITOR
+  Email: editor@test.com
+  Password: password123
+
+📧 ADMIN
+  Email: admin@test.com
+  Password: admin123
+
+
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════
+
+Si algo falla:
+
+❌ "localhost:8080 no responde"
+   → docker-compose up -d
+   
+❌ "No puedo hacer login"
+   → Verifica credenciales arriba
+   → Limpiar cookies: Ctrl+Shift+Delete (incógnito)
+
+❌ "Tabla de artistas vacía"
+   → Ir a: Gestión Artistas → Agregar nuevo
+   → Los datos persisten en BD
+
+❌ "ngrok desconectado"
+   → Reinicia: bash deploy-ngrok.sh
+   → Obtendrás nueva URL
+
+❌ "HTTPS sin certificado"
+   → Normal en ngrok
+   → Hacer click en "Aceptar riesgo"
+
+═══════════════════════════════════════════════════════════════════════════
+
+¡LISTO! 🚀
+
+Dos comandos y tu demo está en vivo en internet:
+
+  bash pre-demo-check.sh
+  bash deploy-ngrok.sh
+
+═══════════════════════════════════════════════════════════════════════════
+```

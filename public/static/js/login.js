@@ -14,12 +14,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = document.getElementById("email").value.trim().toLowerCase();
     const password = document.getElementById("password").value.trim();
 
+    // Limpiar mensaje de error anterior
+    if (errorMsg) {
+      errorMsg.hidden = true;
+      errorMsg.textContent = "";
+    }
+
     const formData = new FormData();
     formData.append("email", email);
     formData.append("password", password);
 
     try {
-      const res = await fetch("/api/login.php", { // Llama al nuevo endpoint
+      const res = await fetch("/api/login.php", {
         method: "POST",
         body: formData
       });
@@ -32,15 +38,23 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Redirigiendo a:", resultado.redirect);
         window.location.href = resultado.redirect;
       } else {
-        errorMsg.textContent = resultado.message;
-        errorMsg.hidden = false;
+        // Mostrar mensaje de error
+        if (errorMsg) {
+          errorMsg.textContent = resultado.message || "Error en la autenticación";
+          errorMsg.hidden = false;
+        } else {
+          alert(resultado.message || "Error en la autenticación");
+        }
       }
 
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
-      errorMsg.textContent = "Error de conexión con el servidor.";
-      errorMsg.hidden = false;
+      if (errorMsg) {
+        errorMsg.textContent = "Error de conexión con el servidor.";
+        errorMsg.hidden = false;
+      } else {
+        alert("Error de conexión con el servidor.");
+      }
     }
   });
-  // (Removidos los fetch de navbar/footer como antes)
 });

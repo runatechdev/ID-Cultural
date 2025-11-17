@@ -44,6 +44,9 @@ include(__DIR__ . '/../../../../../components/header.php');
                             <a href="<?php echo BASE_URL; ?>src/views/pages/editor/gestion_inicio.php" class="dashboard-item" data-bs-toggle="tooltip" title="Modificar los textos y la imagen de portada de la página de inicio. (Próximamente)">
                                 <i class="bi bi-house-gear-fill dashboard-icon"></i> Editar Página Principal
                             </a>
+                            <a href="<?php echo BASE_URL; ?>src/views/pages/editor/gestion_artistas_famosos.php" class="dashboard-item" data-bs-toggle="tooltip" title="Gestionar artistas famosos de Santiago del Estero en la Wiki.">
+                                <i class="bi bi-star-fill dashboard-icon"></i> Artistas Famosos
+                            </a>
                         </div>
                     </div>
                 </div>

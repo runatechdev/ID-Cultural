@@ -8,14 +8,18 @@
 // Detectar si estamos en desarrollo local o producción
 $is_local = in_array($_SERVER['SERVER_NAME'] ?? '', ['localhost', '127.0.0.1', 'idcultural_web']);
 $is_tailscale = strpos($_SERVER['HTTP_HOST'] ?? '', '.ts.net') !== false;
+$is_ngrok = strpos($_SERVER['HTTP_HOST'] ?? '', '.ngrok') !== false;
 
 // Configurar BASE_URL según el entorno
-if ($is_local) {
+if ($is_local && !$is_ngrok) {
     // Desarrollo local (Docker)
     define('BASE_URL', 'http://localhost:8080/');
 } elseif ($is_tailscale) {
     // Tailscale Funnel - raíz del dominio
     define('BASE_URL', 'https://server-itse.tail0ce263.ts.net/');
+} elseif ($is_ngrok) {
+    // ngrok - SIEMPRE usar HTTPS (ngrok lo requiere)
+    define('BASE_URL', 'https://' . $_SERVER['HTTP_HOST'] . '/');
 } else {
     // Producción (otro servidor)
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
