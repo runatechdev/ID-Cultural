@@ -779,6 +779,32 @@
     position: relative;
     height: 200px;
     overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+}
+
+/* Gradientes diferentes por categoría */
+.famous-artist-item[data-category="Musica"] .famous-image {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.famous-artist-item[data-category="Literatura"] .famous-image {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.famous-artist-item[data-category="Artes Plásticas"] .famous-image {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.famous-artist-item[data-category="Danza"] .famous-image {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.famous-artist-item[data-category="Teatro"] .famous-image {
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
 }
 
 .famous-image img {
@@ -786,6 +812,19 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
+}
+
+.famous-image::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.famous-artist-card:hover .famous-image::before {
+    background: rgba(0,0,0,0.2);
 }
 
 .famous-artist-card:hover .famous-image img {
