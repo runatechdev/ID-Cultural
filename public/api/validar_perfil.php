@@ -98,16 +98,78 @@ try {
         // Actualizar estado del perfil
         if ($accion === 'validar') {
             $nuevo_estado = 'validado';
-            $stmt_update = $pdo->prepare("
-                UPDATE artistas 
-                SET status_perfil = ?, 
-                    motivo_rechazo = NULL
-                WHERE id = ?
+            
+            // Primero, verificar si hay cambios pendientes para este artista
+            $stmt_cambios = $pdo->prepare("
+                SELECT * FROM perfil_cambios_pendientes 
+                WHERE artista_id = ? AND estado = 'pendiente'
+                ORDER BY fecha_solicitud DESC LIMIT 1
             ");
-            $stmt_update->execute([$nuevo_estado, $artista_id]);
+            $stmt_cambios->execute([$artista_id]);
+            $cambios_pendientes = $stmt_cambios->fetch(PDO::FETCH_ASSOC);
+            
+            if ($cambios_pendientes) {
+                // Aplicar los cambios pendientes al perfil del artista
+                $stmt_update = $pdo->prepare("
+                    UPDATE artistas 
+                    SET biografia = COALESCE(?, biografia),
+                        especialidades = COALESCE(?, especialidades),
+                        instagram = COALESCE(?, instagram),
+                        facebook = COALESCE(?, facebook),
+                        twitter = COALESCE(?, twitter),
+                        sitio_web = COALESCE(?, sitio_web),
+                        foto_perfil = COALESCE(?, foto_perfil),
+                        status_perfil = ?, 
+                        motivo_rechazo = NULL
+                    WHERE id = ?
+                ");
+                $stmt_update->execute([
+                    $cambios_pendientes['biografia'],
+                    $cambios_pendientes['especialidades'],
+                    $cambios_pendientes['instagram'],
+                    $cambios_pendientes['facebook'],
+                    $cambios_pendientes['twitter'],
+                    $cambios_pendientes['sitio_web'],
+                    $cambios_pendientes['foto_perfil'],
+                    $nuevo_estado,
+                    $artista_id
+                ]);
+                
+                // Marcar el cambio como aprobado
+                $stmt_aprobar = $pdo->prepare("
+                    UPDATE perfil_cambios_pendientes 
+                    SET estado = 'aprobado',
+                        validador_id = ?,
+                        fecha_validacion = NOW()
+                    WHERE id = ?
+                ");
+                $stmt_aprobar->execute([$validador_id, $cambios_pendientes['id']]);
+            } else {
+                // No hay cambios pendientes, solo actualizar el estado
+                $stmt_update = $pdo->prepare("
+                    UPDATE artistas 
+                    SET status_perfil = ?, 
+                        motivo_rechazo = NULL
+                    WHERE id = ?
+                ");
+                $stmt_update->execute([$nuevo_estado, $artista_id]);
+            }
 
         } else { // rechazar
             $nuevo_estado = 'rechazado';
+            
+            // Rechazar cambios pendientes si existen
+            $stmt_rechazar_cambios = $pdo->prepare("
+                UPDATE perfil_cambios_pendientes 
+                SET estado = 'rechazado',
+                    validador_id = ?,
+                    motivo_rechazo = ?,
+                    fecha_validacion = NOW()
+                WHERE artista_id = ? AND estado = 'pendiente'
+            ");
+            $stmt_rechazar_cambios->execute([$validador_id, $motivo, $artista_id]);
+            
+            // Actualizar estado del perfil del artista
             $stmt_update = $pdo->prepare("
                 UPDATE artistas 
                 SET status_perfil = ?, 

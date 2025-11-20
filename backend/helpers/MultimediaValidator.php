@@ -220,24 +220,43 @@ class MultimediaValidator {
         $extension = self::obtenerExtension($file['name']);
         $nombre_unico = uniqid('media_', true) . '.' . $extension;
         
-        // Definir ruta según tipo
-        $directorio_base = __DIR__ . '/../../public/uploads/';
+        // Definir ruta de forma más confiable
+        // Navegar desde el directorio actual de helpers hacia public/uploads
+        $directorio_base = realpath(__DIR__ . '/../../public');
+        
+        if (!$directorio_base || !is_dir($directorio_base)) {
+            $respuesta['mensaje'] = 'No se puede acceder al directorio public';
+            error_log("ERROR: No se puede acceder a: " . __DIR__ . '/../../public');
+            return $respuesta;
+        }
+        
         $subdirectorio = $tipo . 's/';
-        $ruta_destino = $directorio_base . $subdirectorio;
+        $ruta_destino = $directorio_base . '/uploads/' . $subdirectorio;
         
         // Crear directorio si no existe
         if (!is_dir($ruta_destino)) {
-            if (!mkdir($ruta_destino, 0755, true)) {
-                $respuesta['mensaje'] = 'No se pudo crear el directorio de destino';
+            if (!@mkdir($ruta_destino, 0755, true)) {
+                $respuesta['mensaje'] = 'No se pudo crear el directorio de destino: ' . $ruta_destino;
+                error_log("ERROR al crear directorio: " . $ruta_destino);
                 return $respuesta;
             }
+        }
+        
+        // Verificar que el directorio sea escribible
+        if (!is_writable($ruta_destino)) {
+            $respuesta['mensaje'] = 'No hay permisos de escritura en el directorio';
+            error_log("ERROR: Directorio no escribible: " . $ruta_destino);
+            return $respuesta;
         }
         
         $ruta_completa = $ruta_destino . $nombre_unico;
         
         // Mover archivo
-        if (!move_uploaded_file($file['tmp_name'], $ruta_completa)) {
-            $respuesta['mensaje'] = 'Error al guardar el archivo';
+        if (!@move_uploaded_file($file['tmp_name'], $ruta_completa)) {
+            $respuesta['mensaje'] = 'Error al guardar el archivo en: ' . $ruta_completa;
+            error_log("ERROR: No se pudo mover archivo a: " . $ruta_completa);
+            error_log("Archivo temporal: " . $file['tmp_name']);
+            error_log("Error de PHP: " . error_get_last()['message'] ?? 'sin error específico');
             return $respuesta;
         }
         

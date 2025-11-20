@@ -230,24 +230,34 @@ include(__DIR__ . '/../../../../../components/header.php');
                     const formData = new FormData(form);
 
                     try {
-                        const res = await fetch('/api/actualizar_perfil_publico.php', {
+                        const baseUrl = '<?php echo BASE_URL; ?>';
+                        const url = baseUrl + 'api/actualizar_perfil_publico.php';
+                        
+                        console.log('Enviando a:', url);
+                        console.log('BASE_URL:', baseUrl);
+                        
+                        const res = await fetch(url, {
                             method: 'POST',
                             body: formData
                         });
 
+                        console.log('Response status:', res.status);
+                        
                         const data = await res.json();
+                        
+                        console.log('Response data:', data);
 
-                        if (res.ok && data.success) {
+                        if (data.success) {
                             Swal.fire({
                                 title: '✓ Enviado a Validación',
                                 text: 'Tu perfil público ha sido enviado para revisión. Te notificaremos cuando sea aprobado.',
                                 icon: 'success',
                                 confirmButtonText: 'OK'
                             }).then(() => {
-                                window.location.href = '/src/views/pages/artista/dashboard-artista.php';
+                                window.location.href = baseUrl + 'src/views/pages/artista/dashboard-artista.php';
                             });
                         } else {
-                            Swal.fire('Error', data.error || 'Error al actualizar', 'error');
+                            Swal.fire('Error', data.error || data.mensaje || 'Error al actualizar', 'error');
                         }
                     } catch (err) {
                         console.error(err);
