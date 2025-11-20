@@ -230,7 +230,14 @@ class MultimediaValidator {
             return $respuesta;
         }
         
-        $subdirectorio = $tipo . 's/';
+        // Definir subdirectorio según tipo (corrección ortográfica)
+        $subdirectorios = [
+            'imagen' => 'imagenes/',
+            'video' => 'videos/',
+            'audio' => 'audios/'
+        ];
+        
+        $subdirectorio = $subdirectorios[$tipo] ?? ($tipo . 's/');
         $ruta_destino = $directorio_base . '/uploads/' . $subdirectorio;
         
         // Crear directorio si no existe
