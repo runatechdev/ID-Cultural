@@ -21,59 +21,122 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Tbody encontrado:', tbody.id, tbody.className);
     
     let obrasPendientes = [];
-    let obrasFiltradas = [];
+    let perfilesPendientes = [];
+    let todosPendientes = []; // Combinación de obras y perfiles
+    let filtrados = [];
 
-    // Cargar obras pendientes al iniciar
-    cargarObrasPendientes();
+    // Cargar obras y perfiles pendientes al iniciar
+    cargarTodosPendientes();
 
     // Event listeners para filtros
     document.getElementById('filtro-busqueda')?.addEventListener('input', aplicarFiltros);
     document.getElementById('filtro-categoria')?.addEventListener('change', aplicarFiltros);
     document.getElementById('filtro-municipio')?.addEventListener('change', aplicarFiltros);
 
-    async function cargarObrasPendientes() {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando obras pendientes...</p></td></tr>';
+    async function cargarTodosPendientes() {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando pendientes...</p></td></tr>';
         
         try {
-            console.log('Fetching:', `${BASE_URL}api/get_publicaciones.php?estado=pendiente`);
-            const response = await fetch(`${BASE_URL}api/get_publicaciones.php?estado=pendiente`);
-            console.log('Response status:', response.status, response.ok);
+            // Cargar obras y perfiles en paralelo
+            const [responseObras, responsePerfiles] = await Promise.all([
+                fetch(`${BASE_URL}api/get_publicaciones.php?estado=pendiente`),
+                fetch(`${BASE_URL}api/get_perfiles_pendientes.php`)
+            ]);
             
-            if (!response.ok) throw new Error('Error al obtener los datos.');
+            if (!responseObras.ok) throw new Error('Error al obtener obras.');
+            if (!responsePerfiles.ok) throw new Error('Error al obtener perfiles.');
             
-            obrasPendientes = await response.json();
-            console.log('Obras recibidas:', obrasPendientes);
-            console.log('Total de obras:', obrasPendientes.length);
+            obrasPendientes = await responseObras.json();
+            perfilesPendientes = await responsePerfiles.json();
             
-            obrasFiltradas = [...obrasPendientes];
+            // Marcar tipo para diferenciarlos
+            obrasPendientes.forEach(obra => obra.tipo_pendiente = 'obra');
+            perfilesPendientes.forEach(perfil => perfil.tipo_pendiente = 'perfil');
+            
+            // Combinar ambos arrays
+            todosPendientes = [...obrasPendientes, ...perfilesPendientes];
+            filtrados = [...todosPendientes];
+            
+            console.log('Obras pendientes:', obrasPendientes.length);
+            console.log('Perfiles pendientes:', perfilesPendientes.length);
+            console.log('Total pendientes:', todosPendientes.length);
             
             // Llenar select de municipios
             llenarSelectMunicipios();
             
-            // Mostrar obras
-            console.log('Llamando mostrarObras con:', obrasFiltradas);
-            mostrarObras(obrasFiltradas);
+            // Mostrar items
+            mostrarItems(filtrados);
 
         } catch (error) {
             console.error('Error completo:', error);
-            console.error('Stack:', error.stack);
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle fs-1"></i><p class="mt-2">Error al cargar las obras pendientes.</p></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle fs-1"></i><p class="mt-2">Error al cargar pendientes.</p></td></tr>';
         }
     }
 
-    function mostrarObras(obras) {
-        console.log('mostrarObras llamada con obras:', obras);
-        console.log('Longitud:', obras ? obras.length : 'undefined');
+    function mostrarItems(items) {
+        console.log('mostrarItems llamada con:', items.length, 'items');
         
-        if (!obras || obras.length === 0) {
-            console.log('No hay obras, mostrando mensaje vacío');
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><i class="bi bi-inbox fs-1 text-muted"></i><p class="mt-3 text-muted">No hay obras pendientes de validación</p></td></tr>';
+        if (!items || items.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><i class="bi bi-inbox fs-1 text-muted"></i><p class="mt-3 text-muted">No hay elementos pendientes de validación</p></td></tr>';
             return;
         }
         
-        console.log('Renderizando', obras.length, 'obras');
-
-        tbody.innerHTML = obras.map(obra => `
+        tbody.innerHTML = items.map(item => {
+            if (item.tipo_pendiente === 'perfil') {
+                return renderizarFilaPerfil(item);
+            } else {
+                return renderizarFilaObra(item);
+            }
+        }).join('');
+        
+        // Agregar event listeners después de renderizar
+        agregarEventListeners();
+    }
+    
+    function renderizarFilaPerfil(perfil) {
+        // Determinar qué imagen mostrar
+        const foto_mostrar = perfil.cambios.foto_perfil 
+            ? `${BASE_URL}static/img/perfil_pendiente.jpg` 
+            : (perfil.valores_actuales.foto_perfil || `${BASE_URL}static/img/default-avatar.png`);
+        
+        return `
+            <tr id="perfil-${perfil.id}" class="perfil-row">
+                <td class="ps-3">
+                    <div class="d-flex align-items-center">
+                        <img src="${foto_mostrar}" 
+                             alt="Perfil" 
+                             class="rounded-circle me-3" 
+                             style="width: 50px; height: 50px; object-fit: cover;"
+                             onerror="this.src='${BASE_URL}static/img/default-avatar.png'">
+                        <div>
+                            <strong class="d-block">Cambios de Perfil</strong>
+                            <small class="text-muted">
+                                <i class="bi bi-person-circle"></i> ${escapeHtml(perfil.nombre_artista)}
+                            </small>
+                            ${perfil.cambios.foto_perfil ? '<span class="badge bg-warning ms-2">Nueva Foto</span>' : ''}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge bg-secondary">Perfil</span>
+                </td>
+                <td>
+                    ${perfil.municipio ? `<i class="bi bi-geo-alt"></i> ${escapeHtml(perfil.municipio)}` : '-'}
+                </td>
+                <td>
+                    <small>${formatearFecha(perfil.fecha_solicitud)}</small>
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-primary" onclick="verDetallesPerfil(${perfil.id})">
+                        <i class="bi bi-eye"></i> Ver
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
+    
+    function renderizarFilaObra(obra) {
+        return `
             <tr id="obra-${obra.id}" class="obra-row">
                 <td class="ps-3">
                     <div>
@@ -114,10 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </td>
             </tr>
-        `).join('');
-
-        // Agregar event listeners a los botones
-        agregarEventListeners();
+        `;
     }
 
     function agregarEventListeners() {
@@ -358,29 +418,215 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ============================================
+    // FUNCIONES PARA PERFILES PENDIENTES
+    // ============================================
+    
+    window.verDetallesPerfil = async function(perfilId) {
+        const perfil = perfilesPendientes.find(p => p.id === perfilId);
+        if (!perfil) {
+            Swal.fire('Error', 'No se encontró el perfil', 'error');
+            return;
+        }
+        
+        // Construir HTML de cambios
+        let cambiosHTML = '<div class="text-start">';
+        
+        if (perfil.cambios.foto_perfil) {
+            cambiosHTML += `
+                <div class="mb-3">
+                    <strong>Nueva Foto de Perfil:</strong><br>
+                    <img src="${BASE_URL}static/img/perfil_pendiente.jpg" class="img-thumbnail mt-2" style="max-width: 200px;">
+                    <p class="text-muted small">La imagen se mostrará una vez aprobada</p>
+                </div>
+            `;
+        }
+        
+        if (perfil.cambios.biografia) {
+            cambiosHTML += `
+                <div class="mb-3">
+                    <strong>Nueva Biografía:</strong><br>
+                    <div class="border p-2 mt-2 bg-light">
+                        ${escapeHtml(perfil.cambios.biografia)}
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (perfil.cambios.especialidades) {
+            cambiosHTML += `
+                <div class="mb-3">
+                    <strong>Nuevas Especialidades:</strong><br>
+                    <div class="border p-2 mt-2 bg-light">
+                        ${escapeHtml(perfil.cambios.especialidades)}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Redes sociales
+        const redesSociales = [];
+        if (perfil.cambios.instagram) redesSociales.push(`<i class="bi bi-instagram"></i> ${escapeHtml(perfil.cambios.instagram)}`);
+        if (perfil.cambios.facebook) redesSociales.push(`<i class="bi bi-facebook"></i> ${escapeHtml(perfil.cambios.facebook)}`);
+        if (perfil.cambios.twitter) redesSociales.push(`<i class="bi bi-twitter"></i> ${escapeHtml(perfil.cambios.twitter)}`);
+        if (perfil.cambios.sitio_web) redesSociales.push(`<i class="bi bi-globe"></i> ${escapeHtml(perfil.cambios.sitio_web)}`);
+        
+        if (redesSociales.length > 0) {
+            cambiosHTML += `
+                <div class="mb-3">
+                    <strong>Redes Sociales:</strong><br>
+                    <div class="mt-2">
+                        ${redesSociales.join('<br>')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        cambiosHTML += '</div>';
+        
+        // Mostrar modal con opciones
+        Swal.fire({
+            title: `Cambios de Perfil - ${perfil.nombre_artista}`,
+            html: cambiosHTML,
+            icon: 'info',
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonText: '<i class="bi bi-check-circle"></i> Aprobar',
+            denyButtonText: '<i class="bi bi-x-circle"></i> Rechazar',
+            cancelButtonText: 'Cerrar',
+            confirmButtonColor: '#28a745',
+            denyButtonColor: '#dc3545',
+            width: '600px'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await aprobarPerfil(perfil.artista_id);
+            } else if (result.isDenied) {
+                solicitarMotivoRechazoPerfil(perfil.artista_id);
+            }
+        });
+    }
+    
+    async function aprobarPerfil(artistaId) {
+        try {
+            const formData = new FormData();
+            formData.append('id', artistaId);
+            formData.append('accion', 'validar');
+
+            const response = await fetch(`${BASE_URL}api/validar_perfil.php`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === 'ok') {
+                await Swal.fire({
+                    title: 'Aprobado',
+                    text: result.message,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                cargarTodosPendientes();
+            } else {
+                Swal.fire('Error', result.message || 'No se pudo aprobar el perfil', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire('Error', 'Error de conexión al servidor', 'error');
+        }
+    }
+    
+    function solicitarMotivoRechazoPerfil(artistaId) {
+        Swal.fire({
+            title: 'Rechazar Cambios de Perfil',
+            input: 'textarea',
+            inputLabel: 'Motivo del rechazo',
+            inputPlaceholder: 'Explica por qué se rechazan los cambios...',
+            inputAttributes: {
+                'aria-label': 'Motivo del rechazo',
+                'rows': 4
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Rechazar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#dc3545',
+            inputValidator: (value) => {
+                if (!value || value.trim() === '') {
+                    return 'Debes proporcionar un motivo de rechazo';
+                }
+                return null;
+            }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await rechazarPerfil(artistaId, result.value);
+            }
+        });
+    }
+    
+    async function rechazarPerfil(artistaId, motivo) {
+        try {
+            const formData = new FormData();
+            formData.append('id', artistaId);
+            formData.append('accion', 'rechazar');
+            formData.append('motivo', motivo);
+
+            const response = await fetch(`${BASE_URL}api/validar_perfil.php`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === 'ok') {
+                await Swal.fire({
+                    title: 'Rechazado',
+                    text: result.message,
+                    icon: 'info',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                cargarTodosPendientes();
+            } else {
+                Swal.fire('Error', result.message || 'No se pudo rechazar el perfil', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire('Error', 'Error de conexión al servidor', 'error');
+        }
+    }
+
     function aplicarFiltros() {
         const busqueda = document.getElementById('filtro-busqueda')?.value.toLowerCase() || '';
         const categoria = document.getElementById('filtro-categoria')?.value || '';
         const municipio = document.getElementById('filtro-municipio')?.value || '';
 
-        obrasFiltradas = obrasPendientes.filter(obra => {
-            const coincideBusqueda = obra.titulo.toLowerCase().includes(busqueda) || 
-                                     obra.artista_nombre.toLowerCase().includes(busqueda);
-            const coincideCategoria = !categoria || obra.categoria === categoria;
-            const coincideMunicipio = !municipio || obra.municipio === municipio;
+        filtrados = todosPendientes.filter(item => {
+            // Filtro de búsqueda
+            const textoBusqueda = item.tipo_pendiente === 'perfil'
+                ? `${item.nombre_artista}`.toLowerCase()
+                : `${item.titulo} ${item.artista_nombre}`.toLowerCase();
+            const coincideBusqueda = textoBusqueda.includes(busqueda);
+            
+            // Filtro de categoría (solo para obras)
+            const coincideCategoria = !categoria || item.tipo_pendiente === 'perfil' || item.categoria === categoria;
+            
+            // Filtro de municipio
+            const coincideMunicipio = !municipio || item.municipio === municipio;
 
             return coincideBusqueda && coincideCategoria && coincideMunicipio;
         });
 
-        mostrarObras(obrasFiltradas);
+        mostrarItems(filtrados);
     }
 
     function llenarSelectMunicipios() {
         const select = document.getElementById('filtro-municipio');
         if (!select) return;
 
-        const municipios = [...new Set(obrasPendientes.map(o => o.municipio).filter(Boolean))].sort();
+        const municipios = [...new Set(todosPendientes.map(o => o.municipio).filter(Boolean))].sort();
         
+        select.innerHTML = '<option value="">Todos los municipios</option>';
         municipios.forEach(mun => {
             const option = document.createElement('option');
             option.value = mun;

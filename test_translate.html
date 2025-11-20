@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Traducción</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Prueba de Traducción de Google</h1>
+        <p>Este es un texto de prueba para verificar la traducción.</p>
+        <p>Bienvenido a ID Cultural. Somos una plataforma para artistas.</p>
+        
+        <div class="mt-4">
+            <h3>Selecciona un idioma:</h3>
+            <div class="btn-group" role="group">
+                <button class="btn btn-primary" onclick="changeLanguage('es')">🇪🇸 Español</button>
+                <button class="btn btn-primary" onclick="changeLanguage('en')">🇬🇧 English</button>
+                <button class="btn btn-primary" onclick="changeLanguage('pt')">🇧🇷 Português</button>
+                <button class="btn btn-primary" onclick="changeLanguage('fr')">🇫🇷 Français</button>
+                <button class="btn btn-primary" onclick="changeLanguage('it')">🇮🇹 Italiano</button>
+                <button class="btn btn-primary" onclick="changeLanguage('de')">🇩🇪 Deutsch</button>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <h4>Estado de cookies:</h4>
+            <pre id="cookieStatus"></pre>
+        </div>
+    </div>
+    
+    <!-- Google Translate Element (oculto) -->
+    <div id="google_translate_element" style="display: none;"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript">
+        // Función para cambiar el idioma
+        function changeLanguage(lang) {
+            console.log('Cambiando idioma a:', lang);
+            
+            if (lang === 'es') {
+                // Volver a español - eliminar traducción
+                eraseCookie('googtrans');
+                eraseCookie('googtrans', window.location.hostname);
+                eraseCookie('googtrans', '.' + window.location.hostname);
+                window.location.href = window.location.pathname + window.location.search;
+            } else {
+                // Cambiar a otro idioma
+                const langPair = '/es/' + lang;
+                
+                // Establecer cookies
+                setCookie('googtrans', langPair, 365);
+                setCookie('googtrans', langPair, 365, window.location.hostname);
+                setCookie('googtrans', langPair, 365, '.' + window.location.hostname);
+                
+                // Recargar
+                setTimeout(() => {
+                    window.location.reload();
+                }, 100);
+            }
+        }
+        
+        function setCookie(name, value, days, domain) {
+            let expires = "";
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            const domainStr = domain ? "; domain=" + domain : "";
+            const isSecure = window.location.protocol === 'https:';
+            const secureStr = isSecure ? "; SameSite=None; Secure" : "; SameSite=Lax";
+            
+            const cookie = name + "=" + (value || "") + expires + domainStr + "; path=/" + secureStr;
+            document.cookie = cookie;
+            console.log('Cookie establecida:', cookie);
+            updateCookieStatus();
+        }
+        
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+        
+        function eraseCookie(name, domain) {
+            const domainStr = domain ? "; domain=" + domain : "";
+            document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/' + domainStr;
+            console.log('Cookie borrada:', name, domain);
+            updateCookieStatus();
+        }
+        
+        function updateCookieStatus() {
+            const googtrans = getCookie('googtrans');
+            const allCookies = document.cookie;
+            const statusDiv = document.getElementById('cookieStatus');
+            statusDiv.textContent = `googtrans: ${googtrans || 'No establecida'}\n\nTodas las cookies:\n${allCookies || 'Ninguna'}`;
+        }
+        
+        // Inicializar Google Translate
+        function googleTranslateElementInit() {
+            console.log('Inicializando Google Translate...');
+            new google.translate.TranslateElement({
+                pageLanguage: 'es',
+                includedLanguages: 'en,fr,it,de,pt',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+            
+            setTimeout(() => {
+                const savedLang = getCookie('googtrans');
+                console.log('Idioma guardado:', savedLang);
+                
+                if (savedLang && savedLang !== '/es/es') {
+                    const langCode = savedLang.split('/')[2];
+                    console.log('Aplicando idioma:', langCode);
+                    
+                    const selectElement = document.querySelector('.goog-te-combo');
+                    if (selectElement) {
+                        selectElement.value = langCode;
+                        selectElement.dispatchEvent(new Event('change'));
+                    }
+                }
+            }, 500);
+        }
+        
+        // Al cargar
+        window.addEventListener('DOMContentLoaded', function() {
+            updateCookieStatus();
+            
+            // Ocultar elementos de Google
+            const style = document.createElement('style');
+            style.textContent = `
+                body { top: 0px !important; position: static !important; }
+                .skiptranslate, .goog-te-banner-frame { display: none !important; }
+            `;
+            document.head.appendChild(style);
+        });
+        
+        // Limpiar después de cargar
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.body.style.top = '0px';
+                document.body.style.position = 'static';
+                updateCookieStatus();
+            }, 500);
+        });
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

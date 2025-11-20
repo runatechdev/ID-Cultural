@@ -190,21 +190,42 @@ if (!defined('BASE_URL')) {
 <div id="google_translate_element" style="display: none;"></div>
 
 <script type="text/javascript">
-// Función para cambiar el idioma
+// Función para cambiar el idioma - Mejorada
 function changeLanguage(lang) {
+  console.log('Cambiando idioma a:', lang);
+  
   if (lang === 'es') {
     // Volver a español - eliminar traducción
-    deleteCookie('googtrans');
-    window.location.reload();
+    eraseCookie('googtrans');
+    eraseCookie('googtrans', window.location.hostname);
+    eraseCookie('googtrans', '.' + window.location.hostname);
+    // Recargar sin hash
+    window.location.href = window.location.pathname + window.location.search;
   } else {
     // Cambiar a otro idioma
-    setCookie('googtrans', '/es/' + lang, 1);
-    setCookie('googtrans', '/es/' + lang, 1, window.location.hostname);
-    window.location.reload();
+    const langPair = '/es/' + lang;
+    
+    // Establecer cookies en múltiples dominios
+    setCookie('googtrans', langPair, 365);
+    setCookie('googtrans', langPair, 365, window.location.hostname);
+    setCookie('googtrans', langPair, 365, '.' + window.location.hostname);
+    
+    // Intentar activar la traducción programáticamente
+    setTimeout(() => {
+      if (typeof google !== 'undefined' && google.translate) {
+        const selectElement = document.querySelector('.goog-te-combo');
+        if (selectElement) {
+          selectElement.value = lang;
+          selectElement.dispatchEvent(new Event('change'));
+        }
+      }
+      // Recargar la página para aplicar el cambio
+      window.location.reload();
+    }, 100);
   }
 }
 
-// Funciones de cookies
+// Funciones de cookies mejoradas
 function setCookie(name, value, days, domain) {
   let expires = "";
   if (days) {
@@ -213,7 +234,14 @@ function setCookie(name, value, days, domain) {
     expires = "; expires=" + date.toUTCString();
   }
   const domainStr = domain ? "; domain=" + domain : "";
-  document.cookie = name + "=" + (value || "") + expires + domainStr + "; path=/";
+  
+  // Usar Secure y SameSite solo en HTTPS
+  const isSecure = window.location.protocol === 'https:';
+  const secureStr = isSecure ? "; SameSite=None; Secure" : "; SameSite=Lax";
+  
+  const cookie = name + "=" + (value || "") + expires + domainStr + "; path=/" + secureStr;
+  document.cookie = cookie;
+  console.log('Cookie establecida:', cookie);
 }
 
 function getCookie(name) {
@@ -223,28 +251,83 @@ function getCookie(name) {
   return null;
 }
 
+function eraseCookie(name, domain) {
+  const domainStr = domain ? "; domain=" + domain : "";
+  document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/' + domainStr;
+  console.log('Cookie borrada:', name, domain);
+}
+
 function deleteCookie(name) {
-  document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname;
-  document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.' + window.location.hostname;
+  eraseCookie(name);
+  eraseCookie(name, window.location.hostname);
+  eraseCookie(name, '.' + window.location.hostname);
 }
 
 // Inicializar Google Translate
 function googleTranslateElementInit() {
+  console.log('Inicializando Google Translate...');
   new google.translate.TranslateElement({
     pageLanguage: 'es',
     includedLanguages: 'en,fr,it,de,pt',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
   }, 'google_translate_element');
+  
+  // Esperar a que se inicialice y aplicar idioma guardado
+  setTimeout(() => {
+    const savedLang = getCookie('googtrans');
+    console.log('Idioma guardado en cookie:', savedLang);
+    
+    if (savedLang && savedLang !== '/es/es') {
+      const langCode = savedLang.split('/')[2];
+      console.log('Aplicando idioma:', langCode);
+      
+      const selectElement = document.querySelector('.goog-te-combo');
+      if (selectElement) {
+        selectElement.value = langCode;
+        selectElement.dispatchEvent(new Event('change'));
+      }
+    }
+    
+    // Actualizar indicador visual
+    updateLanguageIndicator();
+  }, 500);
+}
+
+// Actualizar indicador visual del idioma actual
+function updateLanguageIndicator() {
+  const savedLang = getCookie('googtrans');
+  const langCode = savedLang ? savedLang.split('/')[2] : 'es';
+  const button = document.getElementById('translateDropdown');
+  
+  const flags = {
+    'es': '🇪🇸',
+    'en': '🇬🇧',
+    'pt': '🇧🇷',
+    'fr': '🇫🇷',
+    'it': '🇮🇹',
+    'de': '🇩🇪'
+  };
+  
+  if (button && langCode !== 'es') {
+    button.innerHTML = `<span style="font-size: 1.2rem;">${flags[langCode] || '🌐'}</span>`;
+  }
 }
 
 // Al cargar la página
 window.addEventListener('DOMContentLoaded', function() {
-  // Si no hay cookie de traducción, asegurar que esté en español
+  console.log('DOM cargado, verificando traducción...');
+  
+  // Verificar y limpiar cookies inválidas
   const currentLang = getCookie('googtrans');
+  console.log('Cookie googtrans actual:', currentLang);
+  
   if (!currentLang || currentLang === '/es/es' || currentLang === '') {
     deleteCookie('googtrans');
   }
+  
+  // Actualizar indicador visual
+  updateLanguageIndicator();
   
   // Inyectar CSS adicional para eliminar barra blanca
   const style = document.createElement('style');
@@ -257,6 +340,9 @@ window.addEventListener('DOMContentLoaded', function() {
       display: none !important;
     }
     body > .skiptranslate {
+      display: none !important;
+    }
+    .goog-te-banner-frame {
       display: none !important;
     }
   `;
