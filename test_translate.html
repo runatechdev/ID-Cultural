@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Prueba de Traducción de Google</h1>
+        <h1 class="notranslate">Prueba de Traducción de Google</h1>
         <p>Este es un texto de prueba para verificar la traducción.</p>
         <p>Bienvenido a ID Cultural. Somos una plataforma para artistas.</p>
         
@@ -134,19 +134,39 @@
             // Ocultar elementos de Google
             const style = document.createElement('style');
             style.textContent = `
-                body { top: 0px !important; position: static !important; }
+                body { top: 0px !important; position: static !important; margin-top: 0 !important; }
                 .skiptranslate, .goog-te-banner-frame { display: none !important; }
+                iframe.skiptranslate, iframe.goog-te-banner-frame { 
+                    display: none !important; 
+                    visibility: hidden !important;
+                    height: 0 !important;
+                    position: absolute !important;
+                    left: -9999px !important;
+                }
+                .goog-te-spinner, .goog-te-spinner-pos { display: none !important; }
+                .goog-logo-link, .goog-te-gadget { display: none !important; }
             `;
             document.head.appendChild(style);
         });
         
-        // Limpiar después de cargar
+        // Limpiar después de cargar - múltiples intentos
         window.addEventListener('load', function() {
-            setTimeout(() => {
-                document.body.style.top = '0px';
-                document.body.style.position = 'static';
-                updateCookieStatus();
-            }, 500);
+            const cleanupTimes = [100, 300, 500, 800, 1200, 2000];
+            
+            cleanupTimes.forEach(delay => {
+                setTimeout(() => {
+                    document.body.style.top = '0px';
+                    document.body.style.position = 'static';
+                    
+                    // Ocultar todos los iframes de Google
+                    document.querySelectorAll('iframe[name^="goog"], iframe.skiptranslate').forEach(frame => {
+                        frame.style.display = 'none';
+                        frame.style.visibility = 'hidden';
+                    });
+                    
+                    updateCookieStatus();
+                }, delay);
+            });
         });
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>

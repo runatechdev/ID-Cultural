@@ -19,7 +19,7 @@ if (!defined('BASE_URL')) {
     <!-- Logo y Nombre -->
     <a href="<?php echo BASE_URL; ?>index.php" class="navbar-brand d-flex align-items-center text-decoration-none">
       <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
-      <h4 class="m-0 text-white fw-bold typing-effect" id="navbar-title"></h4>
+      <h4 class="m-0 text-white fw-bold typing-effect notranslate" id="navbar-title"></h4>
     </a>
 
     <div>
@@ -193,35 +193,85 @@ if (!defined('BASE_URL')) {
 // Función para cambiar el idioma - Mejorada
 function changeLanguage(lang) {
   console.log('Cambiando idioma a:', lang);
+  console.log('Protocolo:', window.location.protocol);
+  console.log('Hostname:', window.location.hostname);
   
   if (lang === 'es') {
     // Volver a español - eliminar traducción
     eraseCookie('googtrans');
     eraseCookie('googtrans', window.location.hostname);
     eraseCookie('googtrans', '.' + window.location.hostname);
-    // Recargar sin hash
+    
+    // Para ngrok, también limpiar sin el subdominio
+    if (window.location.hostname.includes('ngrok')) {
+      const baseDomain = window.location.hostname.split('.').slice(-2).join('.');
+      eraseCookie('googtrans', '.' + baseDomain);
+    }
+    
+    // Recargar eliminando el hash de Google Translate
     window.location.href = window.location.pathname + window.location.search;
   } else {
     // Cambiar a otro idioma
     const langPair = '/es/' + lang;
+    console.log('Estableciendo langPair:', langPair);
     
-    // Establecer cookies en múltiples dominios
-    setCookie('googtrans', langPair, 365);
-    setCookie('googtrans', langPair, 365, window.location.hostname);
-    setCookie('googtrans', langPair, 365, '.' + window.location.hostname);
+    // Establecer cookies en múltiples variantes - TODAS a la vez
+    const isSecure = window.location.protocol === 'https:';
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (365 * 24 * 60 * 60 * 1000));
+    const expiresStr = "; expires=" + expires.toUTCString();
     
-    // Intentar activar la traducción programáticamente
-    setTimeout(() => {
-      if (typeof google !== 'undefined' && google.translate) {
-        const selectElement = document.querySelector('.goog-te-combo');
-        if (selectElement) {
-          selectElement.value = lang;
-          selectElement.dispatchEvent(new Event('change'));
+    // Variante 1: Sin dominio
+    if (isSecure) {
+      document.cookie = `googtrans=${langPair}${expiresStr}; path=/; SameSite=None; Secure`;
+    } else {
+      document.cookie = `googtrans=${langPair}${expiresStr}; path=/; SameSite=Lax`;
+    }
+    
+    // Variante 2: Con hostname completo
+    if (isSecure) {
+      document.cookie = `googtrans=${langPair}${expiresStr}; path=/; domain=${window.location.hostname}; SameSite=None; Secure`;
+    } else {
+      document.cookie = `googtrans=${langPair}${expiresStr}; path=/; domain=${window.location.hostname}; SameSite=Lax`;
+    }
+    
+    // Variante 3: Con punto antes del hostname (para subdominios)
+    if (window.location.hostname.includes('.')) {
+      if (isSecure) {
+        document.cookie = `googtrans=${langPair}${expiresStr}; path=/; domain=.${window.location.hostname}; SameSite=None; Secure`;
+      } else {
+        document.cookie = `googtrans=${langPair}${expiresStr}; path=/; domain=.${window.location.hostname}; SameSite=Lax`;
+      }
+      
+      // Variante 4: Dominio base para ngrok (ej: .ngrok-free.app)
+      const parts = window.location.hostname.split('.');
+      if (parts.length >= 2) {
+        const baseDomain = parts.slice(-2).join('.');
+        if (isSecure) {
+          document.cookie = `googtrans=${langPair}${expiresStr}; path=/; domain=.${baseDomain}; SameSite=None; Secure`;
         }
       }
-      // Recargar la página para aplicar el cambio
-      window.location.reload();
-    }, 100);
+    }
+    
+    console.log('Cookies establecidas, verificando...');
+    console.log('document.cookie:', document.cookie);
+    
+    // Verificar que se estableció
+    const check = getCookie('googtrans');
+    console.log('Cookie verificada:', check);
+    
+    if (check === langPair) {
+      console.log('✅ Cookie establecida correctamente, recargando página...');
+      // Recargar con el hash que Google Translate espera
+      window.location.href = window.location.pathname + window.location.search + '#googtrans(' + lang + ')';
+      // Forzar recarga completa
+      setTimeout(() => {
+        window.location.reload(true);
+      }, 100);
+    } else {
+      console.error('❌ Error: Cookie no se estableció correctamente');
+      console.log('Esperado:', langPair, 'Obtenido:', check);
+    }
   }
 }
 
@@ -233,21 +283,37 @@ function setCookie(name, value, days, domain) {
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
     expires = "; expires=" + date.toUTCString();
   }
+  
   const domainStr = domain ? "; domain=" + domain : "";
-  
-  // Usar Secure y SameSite solo en HTTPS
   const isSecure = window.location.protocol === 'https:';
-  const secureStr = isSecure ? "; SameSite=None; Secure" : "; SameSite=Lax";
   
-  const cookie = name + "=" + (value || "") + expires + domainStr + "; path=/" + secureStr;
+  // Para HTTPS (ngrok), usar SameSite=None; Secure
+  // Para HTTP (localhost), usar SameSite=Lax
+  let cookie;
+  if (isSecure) {
+    cookie = name + "=" + (value || "") + expires + domainStr + "; path=/; SameSite=None; Secure";
+  } else {
+    cookie = name + "=" + (value || "") + expires + domainStr + "; path=/; SameSite=Lax";
+  }
+  
   document.cookie = cookie;
   console.log('Cookie establecida:', cookie);
+  
+  // Verificar que se estableció
+  setTimeout(() => {
+    const check = getCookie(name);
+    console.log('Verificación - Cookie "' + name + '":', check);
+  }, 50);
 }
 
 function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+  }
   return null;
 }
 
@@ -265,33 +331,68 @@ function deleteCookie(name) {
 
 // Inicializar Google Translate
 function googleTranslateElementInit() {
-  console.log('Inicializando Google Translate...');
-  new google.translate.TranslateElement({
-    pageLanguage: 'es',
-    includedLanguages: 'en,fr,it,de,pt',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
-  }, 'google_translate_element');
+  console.log('=== Inicializando Google Translate ===');
+  console.log('Cookie googtrans al iniciar:', getCookie('googtrans'));
+  console.log('Todas las cookies:', document.cookie);
   
-  // Esperar a que se inicialice y aplicar idioma guardado
-  setTimeout(() => {
-    const savedLang = getCookie('googtrans');
-    console.log('Idioma guardado en cookie:', savedLang);
+  try {
+    new google.translate.TranslateElement({
+      pageLanguage: 'es',
+      includedLanguages: 'en,fr,it,de,pt',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+      autoDisplay: true, // Cambiar a true para que Google lo detecte automáticamente
+      multilanguagePage: true
+    }, 'google_translate_element');
     
-    if (savedLang && savedLang !== '/es/es') {
-      const langCode = savedLang.split('/')[2];
-      console.log('Aplicando idioma:', langCode);
+    // Solo limpiar elementos visuales, no forzar traducción
+    setTimeout(() => {
+      console.log('Google Translate inicializado');
+      const savedLang = getCookie('googtrans');
+      console.log('Idioma en cookie:', savedLang);
       
-      const selectElement = document.querySelector('.goog-te-combo');
-      if (selectElement) {
-        selectElement.value = langCode;
-        selectElement.dispatchEvent(new Event('change'));
-      }
-    }
+      // Actualizar indicador visual
+      updateLanguageIndicator();
+      
+      // Limpiar elementos que causan el logo trabado
+      cleanupGoogleElements();
+    }, 1000);
     
-    // Actualizar indicador visual
-    updateLanguageIndicator();
-  }, 500);
+  } catch (error) {
+    console.error('Error inicializando Google Translate:', error);
+  }
+}
+
+// Limpiar elementos problemáticos de Google Translate
+function cleanupGoogleElements() {
+  // Ocultar el widget de selección
+  const widget = document.getElementById('google_translate_element');
+  if (widget) widget.style.display = 'none';
+  
+  // Ocultar frames y banners
+  const frames = document.querySelectorAll('iframe.goog-te-banner-frame, iframe.skiptranslate');
+  frames.forEach(frame => {
+    frame.style.display = 'none';
+    frame.style.visibility = 'hidden';
+  });
+  
+  // Ajustar body
+  document.body.style.top = '0px';
+  document.body.style.position = 'static';
+  
+  // Ocultar divs de Google
+  const skiptranslate = document.querySelectorAll('.skiptranslate');
+  skiptranslate.forEach(elem => {
+    if (elem.tagName === 'DIV' && !elem.querySelector('.goog-te-combo')) {
+      elem.style.display = 'none';
+    }
+  });
+  
+  // Ocultar logo/spinner de Google
+  const googleLogo = document.querySelector('.goog-logo-link');
+  if (googleLogo) googleLogo.style.display = 'none';
+  
+  const toolbar = document.querySelector('.goog-te-banner');
+  if (toolbar) toolbar.style.display = 'none';
 }
 
 // Actualizar indicador visual del idioma actual
@@ -316,14 +417,21 @@ function updateLanguageIndicator() {
 
 // Al cargar la página
 window.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM cargado, verificando traducción...');
+  console.log('=== DOM Cargado ===');
+  console.log('Protocolo:', window.location.protocol);
+  console.log('Hostname:', window.location.hostname);
+  console.log('Cookie googtrans:', getCookie('googtrans'));
+  console.log('Todas las cookies:', document.cookie);
   
   // Verificar y limpiar cookies inválidas
   const currentLang = getCookie('googtrans');
-  console.log('Cookie googtrans actual:', currentLang);
   
   if (!currentLang || currentLang === '/es/es' || currentLang === '') {
+    console.log('No hay traducción activa, limpiando cookies...');
     deleteCookie('googtrans');
+    sessionStorage.removeItem('translate_retry');
+  } else {
+    console.log('Traducción detectada:', currentLang);
   }
   
   // Actualizar indicador visual
@@ -351,43 +459,50 @@ window.addEventListener('DOMContentLoaded', function() {
 
 // Ocultar elementos de Google Translate
 window.addEventListener('load', function() {
-  setTimeout(() => {
-    // Ocultar barra superior
-    const frames = document.querySelectorAll('iframe.goog-te-banner-frame');
-    frames.forEach(frame => {
-      frame.style.display = 'none';
-      frame.parentNode && frame.parentNode.removeChild(frame);
-    });
-    
-    // Ajustar el body - CRÍTICO para eliminar la barra blanca
-    document.body.style.top = '0px';
-    document.body.style.position = 'static';
-    document.body.classList.remove('translated-ltr', 'translated-rtl');
-    
-    // Ocultar el widget
-    const widget = document.getElementById('google_translate_element');
-    if (widget) widget.style.display = 'none';
-    
-    // Eliminar divs de Google que causan la barra blanca
-    const skiptranslate = document.querySelectorAll('.skiptranslate');
-    skiptranslate.forEach(elem => {
-      if (elem.tagName === 'DIV' && !elem.querySelector('.goog-te-combo')) {
-        elem.style.display = 'none';
+  // Limpiar múltiples veces para asegurar que se oculte todo
+  const cleanupIntervals = [100, 300, 500, 800, 1200, 2000, 3000];
+  
+  cleanupIntervals.forEach(delay => {
+    setTimeout(() => {
+      cleanupGoogleElements();
+    }, delay);
+  });
+  
+  // También observar cambios en el DOM
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.addedNodes.length) {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType === 1) { // Element node
+            // Ocultar frames de Google
+            if (node.tagName === 'IFRAME' && 
+                (node.classList.contains('goog-te-banner-frame') || 
+                 node.classList.contains('skiptranslate'))) {
+              node.style.display = 'none';
+              node.style.visibility = 'hidden';
+            }
+            
+            // Ocultar divs de Google
+            if (node.classList && node.classList.contains('skiptranslate')) {
+              if (!node.querySelector('.goog-te-combo')) {
+                node.style.display = 'none';
+              }
+            }
+          }
+        });
       }
     });
-  }, 100);
-  
-  // Segundo intento después de más tiempo
-  setTimeout(() => {
+    
+    // Asegurar que el body esté correcto
     document.body.style.top = '0px';
     document.body.style.position = 'static';
-  }, 500);
+  });
   
-// Tercer intento
-setTimeout(() => {
-  document.body.style.top = '0px';
-  document.body.style.position = 'static';
-}, 1000);
+  // Observar cambios en el body
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
 });
 
 // Funcionalidad del botón de búsqueda
@@ -663,12 +778,15 @@ window.addEventListener('load', typeEffect);
 /* Asegurar que NO aparezca la barra de Google */
 body > .skiptranslate {
   display: none !important;
+  visibility: hidden !important;
 }
 
 .goog-te-banner-frame,
 .goog-te-banner-frame.skiptranslate {
   display: none !important;
   visibility: hidden !important;
+  height: 0 !important;
+  opacity: 0 !important;
 }
 
 #goog-gt-tt, .goog-te-balloon-frame {
@@ -694,6 +812,9 @@ body.translated-rtl {
 iframe.skiptranslate {
   display: none !important;
   visibility: hidden !important;
+  height: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
 }
 
 .goog-logo-link {
@@ -707,4 +828,68 @@ iframe.skiptranslate {
 #google_translate_element {
   display: none !important;
 }
+
+/* Ocultar el spinner/logo de carga de Google */
+.goog-te-spinner-pos {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.goog-te-spinner {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Evitar que Google Translate modifique elementos con notranslate */
+.notranslate {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Asegurar que el navbar-title no se traduzca */
+#navbar-title {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Ocultar cualquier iframe de Google Translate */
+iframe[name^="goog"] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+}
+
+/* Asegurar que el body no tenga margen superior */
+body {
+  top: 0 !important;
+  position: static !important;
+  margin-top: 0 !important;
+}
+
+html.translated-ltr,
+html.translated-rtl {
+  margin-top: 0 !important;
+}
+
+body.translated-ltr,
+body.translated-rtl {
+  top: 0 !important;
+}
+
+/* Ocultar el toolbar de Google Translate */
+.goog-te-banner {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+}
+
+/* Prevenir que elementos dinámicos de Google interfieran */
+[style*="z-index: 1000000"] {
+  display: none !important;
+}
+
 </style>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Real de Google Translate</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Test de Google Translate (Como en navbar.php)</h1>
+        
+        <div class="alert alert-info">
+            <strong>Estado actual:</strong>
+            <pre id="status"></pre>
+        </div>
+        
+        <div class="btn-group mb-3" role="group">
+            <button class="btn btn-primary" onclick="changeLanguage('es')">🇪🇸 Español</button>
+            <button class="btn btn-primary" onclick="changeLanguage('en')">🇬🇧 English</button>
+            <button class="btn btn-primary" onclick="changeLanguage('pt')">🇧🇷 Português</button>
+            <button class="btn btn-primary" onclick="changeLanguage('fr')">🇫🇷 Français</button>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <h2>Texto de Prueba</h2>
+                <p>Bienvenido a ID Cultural. Esta es una plataforma para artistas y gestores culturales.</p>
+                <p>Aquí puedes encontrar obras de arte, eventos culturales y mucho más.</p>
+                <p>La comunidad artística te espera. Únete ahora y comparte tu talento con el mundo.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Google Translate Element (oculto) -->
+    <div id="google_translate_element" style="display: none;"></div>
+    
+    <script>
+        function updateStatus() {
+            const status = document.getElementById('status');
+            const googtrans = getCookie('googtrans');
+            status.textContent = `Cookie googtrans: ${googtrans || '(ninguna)'}
+Protocolo: ${window.location.protocol}
+Hostname: ${window.location.hostname}
+URL: ${window.location.href}
+
+Todas las cookies:
+${document.cookie || '(ninguna)'}`;
+        }
+        
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+        
+        function eraseCookie(name, domain) {
+            const domainStr = domain ? "; domain=" + domain : "";
+            document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/' + domainStr;
+        }
+        
+        function deleteCookie(name) {
+            eraseCookie(name);
+            eraseCookie(name, window.location.hostname);
+            eraseCookie(name, '.' + window.location.hostname);
+        }
+        
+        // MISMA FUNCIÓN QUE EN NAVBAR.PHP
+        function changeLanguage(lang) {
+            console.log('Cambiando idioma a:', lang);
+            
+            if (lang === 'es') {
+                eraseCookie('googtrans');
+                eraseCookie('googtrans', window.location.hostname);
+                eraseCookie('googtrans', '.' + window.location.hostname);
+                
+                if (window.location.hostname.includes('ngrok')) {
+                    const baseDomain = window.location.hostname.split('.').slice(-2).join('.');
+                    eraseCookie('googtrans', '.' + baseDomain);
+                }
+                
+                window.location.href = window.location.pathname + window.location.search;
+            } else {
+                const langPair = '/es/' + lang;
+                console.log('Estableciendo langPair:', langPair);
+                
+                const isSecure = window.location.protocol === 'https:';
+                const expires = new Date();
+                expires.setTime(expires.getTime() + (365 * 24 * 60 * 60 * 1000));
+                const expiresStr = "; expires=" + expires.toUTCString();
+                
+                // Establecer cookies en todas las variantes
+                if (isSecure) {
+                    document.cookie = \`googtrans=\${langPair}\${expiresStr}; path=/; SameSite=None; Secure\`;
+                    document.cookie = \`googtrans=\${langPair}\${expiresStr}; path=/; domain=\${window.location.hostname}; SameSite=None; Secure\`;
+                } else {
+                    document.cookie = \`googtrans=\${langPair}\${expiresStr}; path=/; SameSite=Lax\`;
+                    document.cookie = \`googtrans=\${langPair}\${expiresStr}; path=/; domain=\${window.location.hostname}; SameSite=Lax\`;
+                }
+                
+                if (window.location.hostname.includes('.')) {
+                    if (isSecure) {
+                        document.cookie = \`googtrans=\${langPair}\${expiresStr}; path=/; domain=.\${window.location.hostname}; SameSite=None; Secure\`;
+                    }
+                    
+                    const parts = window.location.hostname.split('.');
+                    if (parts.length >= 2) {
+                        const baseDomain = parts.slice(-2).join('.');
+                        if (isSecure) {
+                            document.cookie = \`googtrans=\${langPair}\${expiresStr}; path=/; domain=.\${baseDomain}; SameSite=None; Secure\`;
+                        }
+                    }
+                }
+                
+                console.log('Cookies establecidas, verificando...');
+                console.log('document.cookie:', document.cookie);
+                
+                const check = getCookie('googtrans');
+                console.log('Cookie verificada:', check);
+                
+                if (check === langPair) {
+                    console.log('✅ Cookie OK, recargando con hash...');
+                    window.location.href = window.location.pathname + window.location.search + '#googtrans(' + lang + ')';
+                    setTimeout(() => {
+                        window.location.reload(true);
+                    }, 100);
+                } else {
+                    console.error('❌ Error: Cookie no se estableció');
+                }
+            }
+        }
+        
+        // Inicializar Google Translate (IGUAL QUE NAVBAR.PHP)
+        function googleTranslateElementInit() {
+            console.log('=== Inicializando Google Translate ===');
+            console.log('Cookie googtrans al iniciar:', getCookie('googtrans'));
+            
+            new google.translate.TranslateElement({
+                pageLanguage: 'es',
+                includedLanguages: 'en,fr,it,de,pt',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: true,
+                multilanguagePage: true
+            }, 'google_translate_element');
+            
+            setTimeout(() => {
+                console.log('Google Translate inicializado');
+                updateStatus();
+                
+                // Ocultar elementos
+                document.querySelectorAll('iframe.goog-te-banner-frame, iframe.skiptranslate').forEach(el => {
+                    el.style.display = 'none';
+                });
+                document.body.style.top = '0px';
+                document.body.style.position = 'static';
+            }, 1000);
+        }
+        
+        // Al cargar
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('=== DOM Cargado ===');
+            updateStatus();
+            
+            const style = document.createElement('style');
+            style.textContent = \`
+                body { top: 0px !important; position: static !important; }
+                .skiptranslate, .goog-te-banner-frame, iframe.skiptranslate { display: none !important; }
+                .goog-te-spinner { display: none !important; }
+            \`;
+            document.head.appendChild(style);
+        });
+        
+        // Limpiar después de cargar
+        window.addEventListener('load', () => {
+            const cleanupTimes = [100, 300, 500, 1000, 2000];
+            cleanupTimes.forEach(delay => {
+                setTimeout(() => {
+                    document.body.style.top = '0px';
+                    document.body.style.position = 'static';
+                    document.querySelectorAll('iframe[name^="goog"]').forEach(f => f.style.display = 'none');
+                    updateStatus();
+                }, delay);
+            });
+        });
+    </script>
+    
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>
