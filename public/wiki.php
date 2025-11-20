@@ -35,23 +35,9 @@ include(__DIR__ . '/../components/header.php');
         <div class="wiki-pattern"></div>
         
         <!-- Header de la Wiki -->
-        <div class="wiki-header text-center mb-5">
+        <div class="wiki-header text-center mb-2">
             <h1 class="display-4 fw-bold text-gradient">Wiki Cultural de Santiago del Estero</h1>
             <p class="lead">Descubre el talento artístico y cultural de nuestra provincia</p>
-            <div class="stats-row">
-                <div class="stat-item">
-                    <div class="stat-number" id="total-artistas">0</div>
-                    <div class="stat-label">Artistas Registrados</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="total-obras">0</div>
-                    <div class="stat-label">Obras Validadas</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="total-categorias">7</div>
-                    <div class="stat-label">Categorías Artísticas</div>
-                </div>
-            </div>
         </div>
 
         <!-- Barra de Búsqueda Mejorada -->
@@ -256,6 +242,22 @@ include(__DIR__ . '/../components/header.php');
                     </nav>
                 </div>
 
+            </div>
+        </div>
+
+        <!-- Estadísticas - Al Final -->
+        <div class="stats-row mt-5 mb-5">
+            <div class="stat-item">
+                <div class="stat-number" id="total-artistas">0</div>
+                <div class="stat-label">Artistas Registrados</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="total-obras">0</div>
+                <div class="stat-label">Obras Validadas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="total-categorias">7</div>
+                <div class="stat-label">Categorías Artísticas</div>
             </div>
         </div>
 

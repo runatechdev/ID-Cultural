@@ -3,6 +3,31 @@
  * JavaScript para la página de inicio
  */
 
+/**
+ * Construir URL de imagen segura (HTTPS)
+ */
+function construirURLImagen(urlOriginal) {
+    if (!urlOriginal) return '';
+    
+    // Si ya es una URL completa HTTPS, devolverla
+    if (urlOriginal.startsWith('https://')) {
+        return urlOriginal;
+    }
+    
+    // Si es HTTP de localhost, convertir a ruta relativa
+    if (urlOriginal.includes('http://localhost')) {
+        urlOriginal = urlOriginal.replace(/^.*\/static\//, '/static/');
+    }
+    
+    // Si es una ruta relativa o comienza con /, usarla con BASE_URL
+    if (urlOriginal.startsWith('/')) {
+        return BASE_URL + urlOriginal.substring(1);
+    }
+    
+    // Si es una ruta relativa, agregarla a BASE_URL
+    return BASE_URL + urlOriginal;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializar animaciones AOS
     if (typeof AOS !== 'undefined') {
@@ -132,7 +157,7 @@ async function cargarNoticias() {
             <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="${index * 100}">
                 <article class="card noticia-card h-100" onclick="window.location.href='${BASE_URL}noticias.php'" style="cursor: pointer;">
                     ${noticia.imagen_url ? `
-                        <img src="${escapeHtml(noticia.imagen_url)}" 
+                        <img src="${construirURLImagen(noticia.imagen_url)}" 
                              class="card-img-top" 
                              alt="${escapeHtml(noticia.titulo)}"
                              onerror="this.src='https://placehold.co/600x400/0d6efd/FFFFFF?text=Sin+Imagen'">
