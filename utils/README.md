@@ -13,6 +13,7 @@ Scripts para verificar el estado y funcionamiento de diferentes componentes:
 - **`check_validation_status.php`** - Verificación del estado de validación
 - **`check_users.php`** - Verificación de usuarios y perfiles
 - **`check_session.php`** - Verificación de sesiones activas
+- **`check_login_errors.sh`** ⭐ - Verificación del sistema de manejo de errores de login
 
 ### 🐛 `/debug/` - Herramientas de Depuración
 Scripts para debugging y análisis detallado:
@@ -20,6 +21,7 @@ Scripts para debugging y análisis detallado:
 - **`debug_session.php`** - Depuración de problemas de sesión
 - **`inspect_artistas.php`** - Inspección detallada de datos de artistas
 - **`inspect_db.php`** - Inspección general de la base de datos
+- **`test_login_errors.html`** ⭐ - Prueba interactiva del sistema de errores de login
 
 ### 🔧 `/fixes/` - Correcciones y Utilidades
 Scripts para reparar problemas y mantener la integridad:

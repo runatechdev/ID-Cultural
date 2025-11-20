@@ -2,27 +2,94 @@
 /**
  * EmailHelper.php
  * Maneja el envío de emails en la plataforma ID Cultural
- * Usa función mail() estándar de PHP
+ * Usa SendGrid via PHPMailer para envío confiable
  */
 
+// Cargar autoload de Composer
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+// Importar PHPMailer classes
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 class EmailHelper {
-    private $from_email = 'noreply@idcultural.gob.ar';
-    private $from_name = 'ID Cultural - Subsecretaría de Cultura';
+    private $from_email;
+    private $from_name;
+    
+    // Configuración SendGrid
+    private $sendgrid_api_key;
     
     public function __construct() {
-        // Configuración automática
+        // Cargar configuración desde variables de entorno o archivo .env
+        $this->loadConfig();
+        
+        // Verificar que PHPMailer esté disponible
+        if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+            error_log("PHPMailer no está instalado. Ejecuta: composer require phpmailer/phpmailer");
+        }
+    }
+    
+    private function loadConfig() {
+        // Cargar desde .env si existe
+        $env_file = __DIR__ . '/../../.env';
+        if (file_exists($env_file)) {
+            $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                if (strpos($line, '#') !== 0 && strpos($line, '=') !== false) {
+                    list($key, $value) = explode('=', $line, 2);
+                    $_ENV[trim($key)] = trim($value);
+                }
+            }
+        }
+        
+        // Configurar valores con fallbacks
+        $this->sendgrid_api_key = $_ENV['SENDGRID_API_KEY'] ?? '';
+        $this->from_email = $_ENV['SENDGRID_FROM_EMAIL'] ?? 'noreply@idcultural.gob.ar';
+        $this->from_name = $_ENV['SENDGRID_FROM_NAME'] ?? 'ID Cultural - Subsecretaría de Cultura';
+        
+        // Verificar configuración crítica
+        if (empty($this->sendgrid_api_key)) {
+            error_log("SENDGRID_API_KEY no está configurado. Revisa el archivo .env");
+        }
     }
     
     /**
-     * Envía un email
+     * Envía un email usando SendGrid
      */
     private function enviarMail($email_destino, $asunto, $html) {
-        $headers = "MIME-Version: 1.0" . "\r\n";
-        $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
-        $headers .= "From: " . $this->from_name . " <" . $this->from_email . ">" . "\r\n";
-        $headers .= "Reply-To: " . $this->from_email . "\r\n";
-        
-        return mail($email_destino, $asunto, $html, $headers);
+        try {
+            $mail = new PHPMailer(true);
+
+            // Configuración del servidor SMTP de SendGrid
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.sendgrid.net';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'apikey'; // Siempre es 'apikey' para SendGrid
+            $mail->Password   = $this->sendgrid_api_key;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+
+            // Configuración del email
+            $mail->setFrom($this->from_email, $this->from_name);
+            $mail->addAddress($email_destino);
+            $mail->addReplyTo($this->from_email, $this->from_name);
+
+            // Contenido
+            $mail->isHTML(true);
+            $mail->CharSet = 'UTF-8';
+            $mail->Subject = $asunto;
+            $mail->Body    = $html;
+
+            // Enviar
+            $mail->send();
+            error_log("Email enviado exitosamente a: $email_destino");
+            return true;
+
+        } catch (Exception $e) {
+            error_log("Error enviando email: {$mail->ErrorInfo}");
+            return false;
+        }
     }
     
     /**

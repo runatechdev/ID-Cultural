@@ -21,6 +21,10 @@ include(__DIR__ . '/../../../../../components/header.php');
       <div id="mensaje-error" class="alert alert-danger" role="alert" hidden></div>
 
       <form id="loginForm" novalidate>
+        <!-- Contenedor para mostrar mensajes de error -->
+        <div id="mensaje-error" class="alert alert-danger" style="display: none;" role="alert">
+        </div>
+        
         <div class="input-group mb-3">
           <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
           <input type="email" class="form-control" id="email" name="email" placeholder="Correo Electrónico" required>

@@ -1,11 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
   const errorMsg = document.getElementById("mensaje-error");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
 
   if (!form) {
     console.warn("Formulario de login no encontrado");
     return;
   }
+
+  // Ocultar mensajes de error cuando el usuario empiece a escribir
+  function hideErrorMessage() {
+    if (errorMsg) {
+      errorMsg.style.display = "none";
+    }
+  }
+
+  // Agregar event listeners para ocultar errores al escribir
+  if (emailInput) emailInput.addEventListener("input", hideErrorMessage);
+  if (passwordInput) passwordInput.addEventListener("input", hideErrorMessage);
 
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
@@ -14,11 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = document.getElementById("email").value.trim().toLowerCase();
     const password = document.getElementById("password").value.trim();
 
-    // Limpiar mensaje de error anterior
-    if (errorMsg) {
-      errorMsg.hidden = true;
-      errorMsg.textContent = "";
-    }
+    // Ocultar mensajes previos
+    hideErrorMessage();
 
     const formData = new FormData();
     formData.append("email", email);
@@ -38,12 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Redirigiendo a:", resultado.redirect);
         window.location.href = resultado.redirect;
       } else {
-        // Mostrar mensaje de error
         if (errorMsg) {
-          errorMsg.textContent = resultado.message || "Error en la autenticación";
-          errorMsg.hidden = false;
-        } else {
-          alert(resultado.message || "Error en la autenticación");
+          errorMsg.textContent = resultado.message;
+          errorMsg.style.display = "block";
         }
       }
 
@@ -51,9 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error al iniciar sesión:", error);
       if (errorMsg) {
         errorMsg.textContent = "Error de conexión con el servidor.";
-        errorMsg.hidden = false;
-      } else {
-        alert("Error de conexión con el servidor.");
+        errorMsg.style.display = "block";
       }
     }
   });
