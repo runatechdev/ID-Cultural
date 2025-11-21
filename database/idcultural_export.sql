@@ -140,7 +140,7 @@ CREATE TABLE `artistas` (
   UNIQUE KEY `email` (`email`),
   KEY `idx_status_perfil` (`status_perfil`),
   KEY `idx_status_provincia` (`status_perfil`,`provincia`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -149,7 +149,7 @@ CREATE TABLE `artistas` (
 
 LOCK TABLES `artistas` WRITE;
 /*!40000 ALTER TABLE `artistas` DISABLE KEYS */;
-INSERT INTO `artistas` VALUES (2,'nuevo','nuevo','2000-12-12','femenino','Argentina','Buenos Aires','La Plata','nuevo@gmail.com','$2y$10$7nxg3IMycH8sDjm0RbHDaO3DlYedW8ZOdsX4dXcJ3vV/K9IA.o8rq','artista','rechazado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'rechazado','hbgb'),(3,'prueba','prueba','2001-02-21','masculino','Argentina','Buenos Aires','La Plata','prueba@gmail.com','$2y$10$Swtb6xK8KSKsuNXFLfcJtOZPfLgqUKYeWMBDJqVFqCO/c7C8UYDwi','artista','validado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'rechazado','jnn'),(5,'Carlos','Gomez','1995-03-15','masculino','Argentina','Santiago del Estero','La Banda','carlos@gmail.com','$2y$10$...','artista','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(6,'Maria','Ledezma','1988-07-22','femenino','Argentina','Santiago del Estero','Termas de Río Hondo','maria@gmail.com','$2y$10$...','artista','rechazado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(7,'Marcos','Romano','1999-03-10','masculino','Argentina','Santiago del Estero','Santiago del Estero','ejemplo@ejemplo.com','$2y$10$59P2kCjWBNm4xTkxCzTr9O45Jv5B2e/b2.e5U2R/lvyNX/8wTIhwe','artista','validado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(8,'Marcos','Romano','1949-05-15','Masculino','Argentina','Santiago del Estero','Tintina','tralalero@tralala.com','$2y$10$QWpJ6kpCFoLzBNN3TXOP7uqXmpqsL7SsF6XqCKHDrqaukbKJrraLu','artista','validado','Musico, autodidacta, buen pibe, nacido en Tintina. Con una trayectoria amplia.','Musico','@marcos_romano_updated','marcos.romano.updated','@marcos_romano_updated','https://marcos-romano-updated.com','/uploads/imagens/media_690f8d41bdf2f6.84231658.jpeg','validado',NULL),(9,'Omar Emilio','Antonio','2000-12-12','otro','Argentina','Santiago del Estero','Santiago del Estero','coo@gmail.com','$2y$10$aM1Pg3YXMYWLoADGREByke8gAnzgQCc8W4VYf5Fgv4RVPTdx.YhV.','artista','validado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL);
+INSERT INTO `artistas` VALUES (2,'nuevo','nuevo','2000-12-12','femenino','Argentina','Buenos Aires','La Plata','nuevo@gmail.com','$2y$10$7nxg3IMycH8sDjm0RbHDaO3DlYedW8ZOdsX4dXcJ3vV/K9IA.o8rq','artista','rechazado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'rechazado','hbgb'),(3,'prueba','prueba','2001-02-21','masculino','Argentina','Buenos Aires','La Plata','prueba@gmail.com','$2y$10$Swtb6xK8KSKsuNXFLfcJtOZPfLgqUKYeWMBDJqVFqCO/c7C8UYDwi','artista','validado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'rechazado','jnn'),(5,'Carlos','Gomez','1995-03-15','masculino','Argentina','Santiago del Estero','La Banda','carlos@gmail.com','$2y$10$...','artista','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(6,'Maria','Ledezma','1988-07-22','femenino','Argentina','Santiago del Estero','Termas de Río Hondo','maria@gmail.com','$2y$10$...','artista','rechazado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(7,'Marcos','Romano','1999-03-10','masculino','Argentina','Santiago del Estero','Santiago del Estero','ejemplo@ejemplo.com','$2y$10$59P2kCjWBNm4xTkxCzTr9O45Jv5B2e/b2.e5U2R/lvyNX/8wTIhwe','artista','validado',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'validado',NULL),(8,'Marcos','Romano','1949-05-15','Masculino','Argentina','Santiago del Estero','Tintina','tralalero@tralala.com','$2y$10$QWpJ6kpCFoLzBNN3TXOP7uqXmpqsL7SsF6XqCKHDrqaukbKJrraLu','artista','validado','Musico, autodidacta, buen pibe, nacido en Tintina. Con una trayectoria amplia.','Musico','@marcos_romano_updated','marcos.romano.updated','@marcos_romano_updated','https://marcos-romano-updated.com','/uploads/imagenes/media_691f9278c2a527.04049906.jpeg','validado',NULL),(9,'Omar Emilio','Antonio','2000-12-12','otro','Argentina','Santiago del Estero','Santiago del Estero','coo@gmail.com','$2y$10$aM1Pg3YXMYWLoADGREByke8gAnzgQCc8W4VYf5Fgv4RVPTdx.YhV.','artista','validado','Coo, el personaje que fue símbolo, escándalo y leyenda urbana','','','','','https://youtu.be/sCnCb_c8b9k?si=cIpoOHrB0t7M2-YR','/uploads/imagenes/media_691f9de87e4a11.39972145.png','validado',NULL),(10,'Leopoldo Dante','Tevez','','masculino','Argentina','Santiago del Estero','Frías','leodan@gmail.com','$2y$10$JnmPx1tV4cmzP/wxEu9XnOjFE65MtO6Aip9zR7NLMp1TzKBwbxL12','artista','validado','onocido como Leo Dan, fue un cantante, compositor y actor argentino.[','','','','','','/uploads/imagenes/media_691fa18a673b51.97776960.jpeg','validado',NULL);
 /*!40000 ALTER TABLE `artistas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -355,7 +355,7 @@ CREATE TABLE `intereses_artista` (
   PRIMARY KEY (`id`),
   KEY `artista_id` (`artista_id`),
   CONSTRAINT `intereses_artista_ibfk_1` FOREIGN KEY (`artista_id`) REFERENCES `artistas` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -364,7 +364,7 @@ CREATE TABLE `intereses_artista` (
 
 LOCK TABLES `intereses_artista` WRITE;
 /*!40000 ALTER TABLE `intereses_artista` DISABLE KEYS */;
-INSERT INTO `intereses_artista` VALUES (1,7,'musica'),(2,7,'artes_visuales'),(3,8,'musica'),(4,8,'danza'),(5,8,'teatro'),(6,9,'musica');
+INSERT INTO `intereses_artista` VALUES (1,7,'musica'),(2,7,'artes_visuales'),(3,8,'musica'),(4,8,'danza'),(5,8,'teatro'),(6,9,'musica'),(7,10,'musica');
 /*!40000 ALTER TABLE `intereses_artista` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -386,7 +386,7 @@ CREATE TABLE `logs_validacion_perfiles` (
   KEY `idx_artista_id` (`artista_id`),
   KEY `idx_validador_id` (`validador_id`),
   KEY `idx_fecha_accion` (`fecha_accion`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -395,7 +395,7 @@ CREATE TABLE `logs_validacion_perfiles` (
 
 LOCK TABLES `logs_validacion_perfiles` WRITE;
 /*!40000 ALTER TABLE `logs_validacion_perfiles` DISABLE KEYS */;
-INSERT INTO `logs_validacion_perfiles` VALUES (1,8,1,'validar',NULL,'2025-11-09 00:10:27'),(2,7,1,'validar',NULL,'2025-11-09 00:21:06'),(3,6,1,'rechazar','lo','2025-11-09 00:24:58'),(4,6,1,'validar',NULL,'2025-11-09 00:25:02'),(5,5,1,'validar',NULL,'2025-11-09 00:26:54'),(6,3,1,'rechazar','jnn','2025-11-09 14:26:36'),(7,2,1,'rechazar','hbgb','2025-11-09 14:26:43'),(8,8,1,'validar',NULL,'2025-11-10 00:40:48'),(9,8,1,'validar',NULL,'2025-11-17 12:13:15'),(10,9,1,'validar',NULL,'2025-11-17 15:22:04');
+INSERT INTO `logs_validacion_perfiles` VALUES (1,8,1,'validar',NULL,'2025-11-09 00:10:27'),(2,7,1,'validar',NULL,'2025-11-09 00:21:06'),(3,6,1,'rechazar','lo','2025-11-09 00:24:58'),(4,6,1,'validar',NULL,'2025-11-09 00:25:02'),(5,5,1,'validar',NULL,'2025-11-09 00:26:54'),(6,3,1,'rechazar','jnn','2025-11-09 14:26:36'),(7,2,1,'rechazar','hbgb','2025-11-09 14:26:43'),(8,8,1,'validar',NULL,'2025-11-10 00:40:48'),(9,8,1,'validar',NULL,'2025-11-17 12:13:15'),(10,9,1,'validar',NULL,'2025-11-17 15:22:04'),(11,8,3,'validar',NULL,'2025-11-20 22:50:34'),(12,9,1,'validar',NULL,'2025-11-20 23:03:20'),(13,10,3,'validar',NULL,'2025-11-20 23:18:07');
 /*!40000 ALTER TABLE `logs_validacion_perfiles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -497,6 +497,48 @@ LOCK TABLES `password_reset_tokens` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `perfil_cambios_pendientes`
+--
+
+DROP TABLE IF EXISTS `perfil_cambios_pendientes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `perfil_cambios_pendientes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `artista_id` int(11) NOT NULL,
+  `biografia` text DEFAULT NULL,
+  `especialidades` varchar(500) DEFAULT NULL,
+  `instagram` varchar(100) DEFAULT NULL,
+  `facebook` varchar(255) DEFAULT NULL,
+  `twitter` varchar(100) DEFAULT NULL,
+  `sitio_web` varchar(255) DEFAULT NULL,
+  `foto_perfil` varchar(255) DEFAULT NULL,
+  `estado` enum('pendiente','aprobado','rechazado') DEFAULT 'pendiente',
+  `validador_id` int(11) DEFAULT NULL,
+  `motivo_rechazo` text DEFAULT NULL,
+  `fecha_solicitud` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_validacion` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `validador_id` (`validador_id`),
+  KEY `idx_artista_estado` (`artista_id`,`estado`),
+  KEY `idx_estado` (`estado`),
+  KEY `idx_fecha_solicitud` (`fecha_solicitud`),
+  CONSTRAINT `perfil_cambios_pendientes_ibfk_1` FOREIGN KEY (`artista_id`) REFERENCES `artistas` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `perfil_cambios_pendientes_ibfk_2` FOREIGN KEY (`validador_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Almacena cambios de perfil pendientes de validación antes de aplicarlos al perfil público';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `perfil_cambios_pendientes`
+--
+
+LOCK TABLES `perfil_cambios_pendientes` WRITE;
+/*!40000 ALTER TABLE `perfil_cambios_pendientes` DISABLE KEYS */;
+INSERT INTO `perfil_cambios_pendientes` VALUES (1,8,'Musico, autodidacta, buen pibe, nacido en Tintina. Con una trayectoria amplia.','Musico','@marcos_romano_updated','marcos.romano.updated','@marcos_romano_updated','https://marcos-romano-updated.com','/uploads/imagenes/media_691f9278c2a527.04049906.jpeg','aprobado',3,NULL,'2025-11-20 22:13:12','2025-11-20 22:50:34'),(2,9,'Coo, el personaje que fue símbolo, escándalo y leyenda urbana','','','','','https://youtu.be/sCnCb_c8b9k?si=cIpoOHrB0t7M2-YR','/uploads/imagenes/media_691f9de87e4a11.39972145.png','aprobado',1,NULL,'2025-11-20 23:02:00','2025-11-20 23:03:20'),(3,10,'onocido como Leo Dan, fue un cantante, compositor y actor argentino.[','','','','','','/uploads/imagenes/media_691fa18a673b51.97776960.jpeg','aprobado',3,NULL,'2025-11-20 23:17:30','2025-11-20 23:18:07');
+/*!40000 ALTER TABLE `perfil_cambios_pendientes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `preferencias_notificaciones`
 --
 
@@ -554,7 +596,7 @@ CREATE TABLE `publicaciones` (
   KEY `validador_id` (`validador_id`),
   CONSTRAINT `publicaciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `artistas` (`id`) ON DELETE CASCADE,
   CONSTRAINT `publicaciones_ibfk_2` FOREIGN KEY (`validador_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -563,7 +605,7 @@ CREATE TABLE `publicaciones` (
 
 LOCK TABLES `publicaciones` WRITE;
 /*!40000 ALTER TABLE `publicaciones` DISABLE KEYS */;
-INSERT INTO `publicaciones` VALUES (5,8,'Historias del Chaco Santiagueño','Una obra que explora los paisajes y la historia cultural del Chaco Santiagueño, rescatando las tradiciones ancestrales y las voces olvidadas del territorio. Mediante técnicas literarias innovadoras, el artista teje narrativas que conectan pasado y presente.','literatura','{\"action\":\"save\",\"genero-lit\":\"sdad\",\"editorial\":\"aasdsad\"}',NULL,'validado','2025-11-08 21:55:42','2025-11-08 21:55:42',3,'2025-11-08 22:06:24'),(6,8,'Ritmos del Noroeste','Composición musical original que fusiona instrumentos tradicionales santiagueños con sonoridades contemporáneas. Una pieza de 4 minutos que invita al oyente a un viaje por los paisajes sonoros del norte argentino, con influencias de chacarera y folclore local.','musica','{\"action\":\"save\",\"plataformas\":\"aaaa\",\"sello\":\"aaaaa\"}','/uploads/imagens/media_690fc13a934708.23834792.jpeg','validado','2025-11-08 22:16:26','2025-11-08 22:16:26',3,'2025-11-08 22:17:00'),(7,8,'Poesía en Silencio','Obra literaria que explora la melancolía y la belleza de los silencios rurales. A través de versos libres, el autor reflexiona sobre la identidad cultural santiagueña y su relación con la modernidad. Una propuesta introspectiva y evocadora.','musica','{\"action\":\"save\",\"plataformas\":\"asdasdsad\",\"sello\":\"dasdsad\"}',NULL,'validado','2025-11-10 00:02:00','2025-11-10 00:07:01',1,'2025-11-17 12:13:40'),(8,9,'Recuerdo','Una figura de calle, un ritmo y una ciudad\r\nDurante años, Coo fue parte del paisaje habitual del microcentro santiagueño. Con su característico güiro en mano, su voz al ritmo de guaracha y su forma particular de vestir, se convirtió en un personaje querible, especialmente entre los más chicos y los adultos que aún veían en él el reflejo de una ciudad que no había perdido del todo su cantor.','musica','{\"action\":\"save\",\"plataformas\":\"https:\\/\\/youtu.be\\/sCnCb_c8b9k?si=EOLwJYC4gLe2wpT5\"}',NULL,'validado','2025-11-17 15:24:26','2025-11-17 15:24:26',1,'2025-11-17 15:25:43');
+INSERT INTO `publicaciones` VALUES (5,8,'Historias del Chaco Santiagueño','Una obra que explora los paisajes y la historia cultural del Chaco Santiagueño, rescatando las tradiciones ancestrales y las voces olvidadas del territorio. Mediante técnicas literarias innovadoras, el artista teje narrativas que conectan pasado y presente.','literatura','{\"action\":\"save\",\"genero-lit\":\"sdad\",\"editorial\":\"aasdsad\"}',NULL,'validado','2025-11-08 21:55:42','2025-11-08 21:55:42',3,'2025-11-08 22:06:24'),(6,8,'Ritmos del Noroeste','Composición musical original que fusiona instrumentos tradicionales santiagueños con sonoridades contemporáneas. Una pieza de 4 minutos que invita al oyente a un viaje por los paisajes sonoros del norte argentino, con influencias de chacarera y folclore local.','musica','{\"action\":\"save\",\"plataformas\":\"aaaa\",\"sello\":\"aaaaa\"}','/uploads/imagens/media_690fc13a934708.23834792.jpeg','validado','2025-11-08 22:16:26','2025-11-08 22:16:26',3,'2025-11-08 22:17:00'),(7,8,'Poesía en Silencio','Obra literaria que explora la melancolía y la belleza de los silencios rurales. A través de versos libres, el autor reflexiona sobre la identidad cultural santiagueña y su relación con la modernidad. Una propuesta introspectiva y evocadora.','musica','{\"action\":\"save\",\"plataformas\":\"asdasdsad\",\"sello\":\"dasdsad\"}',NULL,'validado','2025-11-10 00:02:00','2025-11-10 00:07:01',1,'2025-11-17 12:13:40'),(8,9,'Recuerdo','Una figura de calle, un ritmo y una ciudad\r\nDurante años, Coo fue parte del paisaje habitual del microcentro santiagueño. Con su característico güiro en mano, su voz al ritmo de guaracha y su forma particular de vestir, se convirtió en un personaje querible, especialmente entre los más chicos y los adultos que aún veían en él el reflejo de una ciudad que no había perdido del todo su cantor.','musica','{\"action\":\"save\",\"plataformas\":\"https:\\/\\/youtu.be\\/sCnCb_c8b9k?si=EOLwJYC4gLe2wpT5\"}',NULL,'validado','2025-11-17 15:24:26','2025-11-17 15:24:26',1,'2025-11-17 15:25:43'),(9,10,'Mary es mi amor','Cerca de 1966, él y su esposa, Marietta Tevez, decidieron emigrar a España, donde continuó grabando y produciendo canciones de éxito comercial, como «Mary es mi amor», «Con los brazos cruzados», «Siempre estoy pensando en ella», «Cómo poder saber si te amo» y «Será posible amor», entre otros.[34]​','musica','{\"action\":\"save\"}','/uploads/imagenes/media_691fa25564da82.76544730.jpg','validado','2025-11-20 23:20:53','2025-11-20 23:20:53',3,'2025-11-20 23:21:14');
 /*!40000 ALTER TABLE `publicaciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -608,7 +650,7 @@ CREATE TABLE `system_logs` (
   `details` text DEFAULT NULL,
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -617,7 +659,7 @@ CREATE TABLE `system_logs` (
 
 LOCK TABLES `system_logs` WRITE;
 /*!40000 ALTER TABLE `system_logs` DISABLE KEYS */;
-INSERT INTO `system_logs` VALUES (1,1,'Administrador Principal','INICIO DE SESIÓN','El usuario ha iniciado sesión correctamente.','2025-08-14 18:21:33'),(2,2,'Editor de Contenidos','CREACIÓN DE NOTICIA','Se ha creado la noticia con ID: 101.','2025-08-14 18:21:33'),(3,3,'Validador de Artistas','VALIDACIÓN DE ARTISTA','Se ha aprobado la solicitud del artista con ID: 1. Comentario: Excelente portfolio.','2025-08-14 18:21:33'),(4,3,'Validador de Artistas','RECHAZO DE ARTISTA','Se ha rechazado la solicitud del artista con ID: 2. Motivo: Faltan referencias comprobables.','2025-08-14 18:21:33'),(5,1,'Usuario Desconocido','VALIDACIÓN DE ARTISTA','Se ha validado la solicitud con ID: 1.','2025-08-14 18:39:49'),(6,1,'Admin','VALIDACIÓN DE ARTISTA','Se ha cambiado el estado del artista ID: 1 a validado.','2025-08-14 19:15:57'),(7,1,'Admin','VALIDACIÓN DE ARTISTA','Se ha cambiado el estado del artista ID: 4 a validado. Comentario: buen pibe','2025-08-14 19:21:30'),(8,1,'Admin','VALIDACIÓN DE ARTISTA','Se ha cambiado el estado del artista ID: 3 a validado.','2025-08-14 19:32:05'),(9,1,'Admin','RECHAZO DE ARTISTA','Se ha cambiado el estado del artista ID: 2 a rechazado. Motivo: ninguna cancion es tuya','2025-08-14 19:32:25'),(10,1,'Admin','VALIDACIÓN DE ARTISTA','Se ha cambiado el estado del artista ID: 7 a validado.','2025-10-27 05:21:21'),(11,3,' ','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 2 del artista \'marcos romano\' (ID: 8) ha sido validada.','2025-11-08 03:52:07'),(12,3,'validador','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 3 del artista \'Marcos Romano\' (ID: 8) ha sido validada.','2025-11-08 21:08:42'),(13,3,'validador','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 5 del artista \'Marcos Romano\' (ID: 8) ha sido validada.','2025-11-08 22:06:24'),(14,3,'validador','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 6 del artista \'Marcos Romano\' (ID: 8) ha sido validada.','2025-11-08 22:17:00'),(15,1,'admin','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 7 del artista \'Marcos Romano\' (ID: 8) ha sido validada.','2025-11-17 12:13:40'),(16,1,'admin','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 8 del artista \'Omar Emilio Antonio\' (ID: 9) ha sido validada.','2025-11-17 15:25:43');
+INSERT INTO `system_logs` VALUES (1,1,'Administrador Principal','INICIO DE SESIÓN','El usuario ha iniciado sesión correctamente.','2025-08-14 18:21:33'),(2,2,'Editor de Contenidos','CREACIÓN DE NOTICIA','Se ha creado la noticia con ID: 101.','2025-08-14 18:21:33'),(3,3,'Validador de Artistas','VALIDACIÓN DE ARTISTA','Se ha aprobado la solicitud del artista con ID: 1. Comentario: Excelente portfolio.','2025-08-14 18:21:33'),(4,3,'Validador de Artistas','RECHAZO DE ARTISTA','Se ha rechazado la solicitud del artista con ID: 2. Motivo: Faltan referencias comprobables.','2025-08-14 18:21:33'),(5,1,'Usuario Desconocido','VALIDACIÓN DE ARTISTA','Se ha validado la solicitud con ID: 1.','2025-08-14 18:39:49'),(6,1,'Admin','VALIDACIÓN DE ARTISTA','Se ha cambiado el estado del artista ID: 1 a validado.','2025-08-14 19:15:57'),(7,1,'Admin','VALIDACIÓN DE ARTISTA','Se ha cambiado el estado del artista ID: 4 a validado. Comentario: buen pibe','2025-08-14 19:21:30'),(8,1,'Admin','VALIDACIÓN DE ARTISTA','Se ha cambiado el estado del artista ID: 3 a validado.','2025-08-14 19:32:05'),(9,1,'Admin','RECHAZO DE ARTISTA','Se ha cambiado el estado del artista ID: 2 a rechazado. Motivo: ninguna cancion es tuya','2025-08-14 19:32:25'),(10,1,'Admin','VALIDACIÓN DE ARTISTA','Se ha cambiado el estado del artista ID: 7 a validado.','2025-10-27 05:21:21'),(11,3,' ','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 2 del artista \'marcos romano\' (ID: 8) ha sido validada.','2025-11-08 03:52:07'),(12,3,'validador','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 3 del artista \'Marcos Romano\' (ID: 8) ha sido validada.','2025-11-08 21:08:42'),(13,3,'validador','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 5 del artista \'Marcos Romano\' (ID: 8) ha sido validada.','2025-11-08 22:06:24'),(14,3,'validador','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 6 del artista \'Marcos Romano\' (ID: 8) ha sido validada.','2025-11-08 22:17:00'),(15,1,'admin','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 7 del artista \'Marcos Romano\' (ID: 8) ha sido validada.','2025-11-17 12:13:40'),(16,1,'admin','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 8 del artista \'Omar Emilio Antonio\' (ID: 9) ha sido validada.','2025-11-17 15:25:43'),(17,3,'validador','VALIDACIÓN DE PUBLICACIÓN','Publicación ID: 9 del artista \'Leopoldo Dante Tevez\' (ID: 10) ha sido validada.','2025-11-20 23:21:14');
 /*!40000 ALTER TABLE `system_logs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -712,4 +754,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-20  0:38:45
+-- Dump completed on 2025-11-21 15:21:53
