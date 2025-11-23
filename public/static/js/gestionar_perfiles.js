@@ -26,14 +26,20 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando perfiles...</p></td></tr>';
         
         try {
-            console.log('Fetching:', `${BASE_URL}api/get_perfiles.php?estado=pendiente`);
-            const response = await fetch(`${BASE_URL}api/get_perfiles.php?estado=pendiente`);
+            // Cargar CAMBIOS PENDIENTES de perfil, no perfiles completos
+            console.log('Fetching:', `${BASE_URL}api/get_perfiles_pendientes.php`);
+            const response = await fetch(`${BASE_URL}api/get_perfiles_pendientes.php`);
             console.log('Response status:', response.status);
             
-            if (!response.ok) throw new Error('Error al obtener los datos.');
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error response:', errorText);
+                throw new Error('Error al obtener los datos.');
+            }
             
             perfilesPendientes = await response.json();
-            console.log('Perfiles recibidos:', perfilesPendientes.length);
+            console.log('Cambios pendientes recibidos:', perfilesPendientes.length);
+            console.log('Datos:', perfilesPendientes);
             
             perfilesFiltrados = [...perfilesPendientes];
             
@@ -45,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Error:', error);
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle fs-1"></i><p class="mt-2">Error al cargar los perfiles pendientes.</p></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle fs-1"></i><p class="mt-2">Error al cargar los cambios pendientes: ' + error.message + '</p></td></tr>';
         }
     }
 
@@ -53,62 +59,61 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('mostrarPerfiles llamada con:', perfiles.length, 'perfiles');
         
         if (!perfiles || perfiles.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><i class="bi bi-inbox fs-1 text-muted"></i><p class="mt-3 text-muted">No hay perfiles pendientes de validación</p></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><i class="bi bi-inbox fs-1 text-muted"></i><p class="mt-3 text-muted">No hay cambios de perfil pendientes de validación</p></td></tr>';
             return;
         }
 
         tbody.innerHTML = perfiles.map(perfil => {
-            const estadoBadge = obtenerBadgeEstado(perfil.status_perfil);
-            const bioPreview = perfil.biografia ? perfil.biografia.substring(0, 50) + '...' : 'Sin biografía';
+            // Determinar qué cambios hay
+            const cambios = [];
+            if (perfil.cambios.biografia) cambios.push('Biografía');
+            if (perfil.cambios.especialidades) cambios.push('Especialidades');
+            if (perfil.cambios.foto_perfil) cambios.push('Foto de perfil');
+            if (perfil.cambios.instagram || perfil.cambios.facebook || perfil.cambios.twitter || perfil.cambios.sitio_web) {
+                cambios.push('Redes sociales');
+            }
+            
+            const cambiosTexto = cambios.length > 0 ? cambios.join(', ') : 'Sin cambios';
             
             return `
                 <tr id="perfil-${perfil.id}" class="perfil-row">
                     <td>
-                        <div>
-                            <strong class="d-block">${escapeHtml(perfil.nombre + ' ' + perfil.apellido)}</strong>
-                            <small class="text-muted">
-                                <i class="bi bi-briefcase"></i> 
-                                ${escapeHtml(perfil.especialidades || 'Sin especialidad')}
-                            </small>
+                        <div class="d-flex align-items-center">
+                            ${perfil.cambios.foto_perfil ? 
+                                '<img src="' + BASE_URL + 'static/img/perfil_pendiente.jpg" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">' : 
+                                '<i class="bi bi-person-circle fs-3 me-2 text-muted"></i>'
+                            }
+                            <div>
+                                <strong class="d-block">${escapeHtml(perfil.nombre_artista)}</strong>
+                                <small class="text-muted">
+                                    <i class="bi bi-pencil"></i> ${cambiosTexto}
+                                </small>
+                            </div>
                         </div>
                     </td>
                     <td>
                         <small>${escapeHtml(perfil.email)}</small>
                     </td>
                     <td>
-                        <small>${escapeHtml(perfil.municipio || 'No especificado')}</small><br>
-                        <small class="text-muted">${escapeHtml(perfil.provincia || '')}</small>
+                        <small>${escapeHtml(perfil.municipio || 'No especificado')}</small>
                     </td>
                     <td>
-                        ${estadoBadge}
+                        <span class="badge bg-warning text-dark">Pendiente</span>
                     </td>
                     <td class="text-center">
-                        <div class="btn-group-vertical btn-group-sm" role="group">
-                            <button class="btn btn-sm btn-outline-primary btn-ver" 
-                                    data-id="${perfil.id}"
-                                    title="Ver detalles del perfil">
-                                <i class="bi bi-eye"></i> Ver
-                            </button>
-                            ${perfil.status_perfil === 'pendiente' ? `
-                                <button class="btn btn-sm btn-success btn-aprobar" 
-                                        data-id="${perfil.id}"
-                                        title="Aprobar este perfil">
-                                    <i class="bi bi-check-circle"></i> Aprobar
-                                </button>
-                                <button class="btn btn-sm btn-danger btn-rechazar" 
-                                        data-id="${perfil.id}"
-                                        title="Rechazar este perfil">
-                                    <i class="bi bi-x-circle"></i> Rechazar
-                                </button>
-                            ` : ''}
-                        </div>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="verDetallesCambios(${perfil.id})" title="Ver cambios">
+                            <i class="bi bi-eye"></i> Ver Cambios
+                        </button>
+                        <button class="btn btn-sm btn-success me-1" onclick="aprobarCambios(${perfil.artista_id})" title="Aprobar cambios">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="rechazarCambios(${perfil.artista_id})" title="Rechazar cambios">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
                     </td>
                 </tr>
             `;
         }).join('');
-
-        // Agregar event listeners a los botones
-        agregarEventListeners();
     }
 
     function agregarEventListeners() {
@@ -349,6 +354,166 @@ document.addEventListener('DOMContentLoaded', () => {
             option.value = prov;
             option.textContent = prov;
             select.appendChild(option);
+        });
+    }
+
+    // ============================================
+    // FUNCIONES PARA CAMBIOS PENDIENTES
+    // ============================================
+    
+    window.verDetallesCambios = function(perfilId) {
+        const perfil = perfilesPendientes.find(p => p.id === perfilId);
+        if (!perfil) {
+            Swal.fire('Error', 'No se encontró el perfil', 'error');
+            return;
+        }
+        
+        let cambiosHTML = '<div class="text-start">';
+        
+        if (perfil.cambios.foto_perfil) {
+            cambiosHTML += `
+                <div class="mb-3">
+                    <strong>Nueva Foto de Perfil:</strong><br>
+                    <img src="${BASE_URL}${perfil.cambios.foto_perfil}" class="img-thumbnail mt-2" style="max-width: 200px;" onerror="this.src='${BASE_URL}static/img/perfil_pendiente.jpg'">
+                </div>
+            `;
+        }
+        
+        if (perfil.cambios.biografia) {
+            cambiosHTML += `
+                <div class="mb-3">
+                    <strong>Nueva Biografía:</strong><br>
+                    <div class="border p-2 mt-2 bg-light">${escapeHtml(perfil.cambios.biografia)}</div>
+                </div>
+            `;
+        }
+        
+        if (perfil.cambios.especialidades) {
+            cambiosHTML += `
+                <div class="mb-3">
+                    <strong>Nuevas Especialidades:</strong><br>
+                    <div class="border p-2 mt-2 bg-light">${escapeHtml(perfil.cambios.especialidades)}</div>
+                </div>
+            `;
+        }
+        
+        const redesSociales = [];
+        if (perfil.cambios.instagram) redesSociales.push(`<i class="bi bi-instagram"></i> ${escapeHtml(perfil.cambios.instagram)}`);
+        if (perfil.cambios.facebook) redesSociales.push(`<i class="bi bi-facebook"></i> ${escapeHtml(perfil.cambios.facebook)}`);
+        if (perfil.cambios.twitter) redesSociales.push(`<i class="bi bi-twitter"></i> ${escapeHtml(perfil.cambios.twitter)}`);
+        if (perfil.cambios.sitio_web) redesSociales.push(`<i class="bi bi-globe"></i> ${escapeHtml(perfil.cambios.sitio_web)}`);
+        
+        if (redesSociales.length > 0) {
+            cambiosHTML += `
+                <div class="mb-3">
+                    <strong>Redes Sociales:</strong><br>
+                    <div class="mt-2">${redesSociales.join('<br>')}</div>
+                </div>
+            `;
+        }
+        
+        cambiosHTML += '</div>';
+        
+        Swal.fire({
+            title: `Cambios de Perfil - ${perfil.nombre_artista}`,
+            html: cambiosHTML,
+            icon: 'info',
+            width: '600px',
+            confirmButtonText: 'Cerrar'
+        });
+    }
+    
+    window.aprobarCambios = async function(artistaId) {
+        const confirm = await Swal.fire({
+            title: '¿Aprobar cambios?',
+            text: 'Los cambios se aplicarán al perfil del artista',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, aprobar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#28a745'
+        });
+        
+        if (!confirm.isConfirmed) return;
+        
+        try {
+            const formData = new FormData();
+            formData.append('id', artistaId);
+            formData.append('accion', 'validar');
+
+            const response = await fetch(`${BASE_URL}api/validar_perfil.php`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === 'ok') {
+                await Swal.fire({
+                    title: 'Aprobado',
+                    text: result.message,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                cargarPerfiles();
+            } else {
+                Swal.fire('Error', result.message || 'No se pudo aprobar', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire('Error', 'Error de conexión', 'error');
+        }
+    }
+    
+    window.rechazarCambios = function(artistaId) {
+        Swal.fire({
+            title: 'Rechazar Cambios',
+            input: 'textarea',
+            inputLabel: 'Motivo del rechazo',
+            inputPlaceholder: 'Explica por qué se rechazan los cambios...',
+            showCancelButton: true,
+            confirmButtonText: 'Rechazar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#dc3545',
+            inputValidator: (value) => {
+                if (!value || value.trim() === '') {
+                    return 'Debes proporcionar un motivo de rechazo';
+                }
+                return null;
+            }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const formData = new FormData();
+                    formData.append('id', artistaId);
+                    formData.append('accion', 'rechazar');
+                    formData.append('motivo', result.value);
+
+                    const response = await fetch(`${BASE_URL}api/validar_perfil.php`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const apiResult = await response.json();
+
+                    if (response.ok && apiResult.status === 'ok') {
+                        await Swal.fire({
+                            title: 'Rechazado',
+                            text: apiResult.message,
+                            icon: 'info',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        cargarPerfiles();
+                    } else {
+                        Swal.fire('Error', apiResult.message || 'No se pudo rechazar', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'Error de conexión', 'error');
+                }
+            }
         });
     }
 

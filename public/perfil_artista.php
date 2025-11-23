@@ -41,6 +41,17 @@ try {
         exit;
     }
     
+    // Calcular edad si existe fecha_nacimiento
+    $edad = null;
+    if (!empty($artista['fecha_nacimiento'])) {
+        $fecha_nac = new DateTime($artista['fecha_nacimiento']);
+        $hoy = new DateTime();
+        $edad = $hoy->diff($fecha_nac)->y;
+    }
+    
+    // Obtener año de registro
+    $anio_registro = !empty($artista['fecha_creacion']) ? date('Y', strtotime($artista['fecha_creacion'])) : date('Y');
+    
 } catch (PDOException $e) {
     error_log("Error al obtener artista: " . $e->getMessage());
     header('Location: /index.php');
@@ -83,46 +94,165 @@ include(__DIR__ . '/../components/header.php');
                                 </div>
                                 
                                 <!-- Name and Title -->
-                                <h2 class="h1 fw-bold mb-2"><?php echo htmlspecialchars($artista['nombre'] . ' ' . $artista['apellido']); ?></h2>
-                                <p class="text-muted fs-5 mb-5"><?php echo htmlspecialchars($artista['disciplina'] ?? 'Artista'); ?></p>
+                                <h2 class="h1 fw-bold mb-2">
+                                    <?php echo htmlspecialchars($artista['nombre'] . ' ' . $artista['apellido']); ?>
+                                    <?php if ($es_validado): ?>
+                                        <span class="badge bg-success ms-2" style="font-size: 0.5em; vertical-align: middle;">
+                                            <i class="bi bi-patch-check-fill"></i> Perfil Validado
+                                        </span>
+                                    <?php endif; ?>
+                                </h2>
+                                <p class="text-muted fs-5 mb-3">
+                                    <?php echo htmlspecialchars($artista['especialidades'] ?? $artista['disciplina'] ?? 'Artista'); ?>
+                                </p>
+                                
+                                <!-- Estadísticas del Artista -->
+                                <div class="row text-center mb-4">
+                                    <div class="col-4">
+                                        <div class="p-3">
+                                            <h3 class="h2 fw-bold text-primary mb-0"><?php echo $artista['total_obras']; ?></h3>
+                                            <small class="text-muted">Obras Totales</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="p-3">
+                                            <h3 class="h2 fw-bold text-success mb-0"><?php echo $artista['obras_validadas']; ?></h3>
+                                            <small class="text-muted">Obras Validadas</small>
+                                        </div>
+                                    </div>
+                                    <?php if ($es_propietario): ?>
+                                    <div class="col-4">
+                                        <div class="p-3">
+                                            <h3 class="h2 fw-bold text-warning mb-0"><?php echo $artista['total_obras'] - $artista['obras_validadas']; ?></h3>
+                                            <small class="text-muted">Pendientes</small>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
                                 
                                 <!-- Social Links -->
                                 <div class="social-links mb-4">
                                     <?php if (!empty($artista['instagram'])): ?>
-                                        <a href="<?php echo htmlspecialchars($artista['instagram']); ?>" class="btn btn-outline-primary btn-sm rounded-circle social-btn" title="Instagram" target="_blank">
-                                            <i class="bi bi-instagram"></i>
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if (!empty($artista['twitter'])): ?>
-                                        <a href="<?php echo htmlspecialchars($artista['twitter']); ?>" class="btn btn-outline-primary btn-sm rounded-circle social-btn" title="Twitter" target="_blank">
-                                            <i class="bi bi-twitter-x"></i>
+                                        <a href="<?php echo htmlspecialchars($artista['instagram']); ?>" class="btn btn-outline-primary btn-sm rounded-pill px-3 me-2" title="Instagram" target="_blank">
+                                            <i class="bi bi-instagram me-1"></i> Instagram
                                         </a>
                                     <?php endif; ?>
                                     <?php if (!empty($artista['facebook'])): ?>
-                                        <a href="<?php echo htmlspecialchars($artista['facebook']); ?>" class="btn btn-outline-primary btn-sm rounded-circle social-btn" title="Facebook" target="_blank">
-                                            <i class="bi bi-facebook"></i>
+                                        <a href="<?php echo htmlspecialchars($artista['facebook']); ?>" class="btn btn-outline-primary btn-sm rounded-pill px-3 me-2" title="Facebook" target="_blank">
+                                            <i class="bi bi-facebook me-1"></i> Facebook
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!empty($artista['twitter'])): ?>
+                                        <a href="<?php echo htmlspecialchars($artista['twitter']); ?>" class="btn btn-outline-primary btn-sm rounded-pill px-3 me-2" title="Twitter" target="_blank">
+                                            <i class="bi bi-twitter-x me-1"></i> Twitter
                                         </a>
                                     <?php endif; ?>
                                     <?php if (!empty($artista['sitio_web'])): ?>
-                                        <a href="<?php echo htmlspecialchars($artista['sitio_web']); ?>" class="btn btn-outline-primary btn-sm rounded-circle social-btn" title="Sitio Web" target="_blank">
-                                            <i class="bi bi-globe"></i>
+                                        <a href="<?php echo htmlspecialchars($artista['sitio_web']); ?>" class="btn btn-outline-primary btn-sm rounded-pill px-3 me-2" title="Sitio Web" target="_blank">
+                                            <i class="bi bi-globe me-1"></i> Sitio Web
                                         </a>
                                     <?php endif; ?>
                                 </div>
 
                                 <!-- Edit Profile Button (solo si es el artista logueado) -->
-                                <?php if (isset($_SESSION['user_data']) && $_SESSION['user_data']['role'] === 'artista' && $_SESSION['user_data']['id'] === $artista['id']): ?>
-                                    <a href="/src/views/pages/editar-perfil.php" class="btn btn-primary btn-lg rounded-pill px-5 mb-4">
+                                <?php if ($es_propietario): ?>
+                                    <a href="<?php echo BASE_URL; ?>src/views/pages/artista/editar_perfil_publico.php" class="btn btn-primary btn-lg rounded-pill px-5 mb-4">
                                         <i class="bi bi-pencil me-2"></i>Editar Perfil
                                     </a>
                                 <?php endif; ?>
 
+                                <!-- Información Personal -->
+                                <div class="row text-start g-3 mb-4">
+                                    <?php if (!empty($artista['especialidades'])): ?>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-palette-fill text-primary fs-4 me-3"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Disciplina</small>
+                                                <strong><?php echo htmlspecialchars($artista['especialidades']); ?></strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($artista['municipio']) || !empty($artista['provincia'])): ?>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-geo-alt-fill text-danger fs-4 me-3"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Ubicación</small>
+                                                <strong><?php echo htmlspecialchars(($artista['municipio'] ?? '') . ', ' . ($artista['provincia'] ?? '')); ?></strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if ($edad): ?>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-heart-fill text-info fs-4 me-3"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Edad</small>
+                                                <strong><?php echo $edad; ?> años</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-check-fill text-success fs-4 me-3"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Miembro desde</small>
+                                                <strong><?php echo $anio_registro; ?></strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Botones de Acción -->
+                                    <?php if (!$es_propietario): ?>
+                                    <div class="col-12">
+                                        <div class="row g-2">
+                                            <?php if (!empty($artista['whatsapp']) || !empty($artista['telefono'])): ?>
+                                            <div class="col-12">
+                                                <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $artista['whatsapp'] ?? $artista['telefono']); ?>" 
+                                                   class="btn btn-success btn-lg w-100 rounded-pill" target="_blank">
+                                                    <i class="bi bi-whatsapp me-2"></i> WhatsApp
+                                                </a>
+                                            </div>
+                                            <?php endif; ?>
+                                            <div class="col-md-6">
+                                                <button class="btn btn-outline-primary w-100 rounded-pill" onclick="compartirPerfil()">
+                                                    <i class="bi bi-share me-2"></i> Compartir Perfil
+                                                </button>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button class="btn btn-outline-danger w-100 rounded-pill" onclick="reportarPerfil()">
+                                                    <i class="bi bi-flag me-2"></i> Reportar Perfil
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
+
                                 <!-- Description -->
                                 <div class="alert alert-light border border-2 border-secondary rounded-3 p-4 text-start">
+                                    <h5 class="mb-3"><i class="bi bi-file-text me-2"></i>Biografía</h5>
                                     <?php if (!empty($artista['biografia'])): ?>
-                                        <p class="mb-0">
-                                            <?php echo nl2br(htmlspecialchars($artista['biografia'])); ?>
-                                        </p>
+                                        <?php if (strlen($artista['biografia']) > 500): ?>
+                                            <p class="mb-0" id="biografia-texto">
+                                                <?php echo nl2br(htmlspecialchars(substr($artista['biografia'], 0, 500))); ?>
+                                                <span id="biografia-extra" style="display: none;">
+                                                    <?php echo nl2br(htmlspecialchars(substr($artista['biografia'], 500))); ?>
+                                                </span>
+                                                <a href="#" id="leer-mas" class="text-primary fw-bold" onclick="toggleBiografia(event)">...Leer más</a>
+                                            </p>
+                                        <?php else: ?>
+                                            <p class="mb-0">
+                                                <?php echo nl2br(htmlspecialchars($artista['biografia'])); ?>
+                                            </p>
+                                        <?php endif; ?>
                                     <?php else: ?>
                                         <p class="mb-0 text-muted">
                                             <em>Este artista aún no ha añadido una biografía.</em>
@@ -143,16 +273,6 @@ include(__DIR__ . '/../components/header.php');
                                     <i class="bi bi-camera me-2"></i>Obras
                                 </button>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link fw-bold" id="colaboraciones-tab" data-bs-toggle="tab" data-bs-target="#colaboraciones" type="button" role="tab" aria-controls="colaboraciones" aria-selected="false">
-                                    <i class="bi bi-music-note me-2"></i>Colaboraciones
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link fw-bold" id="favoritos-tab" data-bs-toggle="tab" data-bs-target="#favoritos" type="button" role="tab" aria-controls="favoritos" aria-selected="false">
-                                    <i class="bi bi-heart me-2"></i>Favoritos
-                                </button>
-                            </li>
                         </ul>
 
                         <!-- Tab Content -->
@@ -164,7 +284,8 @@ include(__DIR__ . '/../components/header.php');
                                     // Traer obras validadas del artista
                                     try {
                                         $stmt_obras = $pdo->prepare("
-                                            SELECT id, titulo, descripcion, multimedia, fecha_validacion 
+                                            SELECT id, titulo, descripcion, categoria, multimedia, 
+                                                   fecha_validacion, fecha_creacion, campos_extra
                                             FROM publicaciones 
                                             WHERE usuario_id = ? AND estado = 'validado'
                                             ORDER BY fecha_validacion DESC
@@ -184,13 +305,25 @@ include(__DIR__ . '/../components/header.php');
                                         else:
                                             foreach ($obras as $obra):
                                                 $thumbnail = $obra['multimedia'] ? BASE_URL . ltrim($obra['multimedia'], '/') : BASE_URL . 'static/img/paleta-de-pintura.png';
+                                                // Decodificar campos extra para obtener técnica, dimensiones, etc.
+                                                $campos_extra = !empty($obra['campos_extra']) ? json_decode($obra['campos_extra'], true) : [];
                                     ?>
                                         <div class="col-md-6 col-lg-4">
-                                            <div class="card h-100 shadow-sm border-0 overflow-hidden" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#obraModal" onclick="mostrarObra(<?php echo htmlspecialchars(json_encode($obra)); ?>)">
-                                                <img src="<?php echo htmlspecialchars($thumbnail); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($obra['titulo']); ?>" style="height: 250px; object-fit: cover;">
+                                            <div class="card h-100 shadow-sm border-0 overflow-hidden" style="cursor: pointer;" 
+                                                 data-bs-toggle="modal" data-bs-target="#obraModal" 
+                                                 onclick='mostrarObra(<?php echo json_encode($obra, JSON_HEX_APOS | JSON_HEX_QUOT); ?>)'>
+                                                <img src="<?php echo htmlspecialchars($thumbnail); ?>" 
+                                                     class="card-img-top" 
+                                                     alt="<?php echo htmlspecialchars($obra['titulo']); ?>" 
+                                                     style="height: 250px; object-fit: cover;">
                                                 <div class="card-body">
                                                     <h5 class="card-title"><?php echo htmlspecialchars($obra['titulo']); ?></h5>
-                                                    <p class="card-text text-muted small"><?php echo htmlspecialchars(substr($obra['descripcion'], 0, 80) . (strlen($obra['descripcion']) > 80 ? '...' : '')); ?></p>
+                                                    <p class="card-text text-muted small">
+                                                        <?php echo htmlspecialchars(substr($obra['descripcion'], 0, 80) . (strlen($obra['descripcion']) > 80 ? '...' : '')); ?>
+                                                    </p>
+                                                    <?php if (!empty($obra['categoria'])): ?>
+                                                    <span class="badge bg-info"><?php echo htmlspecialchars($obra['categoria']); ?></span>
+                                                    <?php endif; ?>
                                                 </div>
                                                 <div class="card-footer bg-light border-top-0">
                                                     <small class="text-muted">
@@ -275,17 +408,49 @@ include(__DIR__ . '/../components/header.php');
 
     <!-- Modal para ver obra completa -->
     <div class="modal fade" id="obraModal" tabindex="-1" aria-labelledby="obraModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="obraModalLabel">Detalle de Obra</h5>
+                    <h5 class="modal-title fw-bold" id="obraModalLabel">Detalle de Obra</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <img id="obraImagen" src="" alt="" class="img-fluid mb-3" style="max-height: 400px; object-fit: cover; width: 100%;">
-                    <h4 id="obraTitulo"></h4>
-                    <p id="obraDescripcion" class="text-muted"></p>
-                    <small id="obraFecha" class="text-muted d-block"></small>
+                    <div class="row">
+                        <div class="col-md-7">
+                            <img id="obraImagen" src="" alt="" class="img-fluid rounded shadow mb-3" 
+                                 style="max-height: 500px; object-fit: contain; width: 100%;">
+                        </div>
+                        <div class="col-md-5">
+                            <h3 id="obraTitulo" class="fw-bold mb-3"></h3>
+                            <span id="obraCategoria" class="badge bg-info mb-3"></span>
+                            
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-2"><i class="bi bi-file-text me-1"></i> Descripción</h6>
+                                <p id="obraDescripcion" class="text-secondary"></p>
+                            </div>
+                            
+                            <div class="mb-3" id="obraTecnicaContainer" style="display: none;">
+                                <h6 class="text-muted mb-2"><i class="bi bi-brush me-1"></i> Técnica</h6>
+                                <p id="obraTecnica" class="text-secondary"></p>
+                            </div>
+                            
+                            <div class="mb-3" id="obraDimensionesContainer" style="display: none;">
+                                <h6 class="text-muted mb-2"><i class="bi bi-rulers me-1"></i> Dimensiones</h6>
+                                <p id="obraDimensiones" class="text-secondary"></p>
+                            </div>
+                            
+                            <div class="row text-center border-top pt-3 mt-3">
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Fecha de Creación</small>
+                                    <strong id="obraFechaCreacion"></strong>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Fecha de Validación</small>
+                                    <strong id="obraFechaValidacion"></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -299,6 +464,123 @@ include(__DIR__ . '/../components/header.php');
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         const BASE_URL = '<?php echo BASE_URL; ?>';
+        
+        function mostrarObra(obra) {
+            console.log('Obra recibida:', obra);
+            
+            // Información básica
+            document.getElementById('obraTitulo').textContent = obra.titulo || '';
+            document.getElementById('obraDescripcion').textContent = obra.descripcion || '';
+            document.getElementById('obraCategoria').textContent = obra.categoria || 'Sin categoría';
+            
+            // Imagen
+            const imagenSrc = obra.multimedia ? BASE_URL + obra.multimedia.replace(/^\//, '') : BASE_URL + 'static/img/paleta-de-pintura.png';
+            document.getElementById('obraImagen').src = imagenSrc;
+            document.getElementById('obraImagen').alt = obra.titulo || 'Obra';
+            
+            // Fechas
+            if (obra.fecha_creacion) {
+                const fechaCreacion = new Date(obra.fecha_creacion);
+                document.getElementById('obraFechaCreacion').textContent = fechaCreacion.toLocaleDateString('es-AR');
+            } else {
+                document.getElementById('obraFechaCreacion').textContent = 'No disponible';
+            }
+            
+            if (obra.fecha_validacion) {
+                const fechaValidacion = new Date(obra.fecha_validacion);
+                document.getElementById('obraFechaValidacion').textContent = fechaValidacion.toLocaleDateString('es-AR');
+            } else {
+                document.getElementById('obraFechaValidacion').textContent = 'No disponible';
+            }
+            
+            // Campos extra (técnica, dimensiones, etc.)
+            let camposExtra = {};
+            if (obra.campos_extra) {
+                try {
+                    camposExtra = typeof obra.campos_extra === 'string' ? JSON.parse(obra.campos_extra) : obra.campos_extra;
+                } catch(e) {
+                    console.error('Error parsing campos_extra:', e);
+                }
+            }
+            
+            // Técnica
+            if (camposExtra.tecnica || camposExtra.técnica) {
+                document.getElementById('obraTecnica').textContent = camposExtra.tecnica || camposExtra.técnica;
+                document.getElementById('obraTecnicaContainer').style.display = 'block';
+            } else {
+                document.getElementById('obraTecnicaContainer').style.display = 'none';
+            }
+            
+            // Dimensiones
+            if (camposExtra.dimensiones) {
+                document.getElementById('obraDimensiones').textContent = camposExtra.dimensiones;
+                document.getElementById('obraDimensionesContainer').style.display = 'block';
+            } else {
+                document.getElementById('obraDimensionesContainer').style.display = 'none';
+            }
+        }
+        
+        function toggleBiografia(event) {
+            event.preventDefault();
+            const extra = document.getElementById('biografia-extra');
+            const link = document.getElementById('leer-mas');
+            
+            if (extra.style.display === 'none') {
+                extra.style.display = 'inline';
+                link.textContent = ' Leer menos';
+            } else {
+                extra.style.display = 'none';
+                link.textContent = '...Leer más';
+            }
+        }
+        
+        function compartirPerfil() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback: copiar al portapapeles
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Enlace copiado!',
+                        text: 'El enlace del perfil se copió al portapapeles',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                });
+            }
+        }
+        
+        function reportarPerfil() {
+            Swal.fire({
+                title: 'Reportar Perfil',
+                input: 'textarea',
+                inputLabel: 'Motivo del reporte',
+                inputPlaceholder: 'Describe el problema con este perfil...',
+                showCancelButton: true,
+                confirmButtonText: 'Enviar Reporte',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#dc3545',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Debes proporcionar un motivo';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Aquí puedes enviar el reporte a una API
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Reporte Enviado',
+                        text: 'Gracias por tu reporte. Lo revisaremos pronto.',
+                        timer: 2000
+                    });
+                }
+            });
+        }
     </script>
     <script src="<?php echo BASE_URL; ?>static/js/perfil-artista.js"></script>
 </body>

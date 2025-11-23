@@ -241,9 +241,105 @@ try {
             }
             break;
 
+        case 'update':
+            // ACTUALIZAR PUBLICACIÓN EXISTENTE Y REENVIAR A VALIDACIÓN
+            checkArtistaPermissions();
+            
+            $usuario_id = $_SESSION['user_data']['id'];
+            $id = $_POST['id'] ?? '';
+            $titulo = trim($_POST['titulo'] ?? '');
+            $descripcion = trim($_POST['descripcion'] ?? '');
+            $categoria = trim($_POST['categoria'] ?? '');
+
+            // Validaciones básicas
+            if (empty($id)) {
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'ID de publicación no proporcionado.']);
+                exit;
+            }
+
+            if (empty($titulo) || empty($descripcion) || empty($categoria)) {
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'El título, la descripción y la categoría son obligatorios.']);
+                exit;
+            }
+
+            // Recopilar campos extra
+            $campos_extra = [];
+            foreach ($_POST as $key => $value) {
+                if (!in_array($key, ['action', 'id', 'titulo', 'descripcion', 'categoria'])) {
+                    $campos_extra[$key] = trim($value);
+                }
+            }
+            $campos_extra_json = json_encode($campos_extra);
+
+            // Procesar multimedia (solo si hay archivos nuevos)
+            $multimedia_path = null;
+            if (isset($_FILES['multimedia']) && !empty($_FILES['multimedia']['tmp_name'][0])) {
+                require_once __DIR__ . '/../../backend/helpers/MultimediaValidator.php';
+                $validator = new MultimediaValidator();
+                
+                // Procesar primer archivo
+                $file_data = [
+                    'name' => $_FILES['multimedia']['name'][0],
+                    'type' => $_FILES['multimedia']['type'][0],
+                    'tmp_name' => $_FILES['multimedia']['tmp_name'][0],
+                    'error' => $_FILES['multimedia']['error'][0],
+                    'size' => $_FILES['multimedia']['size'][0]
+                ];
+                
+                $result = $validator->guardarArchivo($file_data, 'imagen');
+                if ($result['exitoso']) {
+                    $multimedia_path = $result['ruta'];
+                } else {
+                    throw new Exception("Error al guardar multimedia: " . ($result['mensaje'] ?: 'Error desconocido'));
+                }
+            }
+
+            $pdo->beginTransaction();
+
+            try {
+                // Actualizar la publicación y cambiar estado a pendiente
+                $sql = "UPDATE publicaciones 
+                        SET titulo = ?, descripcion = ?, categoria = ?, campos_extra = ?, 
+                            estado = 'pendiente', fecha_envio_validacion = CURRENT_TIMESTAMP";
+                
+                $params = [$titulo, $descripcion, $categoria, $campos_extra_json];
+                
+                if ($multimedia_path) {
+                    $sql .= ", multimedia = ?";
+                    $params[] = $multimedia_path;
+                }
+                
+                $sql .= " WHERE id = ? AND usuario_id = ?";
+                $params[] = $id;
+                $params[] = $usuario_id;
+                
+                error_log("UPDATE borradores.php: id={$id}, usuario_id={$usuario_id}, titulo={$titulo}");
+                
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($params);
+                
+                error_log("UPDATE borradores.php: rowCount=" . $stmt->rowCount());
+
+                if ($stmt->rowCount() > 0) {
+                    $pdo->commit();
+                    echo json_encode(['status' => 'ok', 'message' => 'Obra actualizada y enviada a validación con éxito.']);
+                } else {
+                    $pdo->rollBack();
+                    http_response_code(404);
+                    echo json_encode(['status' => 'error', 'message' => 'No se encontró la publicación o no tienes permiso para modificarla.']);
+                }
+
+            } catch (PDOException $e) {
+                $pdo->rollBack();
+                throw $e;
+            }
+            break;
+
         default:
             http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Acción no válida. Acciones permitidas: get, save, delete, submit']);
+            echo json_encode(['status' => 'error', 'message' => 'Acción no válida. Acciones permitidas: get, save, delete, submit, update']);
             break;
     }
 

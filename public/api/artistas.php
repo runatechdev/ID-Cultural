@@ -48,15 +48,21 @@ try {
                 }
             } else {
                 // Obtener lista de artistas (con filtro opcional)
-                $sql = "SELECT id, nombre, apellido, email, status, foto_perfil, especialidades as categoria, biografia, municipio, provincia, fecha_nacimiento, genero, instagram, facebook, twitter, sitio_web FROM artistas";
+                $sql = "SELECT a.id, a.nombre, a.apellido, a.email, a.status, a.foto_perfil,
+                        a.especialidades as categoria, a.biografia, a.municipio, a.provincia, 
+                        a.fecha_nacimiento, a.genero, a.instagram, a.facebook, a.twitter, 
+                        a.sitio_web, a.telefono, a.whatsapp,
+                        COUNT(p.id) as total_obras
+                        FROM artistas a
+                        LEFT JOIN publicaciones p ON a.id = p.usuario_id AND p.estado = 'validado'";
                 $params = [];
 
                 if ($status_filter) {
-                    $sql .= " WHERE status = ?";
+                    $sql .= " WHERE a.status = ?";
                     $params[] = $status_filter;
                 }
 
-                $sql .= " ORDER BY id DESC";
+                $sql .= " GROUP BY a.id ORDER BY a.id DESC";
 
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute($params);
@@ -106,9 +112,9 @@ try {
             $intereses = json_decode($_POST['intereses'] ?? '[]', true);
 
             // Validaciones
-            if (empty($nombre) || empty($apellido) || empty($email) || empty($password)) {
+            if (empty($nombre) || empty($apellido) || empty($email) || empty($password) || empty($fecha_nacimiento)) {
                 http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'Los campos con * son obligatorios.']);
+                echo json_encode(['status' => 'error', 'message' => 'Los campos con * son obligatorios. La fecha de nacimiento es obligatoria.']);
                 exit;
             }
             if ($password !== $confirm_password) {
@@ -194,10 +200,11 @@ try {
             break;
 
         case 'delete':
-            // ELIMINAR ARTISTA (solo admin)
+        case 'eliminar_artista':
+            // ELIMINAR ARTISTA Y TODAS SUS OBRAS (solo admin)
             checkAdminPermissions();
             
-            $id = $_POST['id'] ?? '';
+            $id = $_POST['id'] ?? $_POST['artista_id'] ?? '';
 
             if (empty($id)) {
                 http_response_code(400);
@@ -205,15 +212,59 @@ try {
                 exit;
             }
 
-            // La tabla 'publicaciones' tiene ON DELETE CASCADE, así que se borrarán automáticamente
-            $stmt = $pdo->prepare("DELETE FROM artistas WHERE id = ?");
-            $stmt->execute([$id]);
+            try {
+                $pdo->beginTransaction();
 
-            if ($stmt->rowCount() > 0) {
-                echo json_encode(['status' => 'ok', 'message' => 'Artista eliminado con éxito.']);
-            } else {
-                http_response_code(404);
-                echo json_encode(['status' => 'error', 'message' => 'No se encontró el artista a eliminar.']);
+                // Obtener nombre del artista antes de eliminar
+                $stmt = $pdo->prepare("SELECT nombre, apellido FROM artistas WHERE id = ?");
+                $stmt->execute([$id]);
+                $artista = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$artista) {
+                    $pdo->rollBack();
+                    http_response_code(404);
+                    echo json_encode(['status' => 'error', 'message' => 'No se encontró el artista.']);
+                    exit;
+                }
+
+                // Eliminar obras publicadas (la tabla usa usuario_id, no artista_id)
+                $stmt = $pdo->prepare("DELETE FROM publicaciones WHERE usuario_id = ?");
+                $stmt->execute([$id]);
+                $obras_eliminadas = $stmt->rowCount();
+
+                $borradores_eliminados = 0; // No existe tabla de borradores
+
+                // Eliminar cambios pendientes de perfil
+                $stmt = $pdo->prepare("DELETE FROM perfil_cambios_pendientes WHERE artista_id = ?");
+                $stmt->execute([$id]);
+                $cambios_eliminados = $stmt->rowCount();
+
+                // Eliminar intereses
+                $stmt = $pdo->prepare("DELETE FROM intereses_artista WHERE artista_id = ?");
+                $stmt->execute([$id]);
+
+                // Finalmente eliminar el artista
+                $stmt = $pdo->prepare("DELETE FROM artistas WHERE id = ?");
+                $stmt->execute([$id]);
+
+                $pdo->commit();
+
+                $mensaje = "Artista {$artista['nombre']} {$artista['apellido']} eliminado correctamente.";
+                if ($obras_eliminadas > 0) {
+                    $mensaje .= " Se eliminaron {$obras_eliminadas} obra(s) publicada(s).";
+                }
+                if ($cambios_eliminados > 0) {
+                    $mensaje .= " Se eliminaron {$cambios_eliminados} cambio(s) pendiente(s).";
+                }
+
+                echo json_encode(['status' => 'success', 'message' => $mensaje]);
+
+            } catch (Exception $e) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                http_response_code(500);
+                echo json_encode(['status' => 'error', 'message' => 'Error al eliminar: ' . $e->getMessage()]);
             }
             break;
 

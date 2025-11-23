@@ -15,6 +15,10 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../../backend/config/connection.php';
 require_once __DIR__ . '/../../backend/helpers/EmailHelper.php';
+require_once __DIR__ . '/../../backend/helpers/NotificationHelper.php';
+
+// Inicializar helper de notificaciones
+NotificationHelper::init($pdo);
 
 header('Content-Type: application/json; charset=UTF-8');
 
@@ -118,6 +122,7 @@ try {
                         facebook = COALESCE(?, facebook),
                         twitter = COALESCE(?, twitter),
                         sitio_web = COALESCE(?, sitio_web),
+                        whatsapp = COALESCE(?, whatsapp),
                         foto_perfil = COALESCE(?, foto_perfil),
                         status_perfil = ?, 
                         motivo_rechazo = NULL
@@ -130,6 +135,7 @@ try {
                     $cambios_pendientes['facebook'],
                     $cambios_pendientes['twitter'],
                     $cambios_pendientes['sitio_web'],
+                    $cambios_pendientes['whatsapp'],
                     $cambios_pendientes['foto_perfil'],
                     $nuevo_estado,
                     $artista_id
@@ -196,8 +202,14 @@ try {
 
             if ($accion === 'validar') {
                 $emailHelper->notificarPerfilValidado($artista['email'], $nombreCompleto);
+                
+                // CREAR NOTIFICACIÓN de validación de cambio de perfil
+                NotificationHelper::notificarCambioPerfilValidado($artista_id);
             } else {
                 $emailHelper->notificarPerfilRechazado($artista['email'], $nombreCompleto, $motivo);
+                
+                // CREAR NOTIFICACIÓN de rechazo de cambio de perfil
+                NotificationHelper::notificarCambioPerfilRechazado($artista_id, $motivo);
             }
         } catch (Exception $e) {
             error_log("Error enviando email: " . $e->getMessage());

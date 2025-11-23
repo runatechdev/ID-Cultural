@@ -150,7 +150,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <!-- Sección: Contacto -->
                     <h4 class="mb-3 mt-4">Información de Contacto</h4>
                     <div class="row">
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input 
                                 type="email" 
@@ -161,6 +161,18 @@ include(__DIR__ . '/../../../../../components/header.php');
                                 disabled
                             >
                             <small class="text-muted">El email no puede ser modificado. Contacta con soporte si necesitas cambiar tu email.</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input 
+                                type="tel" 
+                                class="form-control" 
+                                id="telefono" 
+                                name="telefono" 
+                                value="<?php echo htmlspecialchars($artista['telefono'] ?? ''); ?>"
+                                placeholder="+54 385 1234567"
+                            >
+                            <small class="text-muted">Ingresa tu número de teléfono personal (opcional)</small>
                         </div>
                     </div>
 
@@ -205,7 +217,8 @@ include(__DIR__ . '/../../../../../components/header.php');
                         genero: document.getElementById('genero').value,
                         pais: document.getElementById('pais').value.trim(),
                         provincia: document.getElementById('provincia').value.trim(),
-                        municipio: document.getElementById('municipio').value.trim()
+                        municipio: document.getElementById('municipio').value.trim(),
+                        telefono: document.getElementById('telefono').value.trim()
                     };
 
                     try {

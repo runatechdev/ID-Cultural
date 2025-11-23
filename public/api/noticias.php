@@ -1,4 +1,8 @@
 <?php
+// Suprimir warnings para evitar que rompan el JSON
+ini_set('display_errors', '0');
+error_reporting(E_ERROR | E_PARSE);
+
 session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../backend/config/connection.php';
@@ -18,15 +22,33 @@ function checkPermissions($allowed_roles = ['editor', 'admin']) {
 // Función para subir imagen
 function uploadNoticiaImage() {
     if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] == 0) {
-        $upload_dir = __DIR__ . '/../../static/uploads/noticias/';
+        // Usar DOCUMENT_ROOT para obtener la ruta real del servidor
+        $upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/static/uploads/noticias/';
+        
+        // Crear directorio si no existe
         if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
+            if (!mkdir($upload_dir, 0777, true)) {
+                error_log("No se pudo crear el directorio: " . $upload_dir);
+                return null;
+            }
+            chmod($upload_dir, 0777);
         }
+        
+        // Verificar que el directorio sea escribible
+        if (!is_writable($upload_dir)) {
+            error_log("Directorio no es escribible: " . $upload_dir);
+            return null;
+        }
+        
         $file_name = time() . '_' . basename($_FILES['imagen']['name']);
         $target_file = $upload_dir . $file_name;
 
         if (move_uploaded_file($_FILES['imagen']['tmp_name'], $target_file)) {
+            chmod($target_file, 0664);
+            error_log("Imagen subida exitosamente: " . $target_file);
             return 'static/uploads/noticias/' . $file_name;
+        } else {
+            error_log("No se pudo mover el archivo a: " . $target_file);
         }
     }
     return null;

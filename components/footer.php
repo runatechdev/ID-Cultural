@@ -21,7 +21,7 @@
   </div>
 
   <div class="footer-links">
-    <a href="/src/views/pages/public/components/contacto.html" target="_blank">Contacto</a>
+  <a href="/src/views/pages/public/components/contacto.php" target="_blank">Contacto</a>
     <a href="/src/views/pages/public/components/privacidad.html" target="_blank">Política de Privacidad</a>
     <a href="/src/views/pages/public/terminos_condiciones.html" target="_blank">Términos de Uso</a>
   </div>
@@ -32,10 +32,18 @@
 
   <!-- Logos integrados en el footer colorido -->
   <div class="footer-logos">
-    <img src="/static/img/logos/Itse.png" alt="ItseLogo">
-    <img src="/static/img/logos/cultura.png" alt="culturaLogo">
-    <img src="/static/img/logos/jefatura.png" alt="jefaturaLogo">
-    <img src="/static/img/logos/gobierno.png" alt="sgoLogo">
+    <a href="https://itse.gob.ar/" target="_blank" rel="noopener">
+      <img src="/static/img/logos/Itse.png" alt="ItseLogo">
+    </a>
+    <a href="https://www.sde.gob.ar/tag/subsecretaria-de-cultura/" target="_blank" rel="noopener">
+      <img src="/static/img/logos/cultura.png" alt="culturaLogo">
+    </a>
+    <a href="https://www.sde.gob.ar/tag/jefatura-de-gabinete-de-ministros/" target="_blank" rel="noopener">
+      <img src="/static/img/logos/jefatura.png" alt="jefaturaLogo">
+    </a>
+    <a href="https://www.sde.gob.ar/" target="_blank" rel="noopener">
+      <img src="/static/img/logos/gobierno.png" alt="sgoLogo">
+    </a>
   </div>
 
   <p style="margin-top: 10px; font-size: 13px; opacity: 0.9;">

@@ -75,25 +75,6 @@ include(__DIR__ . '/../components/header.php');
             <!-- Sidebar -->
             <div class="col-lg-3 col-md-4">
                 <div class="wiki-sidebar">
-                    
-                    <!-- Artista Más Buscado -->
-                    <div class="sidebar-card featured-artist">
-                        <h4 class="sidebar-title">
-                            <i class="bi bi-star-fill"></i>
-                            Artista Destacado
-                        </h4>
-                        <div class="featured-content" id="featured-artist">
-                            <div class="featured-image">
-                                <img src="/static/img/merce.jpg" alt="Mercedes Sosa" class="img-fluid">
-                            </div>
-                            <div class="featured-info">
-                                <h5>Mercedes Sosa</h5>
-                                <p class="featured-category">Música - Folklore</p>
-                                <p class="featured-description">La Negra, voz del pueblo argentino y embajadora cultural de Santiago del Estero.</p>
-                                <a href="#" class="btn-featured">Ver Perfil</a>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Categorías -->
                     <div class="sidebar-card categories">
@@ -147,7 +128,7 @@ include(__DIR__ . '/../components/header.php');
                         </div>
                     </div>
 
-                    <!-- Filtros Rápidos -->
+                    <!-- Filtros Rápidos
                     <div class="sidebar-card quick-filters">
                         <h4 class="sidebar-title">
                             <i class="bi bi-funnel"></i>
@@ -159,7 +140,7 @@ include(__DIR__ . '/../components/header.php');
                             <button class="filter-btn" data-filter="famosos">Artistas Famosos</button>
                             <button class="filter-btn" data-filter="recientes">Más Recientes</button>
                         </div>
-                    </div>
+                    </div>  -->
 
                 </div>
             </div>
@@ -172,15 +153,15 @@ include(__DIR__ . '/../components/header.php');
                     <nav class="tab-navigation">
                         <button class="tab-btn active" data-tab="artistas-validados">
                             <i class="bi bi-people-fill"></i>
-                            Artistas Validados
+                            Artista
                         </button>
                         <button class="tab-btn" data-tab="obras-validadas">
                             <i class="bi bi-collection"></i>
-                            Obras Validadas
+                            Obras
                         </button>
                         <button class="tab-btn" data-tab="artistas-famosos">
                             <i class="bi bi-star-fill"></i>
-                            Artistas Famosos
+                            Artistas Referentes
                         </button>
                     </nav>
                 </div>

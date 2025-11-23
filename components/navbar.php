@@ -13,20 +13,24 @@ if (!defined('BASE_URL')) {
 <!-- Material Icons - CDN -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-<header class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <div class="container d-flex align-items-center justify-content-between">
+<header class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between w-100">
+      
+      <!-- Logo y Nombre -->
+      <a href="<?php echo BASE_URL; ?>index.php" class="navbar-brand d-flex align-items-center text-decoration-none">
+        <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
+        <h4 class="m-0 text-white fw-bold typing-effect notranslate" id="navbar-title"></h4>
+      </a>
 
-    <!-- Logo y Nombre -->
-    <a href="<?php echo BASE_URL; ?>index.php" class="navbar-brand d-flex align-items-center text-decoration-none">
-      <img src="<?php echo BASE_URL; ?>static/img/huella-idcultural.png" alt="ID Cultural Logo" height="40" class="me-2">
-      <h4 class="m-0 text-white fw-bold typing-effect notranslate" id="navbar-title"></h4>
-    </a>
-
-    <div>
-      <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <!-- Botón toggler -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <nav class="collapse navbar-collapse" id="navbarNav">
+    </div>
+
+    <!-- Menú colapsable -->
+    <nav class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center">
           
           <!-- Botón de traducción con dropdown de Bootstrap -->
@@ -55,20 +59,50 @@ if (!defined('BASE_URL')) {
             </button>
           </li>
 
-          <li class="nav-item"><a class="nav-link" href="/wiki.php">Wiki de artistas</a></li>
+          <?php
+          // Determinar si hay sesión y qué rol tiene (mover aquí para usarlo antes)
+          $is_logged_in = isset($_SESSION['user_data']);
+          $user_role = $is_logged_in ? $_SESSION['user_data']['role'] : null;
+          ?>
+
+          <li class="nav-item"><a class="nav-link text-nowrap" href="/wiki.php">Wiki de Artistas</a></li>
+
+          <!-- Notificaciones (solo para artistas logueados) -->
+          <?php if ($is_logged_in && ($user_role === 'artista' || $user_role === 'artista_validado' || $user_role === 'usuario')): ?>
+          <li class="nav-item dropdown">
+            <a class="nav-link position-relative" href="#" id="btn-notificaciones" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-bell fs-5"></i>
+              <span id="notificaciones-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none; font-size: 0.6rem;">
+                0
+              </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="btn-notificaciones" style="width: 350px; max-height: 500px; overflow-y: auto;">
+              <div class="dropdown-header d-flex justify-content-between align-items-center">
+                <span class="fw-bold">Notificaciones</span>
+                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" id="marcar-todas-leidas">
+                  <small>Marcar todas</small>
+                </button>
+              </div>
+              <div class="dropdown-divider"></div>
+              <div id="notificaciones-lista">
+                <!-- Las notificaciones se cargarán aquí dinámicamente -->
+                <div class="text-center py-3">
+                  <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <?php endif; ?>
 
           <!-- Menú dinámico - Siempre visible pero con opciones diferentes -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="mainMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="gap: 8px;">
+            <a class="nav-link dropdown-toggle d-flex align-items-center notranslate" href="#" id="mainMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="gap: 8px;">
               <i class="material-icons" style="font-size: 22px;">view_carousel</i>
               <span>Menú</span>
             </a>
             <div class="dropdown-menu dropdown-menu-end dropdown-with-icons" aria-labelledby="mainMenuDropdown">
-              <?php
-                // Determinar si hay sesión y qué rol tiene
-                $is_logged_in = isset($_SESSION['user_data']);
-                $user_role = $is_logged_in ? $_SESSION['user_data']['role'] : null;
-              ?>
               
               <?php if ($is_logged_in && ($user_role === 'artista' || $user_role === 'artista_validado' || $user_role === 'usuario')): ?>
                 <!-- Menú para Artistas Logueados -->
@@ -132,6 +166,9 @@ if (!defined('BASE_URL')) {
                 <a href="/src/views/pages/validador/panel_validador.php" class="dropdown-item">
                   <i class="material-icons">verified</i> Panel de Control
                 </a>
+                <a href="/src/views/pages/validador/log_validaciones.php" class="dropdown-item">
+                  <i class="material-icons">history_edu</i> Historial de Validaciones
+                </a>
                 <div class="dropdown-divider"></div>
                 <a href="/logout.php" class="dropdown-item">
                   <i class="material-icons">exit_to_app</i> Salir
@@ -168,7 +205,6 @@ if (!defined('BASE_URL')) {
 
         </ul>
       </nav>
-    </div>
 
   </div>
 </header>
@@ -403,7 +439,7 @@ function updateLanguageIndicator() {
   
   const flags = {
     'es': '🇪🇸',
-    'en': '🇬🇧',
+    'en': '🇺🇸',
     'pt': '🇧🇷',
     'fr': '🇫🇷',
     'it': '🇮🇹',
@@ -542,25 +578,78 @@ if (searchInput) {
   });
 }
 
-// Efecto de escritura para el título del navbar
 const titleElement = document.getElementById('navbar-title');
-const fullText = 'ID Cultural';
-let currentIndex = 0;
+const phrases = ['ID Cultural', 'Sgo del Estero'];
+let phraseIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
 
 function typeEffect() {
-  if (currentIndex < fullText.length) {
-    titleElement.textContent = fullText.substring(0, currentIndex + 1) + '|';
-    currentIndex++;
-    setTimeout(typeEffect, 100); // Velocidad de escritura
+  const currentPhrase = phrases[phraseIndex];
+  
+  // Definimos el cursor: si estamos escribiendo/borrando siempre se ve.
+  // El parpadeo solo ocurrirá en la pausa (manejado más abajo).
+  const cursor = '|'; 
+
+  if (isDeleting) {
+    // Borrando
+    titleElement.textContent = currentPhrase.substring(0, charIndex - 1) + cursor;
+    charIndex--;
   } else {
-    // Efecto de cursor parpadeante al final
-    let cursorVisible = true;
-    setInterval(() => {
-      titleElement.textContent = fullText + (cursorVisible ? '|' : '');
-      cursorVisible = !cursorVisible;
-    }, 500);
+    // Escribiendo
+    titleElement.textContent = currentPhrase.substring(0, charIndex + 1) + cursor;
+    charIndex++;
   }
+
+  // --- CONTROL DE VELOCIDAD NATURAL ---
+  // Base más lenta (150ms) + Variación aleatoria (0 a 100ms extra)
+  // Esto hace que cada letra tarde un tiempo distinto, como una persona real.
+  let typeSpeed = 150 + Math.random() * 100;
+
+  if (isDeleting) {
+    typeSpeed /= 2; // Borrar sigue siendo un poco más rápido
+  }
+
+  // --- CONTROL DE FLUJO ---
+  if (!isDeleting && charIndex === currentPhrase.length) {
+    // CASO: FRASE COMPLETA (Pausa con parpadeo)
+    
+    let blinkCount = 0;
+    const maxBlinks = 6; // Cantidad de veces que parpadea (aprox 2-3 segs)
+    
+    // Iniciamos un intervalo exclusivo para el parpadeo
+    const blinkInterval = setInterval(() => {
+      // Alternamos entre mostrar el cursor y no mostrarlo
+      if (titleElement.textContent.endsWith('|')) {
+         titleElement.textContent = currentPhrase; // Sin cursor
+      } else {
+         titleElement.textContent = currentPhrase + '|'; // Con cursor
+      }
+      
+      blinkCount++;
+      
+      // Cuando termine de parpadear, limpiamos y seguimos borrando
+      if (blinkCount >= maxBlinks) {
+        clearInterval(blinkInterval);
+        isDeleting = true; // Cambiamos estado a borrar
+        setTimeout(typeEffect, 1000); // Pequeña pausa antes de empezar a borrar
+      }
+    }, 400); // Velocidad del parpadeo (400ms)
+    
+    return; // IMPORTANTE: Detenemos la recursión aquí para que el intervalo tome el control
+
+  } else if (isDeleting && charIndex === 0) {
+    // CASO: FRASE BORRADA COMPLETAMENTE
+    isDeleting = false;
+    phraseIndex = (phraseIndex + 1) % phrases.length; // Siguiente frase
+    typeSpeed = 500; // Pausa antes de empezar a escribir la nueva
+  }
+
+  setTimeout(typeEffect, typeSpeed);
 }
+
+// Iniciar
+document.addEventListener('DOMContentLoaded', typeEffect);
 
 // Iniciar efecto cuando se carga la página
 window.addEventListener('load', typeEffect);
@@ -586,6 +675,67 @@ window.addEventListener('load', typeEffect);
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   vertical-align: middle;
+}
+
+/* Navbar responsive - evitar que el menú empuje el logo */
+@media (max-width: 991.98px) {
+  /* Forzar navbar sticky en móvil */
+  .navbar.sticky-top {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 1030 !important;
+  }
+  
+  .navbar .container {
+    flex-wrap: wrap;
+  }
+  
+  .navbar-collapse {
+    width: 100%;
+    margin-top: 1rem;
+    overflow: visible !important;
+  }
+  
+  /* Mantener el logo y título fijos en su línea */
+  .navbar-brand {
+    flex: 1;
+  }
+  
+  .navbar-toggler {
+    order: 1;
+  }
+  
+  /* Mantener los items del navbar en horizontal */
+  .navbar-nav {
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .navbar-nav .nav-item {
+    white-space: nowrap;
+    position: static;
+  }
+  
+  /* Asegurar que los dropdowns se vean completos */
+  .navbar-nav .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: auto !important;
+    right: 0 !important;
+    margin-top: 0.5rem;
+  }
+  
+  /* Ajustar padding de los nav-links en móvil */
+  .navbar-nav .nav-link {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
 }
 
 /* Efecto de escritura en el título */
@@ -846,6 +996,16 @@ iframe.skiptranslate {
   transform: translateZ(0);
 }
 
+/* Mantener ancho fijo del botón de menú para evitar cambios al traducir */
+#mainMenuDropdown {
+  min-width: 90px !important;
+  white-space: nowrap !important;
+}
+
+#mainMenuDropdown .material-icons {
+  flex-shrink: 0 !important;
+}
+
 /* Asegurar que el navbar-title no se traduzca */
 #navbar-title {
   pointer-events: none;
@@ -892,4 +1052,67 @@ body.translated-rtl {
   display: none !important;
 }
 
+/* ========================================
+   ESTILOS PARA NOTIFICACIONES
+   ======================================== */
+
+.notificaciones-dropdown {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.notificacion-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.notificacion-item:hover {
+  background-color: #f8f9fa !important;
+}
+
+.notificacion-item.notif-no-leida {
+  background-color: #e7f3ff;
+}
+
+.notificacion-item.notif-leida {
+  opacity: 0.8;
+}
+
+.notificacion-item h6 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.notificacion-item p {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-bottom: 4px;
+}
+
+.notificacion-item small {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+#notificaciones-badge {
+  font-size: 0.6rem;
+  padding: 0.25em 0.5em;
+}
+
+.dropdown-header button {
+  font-size: 0.8rem;
+  color: #007bff;
+}
+
+.dropdown-header button:hover {
+  text-decoration: underline !important;
+}
+
 </style>
+
+<!-- Script de notificaciones para artistas -->
+<?php if ($is_logged_in && ($user_role === 'artista' || $user_role === 'artista_validado' || $user_role === 'usuario')): ?>
+<script src="<?php echo BASE_URL; ?>static/js/notificaciones.js"></script>
+<?php endif; ?>

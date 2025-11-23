@@ -177,7 +177,7 @@ function setupCategoryNavigation() {
             const category = item.getAttribute('data-category');
             const isCurrentlyActive = item.classList.contains('active');
             
-            console.log('Categoría clickeada:', category, 'Activa:', isCurrentlyActive); // Debug
+            //console.log('Categoría clickeada:', category, 'Activa:', isCurrentlyActive); // Debug
             
             // Si ya está activa, deseleccionar
             if (isCurrentlyActive) {
@@ -193,7 +193,7 @@ function setupCategoryNavigation() {
                 // Remover clase activa
                 item.classList.remove('active');
                 
-                console.log('Categoría deseleccionada'); // Debug
+                //console.log('Categoría deseleccionada'); // Debug
             } else {
                 // Seleccionar nueva categoría
                 WIKI.currentFilters.categoria = category;
@@ -208,7 +208,7 @@ function setupCategoryNavigation() {
                 categoryItems.forEach(cat => cat.classList.remove('active'));
                 item.classList.add('active');
                 
-                console.log('Categoría seleccionada:', category); // Debug
+                //console.log('Categoría seleccionada:', category); // Debug
             }
 
             // Resetear página y aplicar filtro en TODAS las pestañas
@@ -241,7 +241,7 @@ function filterFamousArtists() {
     const famousArtistItems = document.querySelectorAll('.famous-artist-item');
     const currentCategory = WIKI.currentFilters.categoria;
     
-    console.log('Filtrando artistas famosos por categoría:', currentCategory); // Debug
+    //console.log('Filtrando artistas famosos por categoría:', currentCategory); // Debug
     
     famousArtistItems.forEach(item => {
         const itemCategory = item.getAttribute('data-category');
@@ -334,10 +334,10 @@ async function loadInitialData() {
         }
         updateStatsDisplay();
         
-        console.log('Datos cargados:', {
-            artistas: WIKI.data.artists.length,
-            obras: WIKI.data.works.length
-        });
+        //console.log('Datos cargados:', {
+        //    artistas: WIKI.data.artists.length,
+        //    obras: WIKI.data.works.length
+        //});
         
     } catch (error) {
         console.error('Error cargando datos iniciales:', error);
@@ -468,9 +468,9 @@ async function loadWorks() {
         const response = await fetch(WIKI.BASE_URL + 'api/get_obras_wiki.php');
         if (response.ok) {
             const data = await response.json();
-            console.log('Respuesta API obras:', data); // Debug
+            //console.log('Respuesta API obras:', data); // Debug
             WIKI.data.works = data.obras || [];
-            console.log('Obras cargadas:', WIKI.data.works.length); // Debug
+            //console.log('Obras cargadas:', WIKI.data.works.length); // Debug
         } else {
             console.error('Error HTTP al cargar obras:', response.status);
             WIKI.data.works = [];
@@ -485,18 +485,29 @@ async function loadWorks() {
  * Actualizar contadores de categorías
  */
 function updateCategoryCounts() {
-    const categories = ['musica', 'literatura', 'danza', 'teatro', 'artesania', 'audiovisual', 'escultura'];
+    const categories = {
+        'musica': 'Musica',
+        'literatura': 'Literatura',
+        'danza': 'Danza',
+        'teatro': 'Teatro',
+        'artesania': 'Artesania',
+        'audiovisual': 'Audiovisual',
+        'escultura': 'Escultura'
+    };
     
-    categories.forEach(cat => {
-        const countElement = document.getElementById(`count-${cat}`);
+    Object.keys(categories).forEach(catKey => {
+        const catValue = categories[catKey];
+        const countElement = document.getElementById(`count-${catKey}`);
+        
         if (countElement) {
-            // Contar artistas y obras por categoría
+            // Contar artistas por categoría (comparación case-insensitive)
             const artistCount = WIKI.data.artists.filter(artist => 
-                artist.categoria && artist.categoria.toLowerCase().includes(cat.replace('musica', 'música'))
+                artist.categoria && artist.categoria.toLowerCase() === catValue.toLowerCase()
             ).length;
             
+            // Contar obras por categoría (comparación case-insensitive)
             const workCount = WIKI.data.works.filter(work => 
-                work.categoria && work.categoria.toLowerCase().includes(cat.replace('musica', 'música'))
+                work.categoria && work.categoria.toLowerCase() === catValue.toLowerCase()
             ).length;
             
             const totalCount = artistCount + workCount;
@@ -568,20 +579,20 @@ function renderValidatedWorks() {
     const container = document.getElementById('validated-works');
     if (!container) return;
 
-    console.log('Todas las obras disponibles:', WIKI.data.works.length); // Debug
+    //console.log('Todas las obras disponibles:', WIKI.data.works.length); // Debug
     
     let filteredWorks = WIKI.data.works.filter(work => {
         // Verificar que la obra esté validada
         return work.estado === 'validado' || work.estado === 'aprobado' || work.estado === 'publicado';
     });
     
-    console.log('Obras antes de filtrar:', WIKI.data.works.length); // Debug
-    console.log('Obras validadas:', filteredWorks.length); // Debug
+    //console.log('Obras antes de filtrar:', WIKI.data.works.length); // Debug
+    //console.log('Obras validadas:', filteredWorks.length); // Debug
     
     // Aplicar filtros adicionales
     filteredWorks = applyCurrentFilters(filteredWorks, 'works');
     
-    console.log('Obras después de filtros:', filteredWorks.length); // Debug
+    //console.log('Obras después de filtros:', filteredWorks.length); // Debug
 
     if (filteredWorks.length === 0) {
         container.innerHTML = `
@@ -724,73 +735,56 @@ function createArtistCard(artist) {
     const location = [artist.municipio, artist.provincia].filter(Boolean).join(', ');
     const categoria = artist.categoria || artist.especialidades || 'Artista';
     const edad = artist.fecha_nacimiento ? calcularEdad(artist.fecha_nacimiento) : null;
+    const totalObras = artist.total_obras || 0;
+    const whatsapp = artist.whatsapp || '';
     
     return `
-        <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
             <div class="artist-card-professional border-0 shadow-sm h-100">
                 <div class="artist-image-container">
                     <img src="${escaparHTML(imageSrc)}" class="artist-profile-image" alt="${escaparHTML(artistName)}">
                     <div class="category-overlay">
                         <span class="category-badge">${escaparHTML(categoria)}</span>
                     </div>
+                    <div class="verified-badge">
+                        <i class="bi bi-patch-check-fill"></i>
+                    </div>
                 </div>
                 <div class="artist-content">
                     <div class="artist-header">
                         <h3 class="artist-name">${escaparHTML(artistName)}</h3>
+                        <p class="artist-location">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            ${escaparHTML(location || 'Santiago del Estero')}
+                        </p>
                     </div>
                     
-                    <div class="artist-details">
-                        <div class="detail-row">
-                            <div class="detail-item">
-                                <i class="bi bi-palette"></i>
-                                <span class="detail-label">Especialidad:</span>
-                                <span class="detail-value">${escaparHTML(categoria)}</span>
-                            </div>
-                            ${edad ? `
-                            <div class="detail-item">
-                                <i class="bi bi-calendar-heart"></i>
-                                <span class="detail-label">Edad:</span>
-                                <span class="detail-value">${edad} años</span>
-                            </div>
-                            ` : ''}
-                        </div>
-                        
-                        <div class="detail-row">
-                            <div class="detail-item">
-                                <i class="bi bi-geo-alt-fill"></i>
-                                <span class="detail-label">Ubicación:</span>
-                                <span class="detail-value">${escaparHTML(location || 'Santiago del Estero')}</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="bi bi-envelope-fill"></i>
-                                <span class="detail-label">Contacto:</span>
-                                <span class="detail-value">${escaparHTML(artist.email || 'No disponible')}</span>
-                            </div>
-                        </div>
-                        
-                        ${artist.biografia ? `
-                        <div class="artist-bio">
-                            <p><i class="bi bi-quote"></i> ${escaparHTML(artist.biografia)}</p>
+                    <div class="artist-stats">
+                        ${edad ? `
+                        <div class="stat-item">
+                            <i class="bi bi-calendar-heart"></i>
+                            <span>${edad} años</span>
                         </div>
                         ` : ''}
-                        
-                        <div class="artist-social-links">
-                            ${artist.instagram ? `<a href="${escaparHTML(artist.instagram)}" target="_blank" class="social-link instagram"><i class="bi bi-instagram"></i></a>` : ''}
-                            ${artist.facebook ? `<a href="${escaparHTML(artist.facebook)}" target="_blank" class="social-link facebook"><i class="bi bi-facebook"></i></a>` : ''}
-                            ${artist.twitter ? `<a href="${escaparHTML(artist.twitter)}" target="_blank" class="social-link twitter"><i class="bi bi-twitter"></i></a>` : ''}
-                            ${artist.sitio_web ? `<a href="${escaparHTML(artist.sitio_web)}" target="_blank" class="social-link website"><i class="bi bi-globe"></i></a>` : ''}
+                        ${totalObras > 0 ? `
+                        <div class="stat-item">
+                            <i class="bi bi-collection"></i>
+                            <span>${totalObras} obra${totalObras !== 1 ? 's' : ''}</span>
                         </div>
+                        ` : ''}
                     </div>
                     
                     <div class="artist-actions">
                         <button class="btn btn-primary btn-view-profile" onclick="goToArtistProfile(${artist.id})">
                             <i class="bi bi-person-circle"></i>
-                            Ver Perfil Completo
+                            Ver Perfil
                         </button>
-                        <button class="btn btn-outline-secondary btn-contact" onclick="contactArtist('${escaparHTML(artist.email)}', '${escaparHTML(artistName)}')">
-                            <i class="bi bi-chat-dots"></i>
+                        ${whatsapp ? `
+                        <button class="btn btn-success btn-contact" onclick="contactArtistWhatsApp('${escaparHTML(whatsapp)}', '${escaparHTML(artistName)}')">
+                            <i class="bi bi-whatsapp"></i>
                             Contactar
                         </button>
+                        ` : ''}
                     </div>
                 </div>
             </div>
@@ -816,7 +810,7 @@ function createWorkCard(work) {
         '<span class="status-badge status-pending"><i class="bi bi-clock-fill"></i> En Proceso</span>';
     
     return `
-        <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
             <div class="work-card-professional border-0 shadow-sm h-100">
                 <div class="work-image-container">
                     <img src="${escaparHTML(imageSrc)}" class="work-main-image" alt="${escaparHTML(work.titulo)}">
@@ -941,7 +935,7 @@ function performSearch() {
     const searchTerm = searchInput?.value || '';
     const category = categorySelect?.value || '';
 
-    console.log('Realizando búsqueda:', { searchTerm, category }); // Debug
+    //console.log('Realizando búsqueda:', { searchTerm, category }); // Debug
 
     // Actualizar filtros
     WIKI.currentFilters.categoria = category;
@@ -1348,4 +1342,29 @@ function favoriteWork(workId) {
         icon: 'info',
         confirmButtonText: 'Entendido'
     });
+}
+
+/**
+ * Contactar artista por WhatsApp
+ */
+function contactArtistWhatsApp(telefono, artistName) {
+    if (!telefono || telefono === 'No disponible' || telefono === '') {
+        Swal.fire({
+            title: 'WhatsApp no disponible',
+            text: 'Este artista no ha proporcionado su número de WhatsApp.',
+            icon: 'info',
+            confirmButtonText: 'Entendido'
+        });
+        return;
+    }
+    
+    // Limpiar el número de teléfono (quitar espacios, guiones, etc.)
+    const numeroLimpio = telefono.replace(/\D/g, '');
+    
+    // Si no tiene código de país, agregar +54 (Argentina)
+    const numeroCompleto = numeroLimpio.startsWith('54') ? numeroLimpio : '54' + numeroLimpio;
+    
+    const mensaje = encodeURIComponent(`Hola ${artistName}, vi tu perfil en ID-Cultural y me gustaría conocer más sobre tu trabajo.`);
+    
+    window.open(`https://wa.me/${numeroCompleto}?text=${mensaje}`, '_blank');
 }

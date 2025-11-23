@@ -7,6 +7,10 @@
 session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../backend/config/connection.php';
+require_once __DIR__ . '/../../backend/helpers/NotificationHelper.php';
+
+// Inicializar helper de notificaciones
+NotificationHelper::init($pdo);
 
 // Verificar que el usuario sea validador o admin
 if (!isset($_SESSION['user_data']) || !in_array($_SESSION['user_data']['role'], ['validador', 'admin'])) {
@@ -83,6 +87,13 @@ try {
             $stmt = $pdo->prepare("UPDATE artistas SET status = 'validado' WHERE id = ?");
             $stmt->execute([$usuario_id]);
         }
+        
+        // 4. CREAR NOTIFICACIÓN de validación
+        $stmt_titulo = $pdo->prepare("SELECT titulo FROM publicaciones WHERE id = ?");
+        $stmt_titulo->execute([$publicacion_id]);
+        $titulo_obra = $stmt_titulo->fetchColumn();
+        
+        NotificationHelper::notificarPublicacionValidada($usuario_id, $titulo_obra, $publicacion_id);
 
         $mensaje = 'La publicación ha sido aprobada y ahora es visible en la Wiki de Artistas.';
         $log_action = 'VALIDACIÓN DE PUBLICACIÓN';
@@ -99,13 +110,20 @@ try {
             WHERE id = ?
         ");
         $stmt->execute([$nuevo_estado, $validador_id, $motivo, $publicacion_id]);
+        
+        // 4. CREAR NOTIFICACIÓN de rechazo
+        $stmt_titulo = $pdo->prepare("SELECT titulo FROM publicaciones WHERE id = ?");
+        $stmt_titulo->execute([$publicacion_id]);
+        $titulo_obra = $stmt_titulo->fetchColumn();
+        
+        NotificationHelper::notificarPublicacionRechazada($usuario_id, $titulo_obra, $motivo);
 
         $mensaje = 'La publicación ha sido rechazada. El artista será notificado.';
         $log_action = 'RECHAZO DE PUBLICACIÓN';
         $log_details = "Publicación ID: {$publicacion_id} del artista '{$usuario_nombre}' (ID: {$usuario_id}) ha sido rechazada. Motivo: {$motivo}";
     }
 
-    // 4. Registrar en el log del sistema (opcional - si la tabla existe)
+    // 5. Registrar en el log del sistema (opcional - si la tabla existe)
     try {
         $stmt = $pdo->prepare("
             INSERT INTO system_logs (user_id, user_name, action, details)

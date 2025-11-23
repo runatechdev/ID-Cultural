@@ -17,9 +17,6 @@ include(__DIR__ . '/../../../../../components/header.php');
 
       <h2 class="mb-4 text-center">Iniciar Sesión</h2>
 
-      <!-- Mensaje de error -->
-      <div id="mensaje-error" class="alert alert-danger" role="alert" hidden></div>
-
       <form id="loginForm" novalidate>
         <!-- Contenedor para mostrar mensajes de error -->
         <div id="mensaje-error" class="alert alert-danger" style="display: none;" role="alert">

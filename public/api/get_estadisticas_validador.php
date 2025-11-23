@@ -16,34 +16,58 @@ if (!isset($_SESSION['user_data']) || !in_array($_SESSION['user_data']['role'], 
 }
 
 try {
-    // Obtener estadísticas de publicaciones por estado
+    // Obtener estadísticas de ARTISTAS por estado
     $stmt = $pdo->prepare("
         SELECT 
-            COUNT(CASE WHEN estado = 'pendiente' THEN 1 END) as pendientes,
-            COUNT(CASE WHEN estado = 'validado' THEN 1 END) as validados,
-            COUNT(CASE WHEN estado = 'rechazado' THEN 1 END) as rechazados,
+            COUNT(CASE WHEN status = 'pendiente' THEN 1 END) as artistas_pendientes,
+            COUNT(CASE WHEN status = 'validado' THEN 1 END) as artistas_validados,
+            COUNT(CASE WHEN status = 'rechazado' THEN 1 END) as artistas_rechazados
+        FROM artistas
+    ");
+    $stmt->execute();
+    $statsArtistas = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Obtener estadísticas de PUBLICACIONES por estado
+    $stmt = $pdo->prepare("
+        SELECT 
+            COUNT(CASE WHEN estado = 'pendiente' THEN 1 END) as obras_pendientes,
+            COUNT(CASE WHEN estado = 'validado' THEN 1 END) as obras_validadas,
+            COUNT(CASE WHEN estado = 'rechazado' THEN 1 END) as obras_rechazadas,
             COUNT(CASE WHEN estado = 'borrador' THEN 1 END) as borradores
         FROM publicaciones
     ");
     $stmt->execute();
-    $stats = $stmt->fetch(PDO::FETCH_ASSOC);
+    $statsPublicaciones = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    // Obtener conteo de artistas validados (usuarios con al menos 1 obra validada)
+    // Obtener total de artistas validados (para referencia)
     $stmt = $pdo->prepare("
-        SELECT COUNT(DISTINCT usuario_id) as total_artistas_validados
-        FROM publicaciones
-        WHERE estado = 'validado'
+        SELECT COUNT(*) as total_artistas
+        FROM artistas
+        WHERE status = 'validado'
     ");
     $stmt->execute();
-    $artistas = $stmt->fetch(PDO::FETCH_ASSOC);
+    $totalArtistas = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    // Convertir a enteros
+    // Convertir a enteros y estructurar respuesta
     $estadisticas = [
-        'pendientes' => (int)$stats['pendientes'],
-        'validados' => (int)$stats['validados'],
-        'rechazados' => (int)$stats['rechazados'],
-        'borradores' => (int)$stats['borradores'],
-        'total_artistas_validados' => (int)$artistas['total_artistas_validados']
+        // Estadísticas de artistas
+        'artistas_pendientes' => (int)$statsArtistas['artistas_pendientes'],
+        'artistas_validados' => (int)$statsArtistas['artistas_validados'],
+        'artistas_rechazados' => (int)$statsArtistas['artistas_rechazados'],
+        
+        // Estadísticas de obras/publicaciones
+        'obras_pendientes' => (int)$statsPublicaciones['obras_pendientes'],
+        'obras_validadas' => (int)$statsPublicaciones['obras_validadas'],
+        'obras_rechazadas' => (int)$statsPublicaciones['obras_rechazadas'],
+        'borradores' => (int)$statsPublicaciones['borradores'],
+        
+        // Totales generales
+        'total_artistas_validados' => (int)$totalArtistas['total_artistas'],
+        
+        // Retrocompatibilidad (para scripts antiguos)
+        'pendientes' => (int)$statsPublicaciones['obras_pendientes'],
+        'validados' => (int)$statsPublicaciones['obras_validadas'],
+        'rechazados' => (int)$statsPublicaciones['obras_rechazadas']
     ];
     
     echo json_encode($estadisticas);

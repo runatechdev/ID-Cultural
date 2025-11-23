@@ -116,6 +116,9 @@ include(__DIR__ . '/../../../../../components/header.php');
                         <a href="<?php echo BASE_URL; ?>src/views/pages/admin/abm_usuarios.php" class="dashboard-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Añadir, editar o eliminar cuentas del personal del sitio (Administradores, Editores, Validadores).">
                             <i class="bi bi-person-badge dashboard-icon"></i> Gestionar Personal
                         </a>
+                        <a href="<?php echo BASE_URL; ?>src/views/pages/admin/gestionar_artistas.php" class="dashboard-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver, modificar y eliminar artistas registrados. Al borrar un artista se eliminan todas sus obras.">
+                            <i class="bi bi-people-fill dashboard-icon"></i> Gestionar Artistas
+                        </a>
                         <a href="<?php echo BASE_URL; ?>src/views/pages/shared/gestion_perfiles.php" class="dashboard-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Revisar y aprobar o rechazar perfiles públicos de artistas.">
                             <i class="bi bi-person-check dashboard-icon"></i> Validar Perfiles de Artistas
                         </a>

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../../../../config.php';
+require_once __DIR__ . '/../../../../../backend/config/connection.php';
 
 // --- Bloque de seguridad para Validador o Admin ---
 if (!isset($_SESSION['user_data']) || !in_array($_SESSION['user_data']['role'], ['validador', 'admin'])) {
@@ -11,6 +12,44 @@ if (!isset($_SESSION['user_data']) || !in_array($_SESSION['user_data']['role'], 
 // --- Variables para el header ---
 $page_title = "Panel de Validador";
 $specific_css_files = ['dashboard.css', 'abm_usuarios.css', 'dashboard-adm.css'];
+
+// --- CONSULTAS REALES A LA BASE DE DATOS ---
+try {
+    // Estadísticas de ARTISTAS
+    $stmt = $pdo->query("
+        SELECT 
+            COUNT(CASE WHEN status = 'pendiente' THEN 1 END) as artistas_pendientes,
+            COUNT(CASE WHEN status = 'validado' THEN 1 END) as artistas_validados,
+            COUNT(CASE WHEN status = 'rechazado' THEN 1 END) as artistas_rechazados
+        FROM artistas
+    ");
+    $statsArtistas = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Estadísticas de PUBLICACIONES/OBRAS
+    $stmt = $pdo->query("
+        SELECT 
+            COUNT(CASE WHEN estado = 'pendiente' THEN 1 END) as obras_pendientes,
+            COUNT(CASE WHEN estado = 'validado' THEN 1 END) as obras_validadas,
+            COUNT(CASE WHEN estado = 'rechazado' THEN 1 END) as obras_rechazadas,
+            COUNT(CASE WHEN estado = 'borrador' THEN 1 END) as borradores
+        FROM publicaciones
+    ");
+    $statsObras = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+} catch (Exception $e) {
+    error_log("Error al obtener estadísticas del validador: " . $e->getMessage());
+    $statsArtistas = [
+        'artistas_pendientes' => 0,
+        'artistas_validados' => 0,
+        'artistas_rechazados' => 0
+    ];
+    $statsObras = [
+        'obras_pendientes' => 0,
+        'obras_validadas' => 0,
+        'obras_rechazadas' => 0,
+        'borradores' => 0
+    ];
+}
 
 // --- Incluir la cabecera ---
 include(__DIR__ . '/../../../../../components/header.php');
@@ -36,7 +75,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                             <div class="stat-card-icon icon-requests"><i class="bi bi-hourglass-split"></i></div>
                             <div class="stat-card-info">
                                 <p class="stat-card-title">Artistas Pendientes</p>
-                                <h3 class="stat-card-number" id="stat-pendientes">0</h3>
+                                <h3 class="stat-card-number"><?php echo $statsArtistas['artistas_pendientes']; ?></h3>
                             </div>
                         </div>
                     </div>
@@ -45,7 +84,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                             <div class="stat-card-icon icon-artists"><i class="bi bi-patch-check-fill"></i></div>
                             <div class="stat-card-info">
                                 <p class="stat-card-title">Artistas Validados</p>
-                                <h3 class="stat-card-number" id="stat-validados">0</h3>
+                                <h3 class="stat-card-number"><?php echo $statsArtistas['artistas_validados']; ?></h3>
                             </div>
                         </div>
                     </div>
@@ -54,7 +93,38 @@ include(__DIR__ . '/../../../../../components/header.php');
                             <div class="stat-card-icon icon-users"><i class="bi bi-x-circle-fill"></i></div>
                             <div class="stat-card-info">
                                 <p class="stat-card-title">Artistas Rechazados</p>
-                                <h3 class="stat-card-number" id="stat-rechazados">0</h3>
+                                <h3 class="stat-card-number"><?php echo $statsArtistas['artistas_rechazados']; ?></h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fila de Tarjetas de Obras/Publicaciones -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="stat-card h-100">
+                            <div class="stat-card-icon" style="background: #fff3cd;"><i class="bi bi-clock-history" style="color: #856404;"></i></div>
+                            <div class="stat-card-info">
+                                <p class="stat-card-title">Obras Pendientes</p>
+                                <h3 class="stat-card-number"><?php echo $statsObras['obras_pendientes']; ?></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="stat-card h-100">
+                            <div class="stat-card-icon" style="background: #d1e7dd;"><i class="bi bi-check2-square" style="color: #0a3622;"></i></div>
+                            <div class="stat-card-info">
+                                <p class="stat-card-title">Obras Validadas</p>
+                                <h3 class="stat-card-number"><?php echo $statsObras['obras_validadas']; ?></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="stat-card h-100">
+                            <div class="stat-card-icon" style="background: #f8d7da;"><i class="bi bi-x-square" style="color: #58151c;"></i></div>
+                            <div class="stat-card-info">
+                                <p class="stat-card-title">Obras Rechazadas</p>
+                                <h3 class="stat-card-number"><?php echo $statsObras['obras_rechazadas']; ?></h3>
                             </div>
                         </div>
                     </div>
@@ -89,8 +159,9 @@ include(__DIR__ . '/../../../../../components/header.php');
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
     <script>
-        const BASE_URL = '<?php echo BASE_URL; ?>';
+      // Inicializar tooltips de Bootstrap
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     </script>
-    <script src="<?php echo BASE_URL; ?>static/js/panel_validador.js"></script>
 </body>
 </html>

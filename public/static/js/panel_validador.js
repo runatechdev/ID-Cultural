@@ -15,8 +15,13 @@ async function cargarEstadisticas() {
         const response = await fetch(`${BASE_URL}api/get_estadisticas_validador.php`);
         const data = await response.json();
         
+        console.log('Estadísticas recibidas:', data); // Debug
+        
         if (data.status === 'ok') {
             actualizarEstadisticas(data.data);
+        } else if (data.artistas_pendientes !== undefined) {
+            // Formato nuevo de respuesta con artistas
+            actualizarEstadisticas(data);
         } else if (data.pendientes !== undefined) {
             // Formato antiguo de respuesta
             actualizarEstadisticas(data);
@@ -29,10 +34,28 @@ async function cargarEstadisticas() {
 }
 
 function actualizarEstadisticas(stats) {
-    // Actualizar números con animación
-    animarNumero('stat-pendientes', stats.pendientes, 'text-warning');
-    animarNumero('stat-validados', stats.validados, 'text-success');
-    animarNumero('stat-rechazados', stats.rechazados, 'text-danger');
+    console.log('Actualizando estadísticas con:', stats); // Debug
+    
+    // Actualizar números con animación - usando estadísticas de ARTISTAS
+    // Usar el operador ?? (nullish coalescing) en lugar de ||
+    const artistasPendientes = stats.artistas_pendientes !== undefined ? stats.artistas_pendientes : (stats.pendientes || 0);
+    const artistasValidados = stats.artistas_validados !== undefined ? stats.artistas_validados : (stats.validados || 0);
+    const artistasRechazados = stats.artistas_rechazados !== undefined ? stats.artistas_rechazados : (stats.rechazados || 0);
+    
+    animarNumero('stat-pendientes', artistasPendientes, 'text-warning');
+    animarNumero('stat-validados', artistasValidados, 'text-success');
+    animarNumero('stat-rechazados', artistasRechazados, 'text-danger');
+    
+    // Si hay elementos para obras (opcional, por si se agregan luego)
+    if (document.getElementById('stat-obras-pendientes')) {
+        animarNumero('stat-obras-pendientes', stats.obras_pendientes || 0, 'text-warning');
+    }
+    if (document.getElementById('stat-obras-validadas')) {
+        animarNumero('stat-obras-validadas', stats.obras_validadas || 0, 'text-success');
+    }
+    if (document.getElementById('stat-obras-rechazadas')) {
+        animarNumero('stat-obras-rechazadas', stats.obras_rechazadas || 0, 'text-danger');
+    }
 }
 
 function animarNumero(elementId, valorFinal, colorClass = '') {

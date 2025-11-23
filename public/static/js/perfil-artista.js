@@ -15,7 +15,7 @@ function initializeProfile() {
     const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
     tabButtons.forEach(button => {
         button.addEventListener('shown.bs.tab', function(event) {
-            console.log('Tab activado:', event.target.textContent);
+            //console.log('Tab activado:', event.target.textContent);
             // Aquí puedes cargar contenido dinámico si es necesario
         });
     });
@@ -31,7 +31,7 @@ function initializeProfile() {
     socialLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('Enlace social clickeado:', this.title);
+            //console.log('Enlace social clickeado:', this.title);
         });
     });
 
@@ -54,7 +54,7 @@ function initializeProfile() {
  */
 function handleEditProfile(e) {
     e.preventDefault();
-    console.log('Editar perfil clickeado');
+    //console.log('Editar perfil clickeado');
     
     // Aquí puedes implementar la lógica de edición
     // Por ejemplo, redirigir a una página de edición o abrir un modal
@@ -157,7 +157,7 @@ function mostrarObra(obra) {
  * Función auxiliar para cargar contenido dinámico en los tabs
  */
 function loadTabContent(tabName) {
-    console.log('Cargando contenido del tab:', tabName);
+    //console.log('Cargando contenido del tab:', tabName);
     
     // Implementar lógica para cargar contenido dinámico desde API
     // Ejemplo:
@@ -171,7 +171,7 @@ function loadTabContent(tabName) {
  * Actualiza el contenido de un tab
  */
 function updateTabContent(data) {
-    console.log('Actualizando contenido:', data);
+    //console.log('Actualizando contenido:', data);
     // Implementar lógica para actualizar el contenido del tab
 }
 

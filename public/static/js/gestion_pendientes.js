@@ -6,19 +6,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Buscar tbody de manera flexible (puede ser tabla-obras-pendientes-body o tabla-artistas-body con clase tabla-obras-body)
     let tbody = document.getElementById('tabla-obras-pendientes-body');
-    console.log('Buscando tbody con ID tabla-obras-pendientes-body:', tbody);
+    //console.log('Buscando tbody con ID tabla-obras-pendientes-body:', tbody);
     
     if (!tbody) {
         tbody = document.querySelector('tbody.tabla-obras-body');
-        console.log('Buscando tbody con selector .tabla-obras-body:', tbody);
+        //console.log('Buscando tbody con selector .tabla-obras-body:', tbody);
     }
     
     if (!tbody) {
         console.error('No se encontró el elemento tbody para cargar las obras');
-        console.log('Elementos tbody disponibles:', document.querySelectorAll('tbody'));
+        //console.log('Elementos tbody disponibles:', document.querySelectorAll('tbody'));
         return;
     }
-    console.log('Tbody encontrado:', tbody.id, tbody.className);
+    //console.log('Tbody encontrado:', tbody.id, tbody.className);
     
     let obrasPendientes = [];
     let perfilesPendientes = [];
@@ -57,9 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
             todosPendientes = [...obrasPendientes, ...perfilesPendientes];
             filtrados = [...todosPendientes];
             
-            console.log('Obras pendientes:', obrasPendientes.length);
-            console.log('Perfiles pendientes:', perfilesPendientes.length);
-            console.log('Total pendientes:', todosPendientes.length);
+            //console.log('Obras pendientes:', obrasPendientes.length);
+            //console.log('Perfiles pendientes:', perfilesPendientes.length);
+            //console.log('Total pendientes:', todosPendientes.length);
             
             // Llenar select de municipios
             llenarSelectMunicipios();
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function mostrarItems(items) {
-        console.log('mostrarItems llamada con:', items.length, 'items');
+        //console.log('mostrarItems llamada con:', items.length, 'items');
         
         if (!items || items.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><i class="bi bi-inbox fs-1 text-muted"></i><p class="mt-3 text-muted">No hay elementos pendientes de validación</p></td></tr>';

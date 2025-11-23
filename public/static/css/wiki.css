@@ -516,13 +516,13 @@ body {
 }
 
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(20px); 
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -543,46 +543,32 @@ body {
     font-size: 1.05rem;
 }
 
-/* Grids de Contenido - MEJORADO */
-.artists-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.works-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-/* Cards Profesionales de Artistas - MEJORADO */
+/* Cards Compactas de Artistas */
 .artist-card-professional {
     background: var(--white);
-    border-radius: 20px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 8px 25px var(--shadow-light);
+    box-shadow: 0 4px 12px var(--shadow-light);
     transition: all 0.3s ease;
     height: 100%;
-    min-height: 520px;
+    min-height: 380px;
     display: flex;
     flex-direction: column;
 }
 
 .artist-card-professional:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 40px var(--shadow-medium);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px var(--shadow-medium);
 }
 
+/* Imagen de perfil con buena altura */
 .artist-image-container {
     position: relative;
     width: 100%;
-    aspect-ratio: 1;
+    height: 280px;
     overflow: hidden;
-    flex-shrink: 0;
     background: linear-gradient(135deg, #f5f5f5, #e9ecef);
+    flex-shrink: 0;
 }
 
 .artist-profile-image {
@@ -602,26 +588,46 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
-    padding: 2rem 1.5rem 1rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+    padding: 1.2rem 1rem 0.8rem;
     text-align: center;
 }
 
+/* Badge más pequeño */
 .category-badge {
     background: var(--gradient-primary);
     color: var(--white);
-    padding: 0.5rem 1.25rem;
-    border-radius: 25px;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.5px;
     display: inline-block;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* Badge de verificado más pequeño */
+.verified-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: rgba(0, 191, 255, 0.95);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+}
+
+/* Contenido más compacto */
 .artist-content {
-    padding: 1.5rem;
+    padding: 1rem;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -629,194 +635,121 @@ body {
 }
 
 .artist-header {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     text-align: center;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--gray-light);
 }
 
 .artist-name {
-    font-size: 1.5rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: var(--gray-dark);
-    margin: 0;
+    margin: 0 0 0.35rem 0;
     line-height: 1.3;
-    word-wrap: break-word;
-    word-break: break-word;
-    overflow-wrap: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
 }
 
-.artist-details {
-    flex: 1;
-    margin-bottom: 1rem;
-    min-height: 0;
-    overflow-y: auto;
-}
-
-.detail-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-    margin-bottom: 1rem;
-}
-
-.detail-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    padding: 0.65rem 0.75rem;
-    background: rgba(0, 191, 255, 0.04);
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-.detail-item:hover {
-    background: rgba(0, 191, 255, 0.1);
-}
-
-.detail-item i {
-    color: var(--primary-cyan);
-    font-size: 1.1rem;
-    flex-shrink: 0;
-    margin-top: 2px;
-}
-
-.detail-label {
-    font-weight: 600;
-    color: var(--gray-dark);
-    flex-shrink: 0;
-    font-size: 0.85rem;
-    min-width: 80px;
-}
-
-.detail-value {
+.artist-location {
     color: var(--gray-medium);
-    font-size: 0.85rem;
-    word-break: break-word;
-    flex: 1;
-    overflow-wrap: break-word;
-}
-
-.artist-bio {
-    background: linear-gradient(135deg, rgba(0, 191, 255, 0.08), rgba(255, 20, 147, 0.05));
-    padding: 1rem;
-    border-radius: 12px;
-    border-left: 4px solid var(--primary-cyan);
-    margin: 1rem 0;
-}
-
-.artist-bio p {
+    font-size: 0.8rem;
     margin: 0;
-    font-style: italic;
-    color: var(--gray-dark);
-    line-height: 1.6;
-    font-size: 0.85rem;
-    word-wrap: break-word;
-}
-
-.artist-bio i {
-    color: var(--primary-cyan);
-    margin-right: 0.5rem;
-    font-size: 1rem;
-}
-
-.artist-social-links {
-    display: flex;
-    gap: 0.5rem;
-    margin: 1rem 0;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.social-link {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    text-decoration: none;
-    color: var(--white);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
+    gap: 0.3rem;
 }
 
-.social-link.instagram {
-    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+.artist-location i {
+    color: var(--primary-cyan);
+    font-size: 0.85rem;
 }
 
-.social-link.facebook {
-    background: #1877f2;
+/* Estadísticas compactas */
+.artist-stats {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.65rem 0;
+    margin: 0.5rem 0 0.75rem 0;
+    border-top: 1px solid var(--gray-light);
 }
 
-.social-link.twitter {
-    background: #1da1f2;
+.artist-stats .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--gray-dark);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    min-width: auto;
 }
 
-.social-link.website {
-    background: var(--gray-dark);
+.artist-stats .stat-item:hover {
+    transform: none;
+    box-shadow: none;
 }
 
-.social-link:hover {
-    transform: translateY(-3px) scale(1.1);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+.artist-stats .stat-item i {
+    color: var(--primary-cyan);
+    font-size: 0.9rem;
 }
 
+/* Botones más compactos */
 .artist-actions {
     display: flex;
-    gap: 0.65rem;
+    gap: 0.5rem;
     margin-top: auto;
-    padding-top: 1rem;
+}
+
+.btn-view-profile,
+.btn-contact {
+    padding: 0.65rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    flex: 1;
+    font-size: 0.8rem;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
 }
 
 .btn-view-profile {
     background: var(--gradient-primary);
-    border: none;
     color: var(--white);
-    padding: 0.8rem 1.25rem;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    flex: 1;
-    font-size: 0.85rem;
-    text-decoration: none;
-    cursor: pointer;
 }
 
 .btn-view-profile:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 191, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 191, 255, 0.3);
     color: var(--white);
 }
 
 .btn-contact {
-    border: 2px solid var(--primary-cyan);
-    color: var(--primary-cyan);
-    padding: 0.8rem 1.25rem;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    background: var(--white);
-    font-size: 0.85rem;
-    flex: 1;
-    text-decoration: none;
-    cursor: pointer;
+    background: #25D366;
+    color: var(--white);
 }
 
 .btn-contact:hover {
-    background: var(--primary-cyan);
-    color: var(--white);
+    background: #128C7E;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 191, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+    color: var(--white);
+}
+
+.btn-view-profile i,
+.btn-contact i {
+    font-size: 0.95rem;
 }
 
 /* Cards de Artistas Famosos */
@@ -1059,8 +992,6 @@ body {
     background: rgba(255, 193, 7, 0.9);
     color: var(--dark-bg);
 }
-
-/* Botones de hover eliminados */
 
 .work-content {
     padding: 1.5rem;
@@ -1325,12 +1256,6 @@ body {
     font-size: 1rem;
 }
 
-.artist-location {
-    margin: 0 0 0.75rem 0;
-    color: var(--gray-medium);
-    font-size: 0.85rem;
-}
-
 .contact-artist-btn {
     padding: 0.5rem 1rem;
     border-radius: 20px;
@@ -1527,46 +1452,42 @@ header .dropdown-menu,
     position: absolute !important;
 }
 
-/* Responsivo - Tablet y Desktop */
-@media (min-width: 768px) {
-    .artists-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-    }
+/* ============================================================================
+   MEDIA QUERIES - CORREGIDAS Y OPTIMIZADAS
+   ========================================================================== */
 
-    .works-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-    }
-}
-
-@media (min-width: 1200px) {
-    .artists-grid {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.75rem;
-    }
-
-    .works-grid {
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 1.75rem;
-    }
-
+/* Desktop XL - 4 columnas */
+@media (min-width: 1400px) {
     .stats-row {
         gap: 3rem;
     }
 }
 
-/* Responsivo - Tablet */
-@media (max-width: 992px) {
+/* Desktop L - 3 columnas */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    /* Bootstrap maneja el grid */
+}
+
+/* Desktop M - 3 columnas */
+@media (min-width: 992px) and (max-width: 1199px) {
     .stats-row {
         gap: 1.5rem;
     }
-
+    
     .stat-item {
         min-width: 120px;
         padding: 1rem;
     }
+    
+    .wiki-sidebar {
+        position: static;
+        max-height: none;
+        margin-bottom: 2rem;
+    }
+}
 
+/* Tablet - 2 columnas */
+@media (min-width: 768px) and (max-width: 991px) {
     .search-input-group {
         flex-direction: column;
         border-radius: 20px;
@@ -1579,34 +1500,43 @@ header .dropdown-menu,
         width: 100%;
     }
 
+    .tab-navigation {
+        flex-wrap: wrap;
+        overflow-x: visible !important;
+        gap: 0.5rem;
+    }
+
+    .tab-btn {
+        flex: 1 1 auto;
+        min-width: 110px;
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+        white-space: normal;
+        text-align: center;
+    }
+    
+    .tab-btn i {
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .artist-card-professional {
+        min-height: 380px;
+    }
+
+    .artist-image-container {
+        height: 250px;
+    }
+    
     .wiki-sidebar {
         position: static;
         max-height: none;
         margin-bottom: 2rem;
     }
-
-    .tab-navigation {
-        flex-wrap: wrap;
-    }
-
-    .tab-btn {
-        flex: none;
-        min-width: calc(50% - 0.25rem);
-        padding: 0.85rem 1rem;
-        font-size: 0.9rem;
-    }
-
-    .artist-card-professional {
-        min-height: 480px;
-    }
-
-    .artist-image-container {
-        aspect-ratio: 3 / 4;
-    }
 }
 
-/* Responsivo - Móvil */
-@media (max-width: 768px) {
+/* Mobile L - 1 columna */
+@media (max-width: 767px) {
     .wiki-header {
         padding: 2rem 0;
     }
@@ -1624,6 +1554,25 @@ header .dropdown-menu,
     .stat-item {
         min-width: 100%;
         max-width: 200px;
+    }
+    
+    /* Pestañas sin scroll en móvil */
+    .tab-navigation {
+        overflow-x: visible !important;
+        flex-wrap: wrap;
+    }
+    
+    .tab-btn {
+        flex: 1 1 30%;
+        min-width: 100px;
+        padding: 0.75rem 0.25rem;
+        font-size: 0.8rem;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .tab-btn i {
+        font-size: 1.2rem;
     }
 
     .search-container {
@@ -1646,87 +1595,52 @@ header .dropdown-menu,
         font-size: 1rem;
     }
 
-    .artists-grid {
-        grid-template-columns: 1fr;
-        gap: 1.25rem;
-    }
-
-    .works-grid {
-        grid-template-columns: 1fr;
-        gap: 1.25rem;
-    }
-
     .artist-card-professional {
-        min-height: 450px;
+        min-height: 360px;
     }
 
     .artist-image-container {
-        aspect-ratio: 1;
         height: 220px;
     }
 
     .artist-content {
-        padding: 1.25rem;
+        padding: 1rem;
     }
 
     .artist-name {
-        font-size: 1.3rem;
+        font-size: 1.15rem;
     }
 
-    .detail-item {
-        padding: 0.6rem;
-        gap: 0.6rem;
-    }
-
-    .detail-label {
-        font-size: 0.8rem;
-        min-width: 70px;
-    }
-
-    .detail-value {
+    .artist-location {
         font-size: 0.8rem;
     }
 
-    .artist-bio {
-        padding: 0.85rem;
-        margin: 0.85rem 0;
+    .artist-stats {
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        margin: 0.4rem 0 0.6rem 0;
     }
 
-    .artist-bio p {
-        font-size: 0.8rem;
-    }
-
-    .artist-social-links {
-        gap: 0.4rem;
-        margin: 0.85rem 0;
-    }
-
-    .social-link {
-        width: 34px;
-        height: 34px;
-        font-size: 0.9rem;
+    .artist-stats .stat-item {
+        font-size: 0.7rem;
     }
 
     .artist-actions {
-        flex-direction: column;
-        gap: 0.6rem;
-        padding-top: 0.85rem;
+        gap: 0.5rem;
     }
 
     .btn-view-profile,
     .btn-contact {
-        width: 100%;
+        padding: 0.65rem 1rem;
         font-size: 0.8rem;
-        padding: 0.7rem 1rem;
     }
 
     .work-image-container {
-        aspect-ratio: 16 / 9;
-        height: 200px;
+        height: 180px;
     }
 
     .work-content {
-        padding: 1.25rem;
+        padding: 1rem;
     }
 
     .work-title {
@@ -1814,9 +1728,14 @@ header .dropdown-menu,
     .content-header p {
         font-size: 1rem;
     }
+    
+    .wiki-sidebar {
+        position: static;
+        margin-bottom: 2rem;
+    }
 }
 
-/* Responsivo - Móvil pequeño */
+/* Mobile M - 1 columna más compacta */
 @media (max-width: 576px) {
     .container-fluid {
         padding-left: 0.75rem;
@@ -1852,80 +1771,45 @@ header .dropdown-menu,
         font-size: 0.95rem;
     }
 
-    .artists-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        padding: 0;
-    }
-
     .artist-card-professional {
-        min-height: 420px;
+        min-height: 350px;
     }
 
     .artist-image-container {
-        height: 180px;
+        height: 200px;
     }
 
     .artist-content {
-        padding: 1rem;
+        padding: 0.9rem;
     }
 
     .artist-name {
-        font-size: 1.15rem;
+        font-size: 1.05rem;
     }
 
-    .detail-row {
-        gap: 0.55rem;
-        margin-bottom: 0.85rem;
-    }
-
-    .detail-item {
-        padding: 0.55rem;
-        gap: 0.55rem;
-    }
-
-    .detail-item i {
-        font-size: 1rem;
-    }
-
-    .detail-label {
-        font-size: 0.75rem;
-        min-width: 65px;
-    }
-
-    .detail-value {
+    .artist-location {
         font-size: 0.75rem;
     }
 
-    .artist-bio {
-        padding: 0.75rem;
-        margin: 0.75rem 0;
+    .artist-stats {
+        gap: 0.6rem;
+        padding: 0.45rem 0;
+        margin: 0.35rem 0 0.5rem 0;
     }
 
-    .artist-bio p {
-        font-size: 0.75rem;
-    }
-
-    .artist-social-links {
-        gap: 0.35rem;
-        margin: 0.75rem 0;
-    }
-
-    .social-link {
-        width: 32px;
-        height: 32px;
-        font-size: 0.85rem;
+    .artist-stats .stat-item {
+        font-size: 0.7rem;
     }
 
     .artist-actions {
-        gap: 0.5rem;
-        padding-top: 0.75rem;
+        gap: 0.45rem;
+        padding-top: 0.65rem;
     }
 
     .btn-view-profile,
     .btn-contact {
         font-size: 0.75rem;
-        padding: 0.65rem 0.85rem;
+        padding: 0.6rem 0.85rem;
     }
 
     .work-image-container {
@@ -1947,11 +1831,8 @@ header .dropdown-menu,
 
     .work-description p {
         font-size: 0.75rem;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
         -webkit-line-clamp: 1;
         line-clamp: 1;
-        overflow: hidden;
     }
 
     .work-metadata {
@@ -2017,6 +1898,7 @@ body.swal2-shown {
 body.swal2-shown .wiki-sidebar {
     position: static !important;
 }
+
 .tab-btn:focus-visible,
 .filter-btn:focus-visible,
 .btn-view-profile:focus-visible,

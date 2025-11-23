@@ -24,6 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
             Swal.fire('Error', 'Las contraseñas no coinciden.', 'error');
             return;
         }
+        // Validación adicional: fecha de nacimiento obligatoria
+        const fecha = document.getElementById('fecha_nacimiento').value;
+        if (!fecha) {
+            Swal.fire('Atención', 'Por favor indica tu fecha de nacimiento.', 'warning');
+            return;
+        }
 
         const formData = new FormData();
         // Recolectar todos los campos
@@ -32,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('email', document.getElementById('email').value);
         formData.append('password', password);
         formData.append('confirm_password', confirm_password);
-        formData.append('fecha_nacimiento', document.getElementById('fecha_nacimiento').value);
+        formData.append('fecha_nacimiento', fecha);
         formData.append('genero', document.getElementById('genero').value);
         formData.append('pais', document.getElementById('pais').value);
         formData.append('provincia', document.getElementById('provincia').value);

@@ -92,23 +92,45 @@ include(__DIR__ . '/../../../../../components/header.php');
                     </div>
 
                     <!-- Sección: Especialidades -->
-                    <h4 class="mb-3 mt-4">Especialidades Artísticas</h4>
+                    <h4 class="mb-3 mt-4">Categoría Artística</h4>
                     <div class="mb-3">
-                        <label for="especialidades" class="form-label">Tus disciplinas artísticas</label>
-                        <input 
-                            type="text" 
-                            class="form-control" 
+                        <label for="especialidades" class="form-label">¿Cuál es tu disciplina principal? *</label>
+                        <select 
+                            class="form-select" 
                             id="especialidades" 
                             name="especialidades" 
-                            placeholder="Ej: Pintura, Escultura, Danza, Música, Fotografía..."
-                            value="<?php echo htmlspecialchars($artista['especialidades'] ?? ''); ?>"
+                            required
                         >
-                        <small class="text-muted">Separa las disciplinas con comas</small>
+                            <option value="">Selecciona una categoría</option>
+                            <option value="Musica" <?php echo ($artista['especialidades'] ?? '') === 'Musica' ? 'selected' : ''; ?>>Música</option>
+                            <option value="Literatura" <?php echo ($artista['especialidades'] ?? '') === 'Literatura' ? 'selected' : ''; ?>>Literatura</option>
+                            <option value="Danza" <?php echo ($artista['especialidades'] ?? '') === 'Danza' ? 'selected' : ''; ?>>Danza</option>
+                            <option value="Teatro" <?php echo ($artista['especialidades'] ?? '') === 'Teatro' ? 'selected' : ''; ?>>Teatro</option>
+                            <option value="Artesania" <?php echo ($artista['especialidades'] ?? '') === 'Artesania' ? 'selected' : ''; ?>>Artesanía</option>
+                            <option value="Audiovisual" <?php echo ($artista['especialidades'] ?? '') === 'Audiovisual' ? 'selected' : ''; ?>>Audiovisual</option>
+                            <option value="Escultura" <?php echo ($artista['especialidades'] ?? '') === 'Escultura' ? 'selected' : ''; ?>>Escultura</option>
+                        </select>
+                        <small class="text-muted">Esta categoría se usará para filtrar tu perfil en la Wiki</small>
                     </div>
 
                     <!-- Sección: Redes Sociales -->
-                    <h4 class="mb-3 mt-4">Redes Sociales</h4>
+                    <h4 class="mb-3 mt-4">Redes Sociales y Contacto</h4>
                     <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="whatsapp" class="form-label">WhatsApp <small class="text-muted">(Público)</small></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-whatsapp"></i></span>
+                                <input 
+                                    type="tel" 
+                                    class="form-control" 
+                                    id="whatsapp" 
+                                    name="whatsapp"
+                                    placeholder="+54 385 1234567"
+                                    value="<?php echo htmlspecialchars($artista['whatsapp'] ?? ''); ?>"
+                                >
+                            </div>
+                            <small class="text-muted">Este número será visible para que te contacten</small>
+                        </div>
                         <div class="col-md-6 mb-3">
                             <label for="instagram" class="form-label">Instagram</label>
                             <div class="input-group">
@@ -123,6 +145,9 @@ include(__DIR__ . '/../../../../../components/header.php');
                                 >
                             </div>
                         </div>
+                    </div>
+                    
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="facebook" class="form-label">Facebook</label>
                             <input 
@@ -134,9 +159,6 @@ include(__DIR__ . '/../../../../../components/header.php');
                                 value="<?php echo htmlspecialchars($artista['facebook'] ?? ''); ?>"
                             >
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="twitter" class="form-label">Twitter / X</label>
                             <div class="input-group">
@@ -151,6 +173,9 @@ include(__DIR__ . '/../../../../../components/header.php');
                                 >
                             </div>
                         </div>
+                    </div>
+                    
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="sitio_web" class="form-label">Sitio Web</label>
                             <input 
