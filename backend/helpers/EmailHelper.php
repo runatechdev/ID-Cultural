@@ -43,10 +43,11 @@ class EmailHelper {
             }
         }
         
-        // Configurar valores con fallbacks
-        $this->sendgrid_api_key = $_ENV['SENDGRID_API_KEY'] ?? '';
-        $this->from_email = $_ENV['SENDGRID_FROM_EMAIL'] ?? 'noreply@idcultural.gob.ar';
-        $this->from_name = $_ENV['SENDGRID_FROM_NAME'] ?? 'ID Cultural - Subsecretaría de Cultura';
+    // Configurar valores con fallbacks
+    // Preferir variables de entorno (getenv) para compatibilidad con contenedores
+    $this->sendgrid_api_key = getenv('SENDGRID_API_KEY') ?: ($_ENV['SENDGRID_API_KEY'] ?? '');
+    $this->from_email = getenv('SENDGRID_FROM_EMAIL') ?: ($_ENV['SENDGRID_FROM_EMAIL'] ?? 'noreply@idcultural.gob.ar');
+    $this->from_name = getenv('SENDGRID_FROM_NAME') ?: ($_ENV['SENDGRID_FROM_NAME'] ?? 'ID Cultural - Subsecretaría de Cultura');
         
         // Verificar configuración crítica
         if (empty($this->sendgrid_api_key)) {
@@ -58,6 +59,12 @@ class EmailHelper {
      * Envía un email usando SendGrid
      */
     private function enviarMail($email_destino, $asunto, $html) {
+        // Si no hay API key configurada, evitar intentar enviar (evita errores en entornos sin clave)
+        if (empty($this->sendgrid_api_key)) {
+            error_log("[EmailHelper] SENDGRID_API_KEY no configurado. Saltando envío a: $email_destino");
+            return false;
+        }
+
         try {
             $mail = new PHPMailer(true);
 
