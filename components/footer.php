@@ -22,7 +22,7 @@
 
   <div class="footer-links">
     <a href="<?php echo defined('BASE_URL') ? BASE_URL : '/'; ?>contacto.php" target="_blank">Contacto</a>
-    <a href="<?php echo defined('BASE_URL') ? BASE_URL : '/'; ?>privacidad.html" target="_blank">Política de Privacidad</a>
+    <a href="<?php echo defined('BASE_URL') ? BASE_URL : '/'; ?>privacidad.php" target="_blank">Política de Privacidad</a>
     <a href="<?php echo defined('BASE_URL') ? BASE_URL : '/'; ?>terminos_condiciones.php" target="_blank">Términos de Uso</a>
   </div>
 

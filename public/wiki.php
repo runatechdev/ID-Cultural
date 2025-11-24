@@ -234,7 +234,7 @@ include(__DIR__ . '/../components/header.php');
             </div>
             <div class="stat-item">
                 <div class="stat-number" id="total-obras">0</div>
-                <div class="stat-label">Obras Validadas</div>
+                <div class="stat-label">Obras</div>
             </div>
             <div class="stat-item">
                 <div class="stat-number" id="total-categorias">7</div>
