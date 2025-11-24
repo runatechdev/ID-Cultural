@@ -101,16 +101,21 @@ try {
 
     } else { // rechazar
         $nuevo_estado = 'rechazado';
-        $stmt = $pdo->prepare("
-            UPDATE publicaciones 
-            SET estado = ?, 
-                validador_id = ?, 
-                fecha_validacion = NOW(),
-                motivo_rechazo = ?
-            WHERE id = ?
-        ");
-        $stmt->execute([$nuevo_estado, $validador_id, $motivo, $publicacion_id]);
-        
+        try {
+            $stmt = $pdo->prepare("
+                UPDATE publicaciones 
+                SET estado = ?, 
+                    validador_id = ?, 
+                    fecha_validacion = NOW()
+                WHERE id = ?
+            ");
+            $stmt->execute([$nuevo_estado, $validador_id, $publicacion_id]);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => 'Error al actualizar publicación: ' . $e->getMessage()]);
+            exit;
+        }
         // 4. CREAR NOTIFICACIÓN de rechazo
         $stmt_titulo = $pdo->prepare("SELECT titulo FROM publicaciones WHERE id = ?");
         $stmt_titulo->execute([$publicacion_id]);
@@ -153,5 +158,5 @@ try {
     $pdo->rollBack();
     error_log("Error en validar_publicacion.php: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => 'Error en la base de datos.']);
+    echo json_encode(['status' => 'error', 'message' => 'Error en la base de datos: ' . $e->getMessage()]);
 }

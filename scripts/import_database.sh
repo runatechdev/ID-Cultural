@@ -25,6 +25,10 @@ docker exec $DB_CONTAINER mysqladmin ping -u $DB_USER -p$DB_PASSWORD --silent 2>
 
 # Importar la base de datos
 echo "📥 Importando datos..."
+echo "💣 Recreando base de datos (para evitar errores de FK)..."
+docker exec $DB_CONTAINER mysql -u $DB_USER -p$DB_PASSWORD -e "DROP DATABASE IF EXISTS $DB_NAME; CREATE DATABASE $DB_NAME;"
+
+echo "📥 Importando datos..."
 docker exec -i $DB_CONTAINER mysql \
     -u $DB_USER \
     -p$DB_PASSWORD \

@@ -19,6 +19,8 @@ mkdir -p "$(dirname "$EXPORT_FILE")"
 
 # Exportar la base de datos
 docker exec $DB_CONTAINER mysqldump \
+    --add-drop-table \
+    --disable-keys \
     -u $DB_USER \
     -p$DB_PASSWORD \
     $DB_NAME > $EXPORT_FILE
