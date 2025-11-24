@@ -995,6 +995,18 @@ function viewArtistDetail(artistId) {
 }
 
 /**
+ * Sistema de Galería Integrado en Modal de Obra - VERSIÓN PROFESIONAL FINAL
+ */
+
+// Variable global para mantener estado de la galería
+let currentGalleryState = {
+    images: [],
+    currentIndex: 0,
+    isGalleryOpen: false,
+    container: null
+};
+
+/**
  * Ver detalle profesional de obra
  */
 function viewWorkDetail(workId) {
@@ -1012,128 +1024,186 @@ function viewWorkDetail(workId) {
     const imageSrc = work.imagen_url || work.imagen_principal || work.multimedia || '/static/img/placeholder-obra.png';
     const artistName = work.artista_nombre || 'Artista Anónimo';
     
-    // Crear multimedia gallery si hay múltiples archivos
-    let mediaGallery = '';
-    if (work.multimedia) {
-        try {
-            const multimediaArray = JSON.parse(work.multimedia);
-            if (Array.isArray(multimediaArray) && multimediaArray.length > 1) {
-                mediaGallery = `
-                    <div class="multimedia-gallery mt-3">
-                        <h6><i class="bi bi-images"></i> Galería de la Obra</h6>
-                        <div class="gallery-grid">
-                            ${multimediaArray.map((media, index) => `
-                                <img src="${media}" class="gallery-thumb" onclick="showFullImage('${media}')" alt="Imagen ${index + 1}">
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
+    // Procesar multimedia para la galería
+    let images = [imageSrc];
+    try {
+        if (work.multimedia) {
+            const multimediaArray = typeof work.multimedia === 'string' ? JSON.parse(work.multimedia) : work.multimedia;
+            if (Array.isArray(multimediaArray)) {
+                images = multimediaArray.filter(media => 
+                    /\.(jpg|jpeg|png|gif|webp)$/i.test(media)
+                );
+                if (images.length === 0) images = [imageSrc];
             }
-        } catch (e) {
-            // Si no es JSON, usar imagen simple
         }
+    } catch (e) {
+        images = [imageSrc];
+    }
+    
+    // Guardar imágenes en estado global
+    currentGalleryState.images = images;
+    currentGalleryState.currentIndex = 0;
+    currentGalleryState.isGalleryOpen = false;
+
+    // Crear HTML de galería mejorada
+    let mediaGallery = '';
+    if (images.length > 1) {
+        mediaGallery = `
+            <div class="multimedia-gallery mt-4 mb-3">
+                <div class="gallery-info">
+                    <span class="gallery-counter"><span id="current-image">1</span> / ${images.length}</span>
+                    <small class="text-muted">Haz clic en una imagen para expandirla</small>
+                </div>
+                <div class="gallery-grid">
+                    ${images.map((media, index) => `
+                        <div class="gallery-thumb-wrapper" data-index="${index}">
+                            <img src="${escaparHTML(media)}" 
+                                 class="gallery-thumb" 
+                                 onclick="openLightboxGallery(${index}, event)" 
+                                 alt="Imagen ${index + 1}"
+                                 title="Click para ver en grande">
+                            <span class="thumb-number">${index + 1}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
     }
 
-    Swal.fire({
-        title: '',
-        html: `
-            <div class="work-detail-modal">
-                <!-- Header con imagen principal -->
-                <div class="modal-work-header">
-                    <div class="work-main-image-container">
-                        <img src="${escaparHTML(imageSrc)}" class="work-modal-image" alt="${escaparHTML(work.titulo)}" onclick="showFullImage('${escaparHTML(imageSrc)}')">
-                        <div class="image-overlay">
-                            <button class="btn btn-light btn-sm expand-image-btn" onclick="showFullImage('${escaparHTML(imageSrc)}')" title="Ver imagen completa">
-                                <i class="bi bi-arrows-fullscreen"></i>
+    const modalHTML = `
+        <div class="work-detail-modal">
+            <div class="modal-work-header">
+                <div class="work-main-image-container">
+                    <img src="${escaparHTML(imageSrc)}" class="work-modal-image" alt="${escaparHTML(work.titulo)}" onclick="openLightboxGallery(0, event)">
+                    <div class="image-overlay">
+                        <button class="btn btn-light btn-sm expand-image-btn" onclick="openLightboxGallery(0, event)" title="Ver imagen completa">
+                            <i class="bi bi-arrows-fullscreen"></i>
+                        </button>
+                    </div>
+                    ${images.length > 1 ? `<div class="gallery-navigation"><span class="image-counter">${images.length} imágenes</span></div>` : ''}
+                </div>
+            </div>
+            
+            <div class="modal-work-content">
+                <div class="work-title-section">
+                    <h3 class="modal-work-title">${escaparHTML(work.titulo)}</h3>
+                    <div class="work-status-badges">
+                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Validado</span>
+                        <span class="badge bg-primary"><i class="bi bi-palette"></i> ${escaparHTML(work.categoria || 'Obra Cultural')}</span>
+                    </div>
+                </div>
+                
+                <div class="artist-info-card">
+                    <div class="artist-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="artist-details">
+                        <h5 class="artist-name">${escaparHTML(artistName)}</h5>
+                        <p class="artist-location">
+                            <i class="bi bi-geo-alt"></i> 
+                            ${escaparHTML([work.municipio, work.provincia].filter(Boolean).join(', ') || 'Santiago del Estero')}
+                        </p>
+                        ${work.artista_email ? `
+                            <button class="btn btn-outline-primary btn-sm contact-artist-btn" onclick="contactWorkArtist('${escaparHTML(work.artista_email)}', '${escaparHTML(artistName)}', '${escaparHTML(work.titulo)}')">
+                                <i class="bi bi-envelope"></i> Contactar Artista
                             </button>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                ${work.descripcion ? `
+                    <div class="work-description-section">
+                        <h6><i class="bi bi-journal-text"></i> Sobre esta Obra</h6>
+                        <p class="work-description-full">${escaparHTML(work.descripcion)}</p>
+                    </div>
+                ` : ''}
+                
+                <div class="work-metadata-section">
+                    <div class="metadata-grid">
+                        <div class="metadata-card">
+                            <i class="bi bi-calendar-event text-primary"></i>
+                            <div>
+                                <span class="metadata-label">Fecha de Creación</span>
+                                <span class="metadata-value">${formatarFecha(work.fecha_creacion)}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="metadata-card">
+                            <i class="bi bi-eye text-success"></i>
+                            <div>
+                                <span class="metadata-label">Estado</span>
+                                <span class="metadata-value">Obra Validada</span>
+                            </div>
+                        </div>
+                        
+                        <div class="metadata-card">
+                            <i class="bi bi-hash text-info"></i>
+                            <div>
+                                <span class="metadata-label">ID de Obra</span>
+                                <span class="metadata-value">#${work.id}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Información de la obra -->
-                <div class="modal-work-content">
-                    <div class="work-title-section">
-                        <h3 class="modal-work-title">${escaparHTML(work.titulo)}</h3>
-                        <div class="work-status-badges">
-                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Validado</span>
-                            <span class="badge bg-primary"><i class="bi bi-palette"></i> ${escaparHTML(work.categoria || 'Obra Cultural')}</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Información del artista -->
-                    <div class="artist-info-card">
-                        <div class="artist-avatar">
-                            <i class="bi bi-person-circle"></i>
-                        </div>
-                        <div class="artist-details">
-                            <h5 class="artist-name">${escaparHTML(artistName)}</h5>
-                            <p class="artist-location">
-                                <i class="bi bi-geo-alt"></i> 
-                                ${escaparHTML([work.municipio, work.provincia].filter(Boolean).join(', ') || 'Santiago del Estero')}
-                            </p>
-                            ${work.artista_email ? `
-                                <button class="btn btn-outline-primary btn-sm contact-artist-btn" onclick="contactWorkArtist('${escaparHTML(work.artista_email)}', '${escaparHTML(artistName)}', '${escaparHTML(work.titulo)}')">
-                                    <i class="bi bi-envelope"></i> Contactar Artista
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                    
-                    <!-- Descripción de la obra -->
-                    ${work.descripcion ? `
-                        <div class="work-description-section">
-                            <h6><i class="bi bi-journal-text"></i> Sobre esta Obra</h6>
-                            <p class="work-description-full">${escaparHTML(work.descripcion)}</p>
-                        </div>
-                    ` : ''}
-                    
-                    <!-- Metadatos -->
-                    <div class="work-metadata-section">
-                        <div class="metadata-grid">
-                            <div class="metadata-card">
-                                <i class="bi bi-calendar-event text-primary"></i>
-                                <div>
-                                    <span class="metadata-label">Fecha de Creación</span>
-                                    <span class="metadata-value">${formatarFecha(work.fecha_creacion)}</span>
-                                </div>
-                            </div>
-                            
-                            <div class="metadata-card">
-                                <i class="bi bi-eye text-success"></i>
-                                <div>
-                                    <span class="metadata-label">Estado</span>
-                                    <span class="metadata-value">Obra Validada</span>
-                                </div>
-                            </div>
-                            
-                            <div class="metadata-card">
-                                <i class="bi bi-hash text-info"></i>
-                                <div>
-                                    <span class="metadata-label">ID de Obra</span>
-                                    <span class="metadata-value">#${work.id}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    ${mediaGallery}
-                    
-                    <!-- Acciones -->
-                    <div class="modal-actions">
-                        <button class="btn btn-primary" onclick="shareWork(${work.id})">
-                            <i class="bi bi-share"></i> Compartir Obra
-                        </button>
-                        <button class="btn btn-outline-secondary" onclick="favoriteWork(${work.id})">
-                            <i class="bi bi-heart"></i> Favorito
-                        </button>
-                        <button class="btn btn-outline-info" onclick="goToArtistProfile(${work.artista_id || 0})">
-                            <i class="bi bi-person"></i> Ver Perfil del Artista
-                        </button>
-                    </div>
+                ${mediaGallery}
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="shareWork(${work.id})">
+                        <i class="bi bi-share"></i> Compartir Obra
+                    </button>
+                    <button class="btn btn-outline-info" onclick="goToArtistProfile(${work.artista_id || 0})">
+                        <i class="bi bi-person"></i> Ver Perfil del Artista
+                    </button>
                 </div>
             </div>
-        `,
+
+            <div id="gallery-lightbox" class="gallery-lightbox" style="display: none;">
+                <div class="gallery-lightbox-content">
+                    <button class="gallery-lightbox-close" onclick="closeLightboxGallery()" title="Cerrar galería">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    
+                    ${currentGalleryState.images.length > 1 ? `
+                        <button class="gallery-lightbox-btn gallery-lightbox-prev" onclick="navigateLightboxGallery(-1)" title="Anterior (←)">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                    ` : ''}
+                    
+                    <div class="gallery-lightbox-image-wrapper">
+                        <img src="${escaparHTML(images[0])}" class="gallery-lightbox-image" id="gallery-lightbox-image" alt="Imagen">
+                    </div>
+                    
+                    ${currentGalleryState.images.length > 1 ? `
+                        <button class="gallery-lightbox-btn gallery-lightbox-next" onclick="navigateLightboxGallery(1)" title="Siguiente (→)">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    ` : ''}
+                    
+                    <div class="gallery-lightbox-counter">
+                        <span id="lightbox-counter">1 / ${images.length}</span>
+                    </div>
+                </div>
+                
+                ${images.length > 1 ? `
+                    <div class="gallery-lightbox-thumbnails">
+                        ${images.map((img, idx) => `
+                            <img src="${escaparHTML(img)}" 
+                                 class="gallery-lightbox-thumb ${idx === 0 ? 'active' : ''}" 
+                                 onclick="jumpToLightboxImage(${idx})"
+                                 alt="Thumb ${idx + 1}">
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+
+    Swal.fire({
+        title: '',
+        html: modalHTML,
         width: '900px',
+        maxHeight: '90vh',
         padding: '0',
         showConfirmButton: false,
         showCloseButton: true,
@@ -1142,10 +1212,387 @@ function viewWorkDetail(workId) {
             closeButton: 'work-modal-close'
         },
         didOpen: () => {
-            // Agregar clase para estilos específicos del modal
             document.querySelector('.swal2-popup').classList.add('work-modal');
+            currentGalleryState.container = document.getElementById('gallery-lightbox');
+            document.addEventListener('keydown', handleLightboxKeyPress);
+        },
+        willClose: () => {
+            document.removeEventListener('keydown', handleLightboxKeyPress);
+            currentGalleryState.isGalleryOpen = false;
         }
     });
+}
+
+/**
+ * Abrir galería lightbox
+ */
+function openLightboxGallery(index, event) {
+    if (event) event.stopPropagation();
+    
+    if (!currentGalleryState.images || currentGalleryState.images.length === 0) return;
+    
+    currentGalleryState.currentIndex = index;
+    currentGalleryState.isGalleryOpen = true;
+    
+    if (currentGalleryState.container) {
+        currentGalleryState.container.style.display = 'flex';
+        
+        // Ocultar botón X del modal
+        const closeBtn = document.querySelector('.swal2-close');
+        if (closeBtn) {
+            closeBtn.style.zIndex = '-1';
+            closeBtn.style.pointerEvents = 'none';
+        }
+        
+        updateLightboxUI();
+    }
+}
+
+/**
+ * Cerrar galería lightbox
+ */
+function closeLightboxGallery() {
+    if (currentGalleryState.container) {
+        currentGalleryState.container.style.display = 'none';
+        currentGalleryState.isGalleryOpen = false;
+        
+        // Restaurar botón X del modal
+        const closeBtn = document.querySelector('.swal2-close');
+        if (closeBtn) {
+            closeBtn.style.zIndex = '1000';
+            closeBtn.style.pointerEvents = 'auto';
+        }
+    }
+}
+
+/**
+ * Navegar en lightbox
+ */
+function navigateLightboxGallery(direction) {
+    if (!currentGalleryState.images || currentGalleryState.images.length <= 1) return;
+    
+    currentGalleryState.currentIndex += direction;
+    
+    if (currentGalleryState.currentIndex < 0) {
+        currentGalleryState.currentIndex = currentGalleryState.images.length - 1;
+    } else if (currentGalleryState.currentIndex >= currentGalleryState.images.length) {
+        currentGalleryState.currentIndex = 0;
+    }
+    
+    updateLightboxUI();
+}
+
+/**
+ * Saltar a imagen específica
+ */
+function jumpToLightboxImage(index) {
+    currentGalleryState.currentIndex = index;
+    updateLightboxUI();
+}
+
+/**
+ * Actualizar UI del lightbox
+ */
+function updateLightboxUI() {
+    const image = document.getElementById('gallery-lightbox-image');
+    const counter = document.getElementById('lightbox-counter');
+    
+    if (image) {
+        image.src = escaparHTML(currentGalleryState.images[currentGalleryState.currentIndex]);
+    }
+    if (counter) {
+        counter.textContent = `${currentGalleryState.currentIndex + 1} / ${currentGalleryState.images.length}`;
+    }
+    
+    // Actualizar miniaturas activas
+    const thumbs = document.querySelectorAll('.gallery-lightbox-thumb');
+    thumbs.forEach((thumb, idx) => {
+        if (idx === currentGalleryState.currentIndex) {
+            thumb.classList.add('active');
+            thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+            thumb.classList.remove('active');
+        }
+    });
+}
+
+/**
+ * Manejador de teclas
+ */
+function handleLightboxKeyPress(e) {
+    if (!currentGalleryState.isGalleryOpen) return;
+    
+    if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigateLightboxGallery(1);
+    } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigateLightboxGallery(-1);
+    } else if (e.key === 'Escape') {
+        e.preventDefault();
+        closeLightboxGallery();
+    }
+}
+
+/**
+ * Estilos CSS para la galería
+ */
+const galleryCss = `
+/* ========== GALERÍA LIGHTBOX INTEGRADA ========== */
+
+.gallery-lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 2rem 1rem;
+    overflow: hidden;
+}
+
+.gallery-lightbox-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-height: calc(100vh - 150px);
+}
+
+.gallery-lightbox-image-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+}
+
+.gallery-lightbox-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    animation: fadeInImage 0.3s ease-in-out;
+}
+
+@keyframes fadeInImage {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.gallery-lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    z-index: 10001;
+    padding: 0;
+}
+
+.gallery-lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.1);
+}
+
+.gallery-lightbox-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10001;
+    padding: 0;
+}
+
+.gallery-lightbox-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-lightbox-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.gallery-lightbox-prev {
+    left: 1rem;
+}
+
+.gallery-lightbox-next {
+    right: 1rem;
+}
+
+.gallery-lightbox-counter {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    z-index: 10001;
+}
+
+.gallery-lightbox-thumbnails {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    max-width: 90%;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    z-index: 10001;
+}
+
+.gallery-lightbox-thumb {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gallery-lightbox-thumb:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+.gallery-lightbox-thumb.active {
+    border-color: #0d6efd;
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.6);
+}
+
+.multimedia-gallery {
+    background: rgba(0, 0, 0, 0.03);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #0d6efd;
+}
+
+.gallery-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.gallery-counter {
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.75rem;
+}
+
+.gallery-thumb-wrapper {
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gallery-thumb-wrapper:hover {
+    transform: scale(1.05);
+    border: 2px solid #0d6efd;
+}
+
+.gallery-thumb {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+.thumb-number {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .gallery-lightbox-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .gallery-lightbox-prev {
+        left: 0.5rem;
+    }
+    
+    .gallery-lightbox-next {
+        right: 0.5rem;
+    }
+    
+    .gallery-lightbox-thumbnail {
+        width: 50px;
+        height: 50px;
+    }
+}
+`;
+
+// Inyectar estilos
+if (!document.getElementById('gallery-styles')) {
+    const styleTag = document.createElement('style');
+    styleTag.id = 'gallery-styles';
+    styleTag.textContent = galleryCss;
+    document.head.appendChild(styleTag);
 }
 
 /**

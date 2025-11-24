@@ -187,7 +187,7 @@ include(__DIR__ . '/../components/header.php');
                     <!-- Obras Validadas -->
                     <div class="tab-pane" id="obras-validadas">
                         <div class="content-header">
-                            <h3>Obras Culturales Validadas</h3>
+                            <h3>Obras Culturales</h3>
                             <p>Creaciones artísticas registradas y validadas en nuestra plataforma</p>
                         </div>
                         <div class="works-grid" id="validated-works">
