@@ -121,37 +121,7 @@ function openImagePreview(imageSrc, imageAlt) {
     });
 }
 
-/**
- * Muestra los detalles de una obra en el modal
- */
-function mostrarObra(obra) {
-    // Obtener o crear elementos del modal
-    const obraImagen = document.getElementById('obraImagen');
-    const obraTitulo = document.getElementById('obraTitulo');
-    const obraDescripcion = document.getElementById('obraDescripcion');
-    const obraFecha = document.getElementById('obraFecha');
 
-    // Construir URL de la imagen
-    let imagenSrc = BASE_URL + 'static/img/paleta-de-pintura.png';
-    if (obra.multimedia) {
-        imagenSrc = BASE_URL + obra.multimedia.replace(/^\//, '');
-    }
-
-    // Llenar los datos
-    obraImagen.src = imagenSrc;
-    obraImagen.alt = obra.titulo;
-    obraTitulo.textContent = obra.titulo;
-    obraDescripcion.textContent = obra.descripcion;
-    
-    // Formatear fecha
-    if (obra.fecha_validacion) {
-        const fecha = new Date(obra.fecha_validacion);
-        obraFecha.textContent = '📅 Validada: ' + fecha.toLocaleDateString('es-AR');
-    }
-
-    // El modal ya está en el HTML con data-bs-target="#obraModal"
-    // Bootstrap lo abrirá automáticamente al hacer click
-}
 
 /**
  * Función auxiliar para cargar contenido dinámico en los tabs
