@@ -252,6 +252,7 @@ if (!defined('BASE_URL')) {
 <!-- Google Translate (OCULTO) - Solo para funcionalidad -->
 <div id="google_translate_element" style="display: none;"></div>
 
+<!-- Script para controlar el modal del video -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const openVideoBtn = document.getElementById('open-video-btn');
@@ -269,6 +270,15 @@ document.addEventListener('DOMContentLoaded', function() {
           keyboard: true
         });
         modal.show();
+        
+        // Reproducir video cuando se abre el modal
+        setTimeout(() => {
+          if (instructionVideo) {
+            instructionVideo.play().catch(err => {
+              console.log('Autoplay bloqueado:', err);
+            });
+          }
+        }, 300);
       } catch (error) {
         console.error('Error al abrir modal:', error);
       }
