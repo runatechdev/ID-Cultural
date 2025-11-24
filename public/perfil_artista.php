@@ -883,27 +883,44 @@ include(__DIR__ . '/../components/header.php');
             document.getElementById('obraDescripcion').textContent = descripcion;
             document.getElementById('obraCategoriaTexto').textContent = categoria;
 
-            // ===== PROCESAR GALERÍA DE IMÁGENES =====
+            // ===== PROCESAR GALERÍA DE IMÁGENES (MEJORADO) =====
             let imagenesArray = [];
             const fallbackImg = BASE_URL + 'static/img/paleta-de-pintura.png';
 
             if (obra.multimedia) {
                 try {
-                    let mediaData = typeof obra.multimedia === 'string' ?
-                        JSON.parse(obra.multimedia) :
-                        obra.multimedia;
+                    let mediaData = obra.multimedia;
 
+                    // Si es string, verificar si es JSON o una ruta simple
+                    if (typeof mediaData === 'string') {
+                        // Intentar detectar si es JSON (empieza con [ o {)
+                        if (mediaData.trim().startsWith('[') || mediaData.trim().startsWith('{')) {
+                            // Es JSON, parsearlo
+                            mediaData = JSON.parse(mediaData);
+                        } else {
+                            // Es una ruta simple, convertir a array
+                            mediaData = [mediaData];
+                        }
+                    }
+
+                    // Ahora procesar según el tipo
                     if (Array.isArray(mediaData)) {
                         imagenesArray = mediaData.map(img => {
-                            let cleanImg = img.replace(/^\/+/, '');
+                            let cleanImg = String(img).replace(/^\/+/, '');
                             return BASE_URL + cleanImg;
                         });
-                    } else if (typeof mediaData === 'string') {
-                        let cleanImg = mediaData.replace(/^\/+/, '');
+                    } else {
+                        // Si es un objeto o algo raro, intentar usarlo directamente
+                        let cleanImg = String(mediaData).replace(/^\/+/, '');
                         imagenesArray = [BASE_URL + cleanImg];
                     }
                 } catch (e) {
                     console.error('Error parseando multimedia:', e);
+                    // Si hay error, intentar usar como string simple
+                    if (obra.multimedia) {
+                        let cleanImg = String(obra.multimedia).replace(/^\/+/, '');
+                        imagenesArray = [BASE_URL + cleanImg];
+                    }
                 }
             }
 
