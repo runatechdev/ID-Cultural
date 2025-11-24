@@ -58,10 +58,13 @@ if (!defined('BASE_URL')) {
 
 
 
-        <!-- Botón de Video Instructivo - Solo en página de registro -->
+        <!-- Botón de Video Instructivo - En registro y cuando artista logueado -->
         <?php
         $current_uri = $_SERVER['REQUEST_URI'];
-        if (strpos($current_uri, '/src/views/pages/auth/registro.php') !== false):
+        $is_registro = strpos($current_uri, '/src/views/pages/auth/registro.php') !== false;
+        $is_artista_logueado = isset($_SESSION['user_data']) && ($_SESSION['user_data']['role'] === 'artista' || $_SESSION['user_data']['role'] === 'artista_validado');
+
+        if ($is_registro || $is_artista_logueado):
         ?>
           <li class="nav-item">
             <button class="btn btn-link nav-link" id="open-video-btn" aria-label="Ver video instructivo" title="Ver video instructivo">
