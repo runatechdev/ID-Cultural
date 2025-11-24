@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 1); error_reporting(E_ALL);
 session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../backend/config/connection.php';
@@ -15,6 +16,18 @@ function checkAdminPermissions() {
     }
 }
 
+// --- BLOQUE DE CONEXIÓN Y VALIDACIÓN DE $pdo ---
+try {
+    if (!isset($pdo) || $pdo === null) {
+        throw new Exception('La variable $pdo es null. Revisa la conexión a la base de datos.');
+    }
+} catch(Exception $e) {
+    http_response_code(500);
+    echo json_encode(['status'=>'error','message'=>'Error de conexión: '.$e->getMessage()]);
+    exit;
+}
+
+// --- BLOQUE PRINCIPAL DE LÓGICA Y QUERIES ---
 try {
     switch ($action) {
         case 'get':
@@ -275,11 +288,15 @@ try {
     }
 
 } catch (PDOException $e) {
-    // Rollback si hay alguna transacción activa
-    if ($pdo->inTransaction()) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
     http_response_code(500);
     echo json_encode(['status' => 'error', 'message' => 'Error en la base de datos: ' . $e->getMessage()]);
+    exit;
+} catch(Exception $e){
+    http_response_code(500);
+    echo json_encode(['status'=>'error','message'=>'Error: '.$e->getMessage()]);
+    exit;
 }
 ?>

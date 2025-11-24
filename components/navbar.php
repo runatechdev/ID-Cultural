@@ -42,7 +42,7 @@ if (!defined('BASE_URL')) {
               <li><h6 class="dropdown-header"><i class="bi bi-translate"></i> Selecciona un idioma</h6></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLanguage('es')">🇪🇸 Español</a></li>
-              <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLanguage('en')">🇬🇧 English</a></li>
+              <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLanguage('en')">🇺🇸 English</a></li>
               <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLanguage('pt')">🇧🇷 Português</a></li>
               <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLanguage('fr')">🇫🇷 Français</a></li>
               <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLanguage('it')">🇮🇹 Italiano</a></li>
@@ -51,6 +51,13 @@ if (!defined('BASE_URL')) {
           </li>
 
           <li class="nav-item"><a class="nav-link" href="/index.php">Inicio</a></li>
+
+<!-- Botón de Video Instructivo -->
+<li class="nav-item">
+  <button class="btn btn-link nav-link" id="open-video-btn" aria-label="Ver video instructivo" title="Ver video instructivo">
+    <i class="bi bi-play-circle fs-5"></i>
+  </button>
+</li>
 
           <!-- Botón de Búsqueda -->
           <li class="nav-item">
@@ -209,6 +216,26 @@ if (!defined('BASE_URL')) {
   </div>
 </header>
 
+<!-- Modal para el Video - FUERA del header -->
+<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-dark">
+      <div class="modal-header bg-dark border-secondary">
+        <h5 class="modal-title text-white" id="videoModalLabel">Video Instructivo - ID Cultural</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body bg-black p-0">
+        <div class="ratio ratio-16x9">
+          <video id="instructionVideo" controls preload="metadata" style="width: 100%; height: 100%; object-fit: contain;">
+            <source src="/static/video/Registro.mp4" type="video/mp4">
+            Tu navegador no soporta la etiqueta de video.
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Estructura de la ventana de búsqueda -->
 <div id="search-overlay" class="search-overlay">
   <button id="close-search-btn" class="btn-close-search" aria-label="Cerrar búsqueda">&times;</button>
@@ -224,6 +251,120 @@ if (!defined('BASE_URL')) {
 
 <!-- Google Translate (OCULTO) - Solo para funcionalidad -->
 <div id="google_translate_element" style="display: none;"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const openVideoBtn = document.getElementById('open-video-btn');
+  const videoModal = document.getElementById('videoModal');
+  const instructionVideo = document.getElementById('instructionVideo');
+  
+  if (openVideoBtn && videoModal) {
+    openVideoBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      try {
+        const modal = new bootstrap.Modal(videoModal, {
+          backdrop: 'static',
+          keyboard: true
+        });
+        modal.show();
+      } catch (error) {
+        console.error('Error al abrir modal:', error);
+      }
+    });
+  }
+  
+  // Pausar video cuando se cierra el modal
+  if (videoModal) {
+    videoModal.addEventListener('hidden.bs.modal', function() {
+      if (instructionVideo) {
+        instructionVideo.pause();
+        instructionVideo.currentTime = 0;
+      }
+    });
+  }
+});
+</script>
+
+<style>
+/* Estilos para el botón de video */
+#open-video-btn {
+  position: relative;
+  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.5rem;
+}
+
+#open-video-btn:hover {
+  transform: scale(1.15);
+  color: rgba(255, 255, 255, 1) !important;
+  text-decoration: none;
+}
+
+#open-video-btn:hover i {
+  animation: pulse-play 0.6s ease-in-out;
+}
+
+@keyframes pulse-play {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* Estilos del modal de video - IMPORTANTE */
+#videoModal {
+  --bs-modal-zindex: 1060;
+}
+
+#videoModal .modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  opacity: 1 !important;
+}
+
+#videoModal .modal-content {
+  border-radius: 8px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#videoModal .modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+}
+
+#videoModal .modal-body {
+  padding: 0;
+}
+
+#videoModal .ratio {
+  background-color: #000;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+#videoModal video {
+  background-color: #000 !important;
+}
+
+/* Asegurar que el modal sea interactivo */
+#videoModal .modal-dialog {
+  pointer-events: auto !important;
+}
+
+#videoModal .modal-content {
+  pointer-events: auto !important;
+}
+
+/* Ocultar elementos de Google Translate en el modal */
+#videoModal .skiptranslate,
+#videoModal iframe.goog-te-banner-frame {
+  display: none !important;
+}
+</style>
 
 <script type="text/javascript">
 // Función para cambiar el idioma - Mejorada
