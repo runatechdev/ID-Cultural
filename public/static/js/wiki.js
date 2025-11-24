@@ -8,7 +8,7 @@ const WIKI = {
     currentTab: 'artistas-validados',
     currentFilters: { categoria: '', filter: 'todos' },
     currentPage: 1,
-    itemsPerPage: 9,
+    itemsPerPage: 12,
     data: {
         artists: [],
         works: [],
@@ -258,7 +258,8 @@ function filterFamousArtists() {
                 'Teatro': ['teatro'],
                 'Artesania': ['artesanía', 'artesania'],
                 'Audiovisual': ['audiovisual'],
-                'Escultura': ['escultura']
+                'Escultura': ['escultura'],
+                'Otros': ['otros', 'other']
             };
             
             let shouldShow = false;
@@ -675,7 +676,8 @@ function applyCurrentFilters(items, type = 'artists') {
                 'teatro': ['teatro'],
                 'artesania': ['artesanía', 'artesania'],
                 'audiovisual': ['audiovisual'],
-                'escultura': ['escultura']
+                'escultura': ['escultura'],
+                'otros': ['otros', 'other']
             };
             
             // Verificar coincidencia exacta o por mapeo

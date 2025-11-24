@@ -3,6 +3,25 @@
  * Archivo: /public/static/js/gestion_pendientes.js
  */
 
+// Agregar estilos para el hover de imágenes
+const style = document.createElement('style');
+style.textContent = `
+    .hover-zoom {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-zoom:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
+    }
+    .img-thumbnail-preview {
+        transition: opacity 0.3s ease;
+    }
+    .img-thumbnail-preview:hover {
+        opacity: 0.8;
+    }
+`;
+document.head.appendChild(style);
+
 document.addEventListener('DOMContentLoaded', () => {
     // Buscar tbody de manera flexible (puede ser tabla-obras-pendientes-body o tabla-artistas-body con clase tabla-obras-body)
     let tbody = document.getElementById('tabla-obras-pendientes-body');
@@ -96,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderizarFilaPerfil(perfil) {
         // Determinar qué imagen mostrar
         const foto_mostrar = perfil.cambios.foto_perfil 
-            ? `${BASE_URL}static/img/perfil_pendiente.jpg` 
+            ? `${BASE_URL}static/img/perfil_pendiente.webp` 
             : (perfil.valores_actuales.foto_perfil || `${BASE_URL}static/img/default-avatar.png`);
         
         return `
@@ -218,44 +237,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const multimedia = typeof obra.multimedia === 'string' ? JSON.parse(obra.multimedia) : obra.multimedia;
             multimediaHTML = `
                 <div class="mt-3">
-                    <h6><i class="bi bi-images"></i> Archivos Multimedia:</h6>
+                    <h6><i class="bi bi-images"></i> Imágenes:</h6>
                     <div class="row g-2">
-                        ${multimedia.map(file => {
-                            if (file.type === 'image' || /\.(jpg|jpeg|png|gif|webp)$/i.test(file.url)) {
+                        ${multimedia.map((file, index) => {
+                            // Si el multimedia es solo una string (URL directa)
+                            const url = typeof file === 'string' ? file : file.url;
+                            const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url) || 
+                                          (file.type && file.type === 'image');
+                            
+                            if (isImage) {
                                 return `
-                                    <div class="col-md-4">
-                                        <img src="${escapeHtml(file.url)}" 
-                                             class="img-fluid rounded shadow-sm" 
-                                             alt="Imagen"
-                                             style="cursor: pointer; max-height: 200px; object-fit: cover;"
-                                             onclick="window.open('${escapeHtml(file.url)}', '_blank')">
-                                    </div>
-                                `;
-                            } else if (file.type === 'video' || /\.(mp4|webm|ogg)$/i.test(file.url)) {
-                                return `
-                                    <div class="col-md-6">
-                                        <video controls class="w-100 rounded">
-                                            <source src="${escapeHtml(file.url)}">
-                                        </video>
-                                    </div>
-                                `;
-                            } else if (file.type === 'audio' || /\.(mp3|wav|ogg)$/i.test(file.url)) {
-                                return `
-                                    <div class="col-12">
-                                        <audio controls class="w-100">
-                                            <source src="${escapeHtml(file.url)}">
-                                        </audio>
-                                    </div>
-                                `;
-                            } else {
-                                return `
-                                    <div class="col-12">
-                                        <a href="${escapeHtml(file.url)}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-download"></i> ${file.nombre || 'Descargar archivo'}
-                                        </a>
+                                    <div class="col-md-3 col-sm-4 col-6">
+                                        <div class="card h-100 shadow-sm hover-zoom" style="cursor: pointer;">
+                                            <img src="${BASE_URL}${escapeHtml(url)}" 
+                                                 class="card-img-top img-thumbnail-preview" 
+                                                 alt="Imagen ${index + 1}"
+                                                 style="height: 150px; object-fit: cover;"
+                                                 onclick="expandirImagen('${BASE_URL}${escapeHtml(url)}', event)"
+                                                 onerror="this.src='${BASE_URL}static/img/no-image.png'">
+                                        </div>
                                     </div>
                                 `;
                             }
+                            return '';
                         }).join('')}
                     </div>
                 </div>
@@ -349,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     timer: 2000,
                     showConfirmButton: false
                 });
-                cargarObrasPendientes();
+                cargarTodosPendientes();
             } else {
                 Swal.fire('Error', result.message || 'No se pudo aprobar la obra', 'error');
             }
@@ -408,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     timer: 2000,
                     showConfirmButton: false
                 });
-                cargarObrasPendientes();
+                cargarTodosPendientes();
             } else {
                 Swal.fire('Error', result.message || 'No se pudo rechazar la obra', 'error');
             }
@@ -436,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cambiosHTML += `
                 <div class="mb-3">
                     <strong>Nueva Foto de Perfil:</strong><br>
-                    <img src="${BASE_URL}static/img/perfil_pendiente.jpg" class="img-thumbnail mt-2" style="max-width: 200px;">
+                    <img src="${BASE_URL}static/img/perfil_pendiente.webp" class="img-thumbnail mt-2" style="max-width: 200px;">
                     <p class="text-muted small">La imagen se mostrará una vez aprobada</p>
                 </div>
             `;
@@ -678,4 +682,111 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatearClave(clave) {
         return clave.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
+
+    // ============================================
+    // LIGHTBOX PARA IMÁGENES
+    // ============================================
+    
+    window.expandirImagen = function(url, event) {
+        // Evitar que se cierre el modal de validación
+        event.stopPropagation();
+        
+        // Crear overlay para lightbox
+        const lightbox = document.createElement('div');
+        lightbox.id = 'image-lightbox';
+        lightbox.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        `;
+        
+        // Crear contenedor de imagen
+        const imgContainer = document.createElement('div');
+        imgContainer.style.cssText = `
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        `;
+        
+        // Crear imagen
+        const img = document.createElement('img');
+        img.src = url;
+        img.style.cssText = `
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        `;
+        
+        // Crear botón de cerrar
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        `;
+        closeBtn.onmouseover = () => {
+            closeBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+            closeBtn.style.color = 'black';
+        };
+        closeBtn.onmouseout = () => {
+            closeBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+            closeBtn.style.color = 'white';
+        };
+        
+        // Función para cerrar lightbox
+        const cerrarLightbox = (e) => {
+            if (e) e.stopPropagation();
+            lightbox.remove();
+        };
+        
+        // Event listeners
+        closeBtn.onclick = cerrarLightbox;
+        lightbox.onclick = cerrarLightbox;
+        img.onclick = (e) => e.stopPropagation(); // Evitar cerrar al hacer click en la imagen
+        
+        // Cerrar con tecla ESC
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') {
+                cerrarLightbox();
+                document.removeEventListener('keydown', handleEsc);
+            }
+        };
+        document.addEventListener('keydown', handleEsc);
+        
+        // Ensamblar elementos
+        imgContainer.appendChild(img);
+        imgContainer.appendChild(closeBtn);
+        lightbox.appendChild(imgContainer);
+        document.body.appendChild(lightbox);
+        
+        // Animación de entrada
+        lightbox.style.opacity = '0';
+        setTimeout(() => {
+            lightbox.style.transition = 'opacity 0.3s';
+            lightbox.style.opacity = '1';
+        }, 10);
+    };
 });

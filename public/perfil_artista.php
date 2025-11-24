@@ -304,7 +304,18 @@ include(__DIR__ . '/../components/header.php');
                                     <?php
                                         else:
                                             foreach ($obras as $obra):
-                                                $thumbnail = $obra['multimedia'] ? BASE_URL . ltrim($obra['multimedia'], '/') : BASE_URL . 'static/img/paleta-de-pintura.png';
+                                                $multimedia = $obra['multimedia'];
+                                                if ($multimedia) {
+                                                    $mediaArr = json_decode($multimedia, true);
+                                                    if (is_array($mediaArr)) {
+                                                        $firstImg = $mediaArr[0];
+                                                    } else {
+                                                        $firstImg = $multimedia;
+                                                    }
+                                                    $thumbnail = BASE_URL . ltrim($firstImg, '/');
+                                                } else {
+                                                    $thumbnail = BASE_URL . 'static/img/paleta-de-pintura.png';
+                                                }
                                                 // Decodificar campos extra para obtener técnica, dimensiones, etc.
                                                 $campos_extra = !empty($obra['campos_extra']) ? json_decode($obra['campos_extra'], true) : [];
                                     ?>

@@ -1,14 +1,14 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../../../../config.php';
+require_once __DIR__ . '/../config.php';
 $page_title = "Términos y Condiciones - ID Cultural";
 // Puedes crear un CSS específico si lo necesitas
 // $specific_css_files = ['terminos.css']; 
-include(__DIR__ . '/../../../../../components/header.php');
+include(__DIR__ . '/../components/header.php');
 ?>
 <body class="dashboard-body">
 
-  <?php include(__DIR__ . '/../../../../../components/navbar.php'); ?>
+  <?php include(__DIR__ . '/../components/navbar.php'); ?>
 
   <main class="container my-5">
     <div class="card">
@@ -41,7 +41,7 @@ include(__DIR__ . '/../../../../../components/header.php');
     </div>
   </main>
 
-  <?php include("../../../../../components/footer.php"); ?>
+  <?php include(__DIR__ . '/../components/footer.php'); ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

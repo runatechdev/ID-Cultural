@@ -60,20 +60,27 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <hr class="my-4">
                     <h5 class="mb-3">📷 Multimedia (Imágenes)</h5>
                     
+                    <!-- Zona de Drag & Drop -->
                     <div class="mb-3">
-                        <label for="multimedia" class="form-label">Subir Imágenes</label>
-                        <div class="input-group">
-                            <input type="file" class="form-control" id="multimedia" name="multimedia" accept="image/*" multiple>
-                            <span class="input-group-text"><i class="bi bi-image"></i></span>
+                        <div id="drop-zone" class="border border-2 border-dashed rounded p-4 text-center" style="min-height: 200px; background: #f8f9fa; cursor: pointer; transition: all 0.3s;">
+                            <div class="py-4">
+                                <i class="bi bi-cloud-upload display-4 text-primary mb-3"></i>
+                                <h5>Arrastra imágenes aquí o haz clic para seleccionar</h5>
+                                <p class="text-muted mb-3">
+                                    Formatos: JPG, PNG, WEBP (máx. 5MB cada una)<br>
+                                    Puedes subir múltiples imágenes
+                                </p>
+                                <input type="file" class="d-none" id="multimedia" name="multimedia" accept="image/*" multiple>
+                                <button type="button" class="btn btn-primary" id="btn-select-images">
+                                    <i class="bi bi-image me-2"></i>Seleccionar Imágenes
+                                </button>
+                            </div>
                         </div>
-                        <small class="text-muted d-block mt-2">
-                            Formatos: JPG, PNG, WEBP (máx. 5MB cada una)<br>
-                            Puedes subir múltiples imágenes (opcional)
-                        </small>
                     </div>
 
                     <!-- Preview de imágenes -->
-                    <div id="preview-container" class="mb-3">
+                    <div id="preview-container" class="mb-3" style="display: none;">
+                        <h6 class="mb-3">Imágenes seleccionadas:</h6>
                         <div id="image-previews" class="row g-3"></div>
                     </div>
 

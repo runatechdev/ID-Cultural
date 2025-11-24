@@ -2,6 +2,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoriaSelect = document.getElementById('categoria');
     const camposContainer = document.getElementById('campos-condicionales-container');
     const form = document.getElementById('form-borrador');
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('multimedia');
+    const previewContainer = document.getElementById('preview-container');
+    const imagePreviews = document.getElementById('image-previews');
+    const btnSelectImages = document.getElementById('btn-select-images');
+    
+    console.log('Elementos inicializados:', {
+        categoriaSelect,
+        camposContainer,
+        form,
+        dropZone,
+        fileInput,
+        previewContainer,
+        imagePreviews,
+        btnSelectImages
+    });
+    
+    let selectedFiles = [];
 
     const camposPorCategoria = {
         musica: `
@@ -23,11 +41,147 @@ document.addEventListener('DOMContentLoaded', () => {
         // Añade aquí las plantillas para las otras categorías (escultura, danza, etc.)
     };
 
+    // Manejo de categorías
     categoriaSelect.addEventListener('change', () => {
         const categoria = categoriaSelect.value;
         camposContainer.innerHTML = camposPorCategoria[categoria] || '';
     });
 
+    // ===== DRAG & DROP FUNCTIONALITY =====
+    
+    // Prevenir comportamiento por defecto
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    // Highlight drop zone cuando arrastramos archivos
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+        dropZone.style.borderColor = '#0d6efd';
+        dropZone.style.background = '#e7f3ff';
+    }
+
+    function unhighlight() {
+        dropZone.style.borderColor = '#dee2e6';
+        dropZone.style.background = '#f8f9fa';
+    }
+
+    // Manejar drop
+    dropZone.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files);
+    }
+
+    // Manejar click en el botón de seleccionar
+    btnSelectImages.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evitar que se propague al dropZone
+        console.log('Botón seleccionar clickeado');
+        fileInput.click();
+    });
+
+    // Manejar click en la zona de drop (solo fuera del botón)
+    dropZone.addEventListener('click', (e) => {
+        // Si el click fue en el botón, no hacer nada (el botón ya lo maneja)
+        if (e.target.closest('#btn-select-images')) {
+            return;
+        }
+        console.log('DropZone clickeado');
+        fileInput.click();
+    });
+
+    // Manejar selección de archivos
+    fileInput.addEventListener('change', (e) => {
+        console.log('File input changed, files:', e.target.files);
+        handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+        console.log('handleFiles called with:', files);
+        files = [...files];
+        console.log('Files array:', files);
+        
+        // Filtrar solo imágenes y verificar tamaño
+        const validFiles = files.filter(file => {
+            if (!file.type.startsWith('image/')) {
+                Swal.fire('Error', `El archivo ${file.name} no es una imagen válida`, 'error');
+                return false;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                Swal.fire('Error', `El archivo ${file.name} supera los 5MB`, 'error');
+                return false;
+            }
+            return true;
+        });
+
+        // Agregar archivos válidos a la lista
+        validFiles.forEach(file => {
+            if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                selectedFiles.push(file);
+            }
+        });
+
+        updatePreviews();
+    }
+
+    function updatePreviews() {
+        if (selectedFiles.length === 0) {
+            previewContainer.style.display = 'none';
+            imagePreviews.innerHTML = '';
+            return;
+        }
+
+        previewContainer.style.display = 'block';
+        imagePreviews.innerHTML = '';
+
+        selectedFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 col-sm-4 col-6';
+                col.innerHTML = `
+                    <div class="card">
+                        <img src="${e.target.result}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        <div class="card-body p-2">
+                            <small class="text-muted d-block text-truncate">${file.name}</small>
+                            <small class="text-muted">${(file.size / 1024).toFixed(2)} KB</small>
+                            <button type="button" class="btn btn-sm btn-danger w-100 mt-2" onclick="removeImage(${index})">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                imagePreviews.appendChild(col);
+            };
+            
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Función global para eliminar imágenes
+    window.removeImage = function(index) {
+        selectedFiles.splice(index, 1);
+        updatePreviews();
+    };
+
+    // ===== SUBMIT FORM =====
+    
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const estado = e.submitter.id === 'btn-enviar-validacion' ? 'pendiente' : 'borrador';
@@ -49,12 +203,11 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('categoria', categoria);
         formData.append('estado', estado);
 
-        // Agregar archivos multimedia (si los hay)
-        const multimediaFiles = document.getElementById('multimedia').files;
-        if (multimediaFiles.length > 0) {
-            for (let i = 0; i < multimediaFiles.length; i++) {
-                formData.append('multimedia[]', multimediaFiles[i]);
-            }
+        // Agregar archivos multimedia
+        if (selectedFiles.length > 0) {
+            selectedFiles.forEach((file, index) => {
+                formData.append('multimedia[]', file);
+            });
         }
 
         // Recolectar campos extra
@@ -68,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Mostrar indicador de carga
         Swal.fire({
             title: 'Procesando...',
-            text: 'Guardando tu borrador',
+            text: `Guardando tu ${estado === 'borrador' ? 'borrador' : 'publicación'}...`,
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
@@ -84,7 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             console.log('Response status:', response.status);
-            console.log('Response headers:', [...response.headers.entries()]);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -92,13 +244,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const responseText = await response.text();
             console.log('Raw response:', responseText);
+            console.log('Response length:', responseText.length);
+            console.log('First 500 chars:', responseText.substring(0, 500));
             
             let result;
             try {
                 result = JSON.parse(responseText);
             } catch (parseError) {
                 console.error('JSON parse error:', parseError);
-                throw new Error('La respuesta del servidor no es JSON válido');
+                console.error('Full response text:', responseText);
+                throw new Error('La respuesta del servidor no es JSON válido. Ver consola para detalles.');
             }
             
             console.log('Parsed response:', result);

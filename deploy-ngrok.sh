@@ -17,7 +17,7 @@ if ! curl -s http://localhost:8080 > /dev/null; then
 fi
 
 # Ejecutar ngrok
-ngrok http 8080 --log=stdout
+ngrok http 8080 --log=stdout --config /home/maxii/.config/ngrok/ngrok.yml
 
 # Cuando termina, mostrar mensaje
 echo ""

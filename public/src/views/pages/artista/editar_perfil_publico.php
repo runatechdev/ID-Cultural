@@ -60,7 +60,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <div class="mb-3">
                         <div class="d-flex align-items-center gap-3">
                             <div>
-                                <img id="preview-foto" src="<?php echo BASE_URL; ?>static/img/perfil-del-usuario.png" alt="Foto Perfil" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
+                                <img id="preview-foto" src="<?php echo BASE_URL; ?>static/img/perfil_pendiente.webp" alt="Foto Perfil" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
                             </div>
                             <div>
                                 <label for="foto_perfil" class="form-label">Subir Foto</label>

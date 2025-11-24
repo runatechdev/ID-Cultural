@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>
                         <div class="d-flex align-items-center">
                             ${perfil.cambios.foto_perfil ? 
-                                '<img src="' + BASE_URL + 'static/img/perfil_pendiente.jpg" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">' : 
+                                '<img src="' + BASE_URL + 'static/img/perfil_pendiente.webp" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">' : 
                                 '<i class="bi bi-person-circle fs-3 me-2 text-muted"></i>'
                             }
                             <div>
@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cambiosHTML += `
                 <div class="mb-3">
                     <strong>Nueva Foto de Perfil:</strong><br>
-                    <img src="${BASE_URL}${perfil.cambios.foto_perfil}" class="img-thumbnail mt-2" style="max-width: 200px;" onerror="this.src='${BASE_URL}static/img/perfil_pendiente.jpg'">
+                    <img src="${BASE_URL}${perfil.cambios.foto_perfil}" class="img-thumbnail mt-2" style="max-width: 200px;" onerror="this.src='${BASE_URL}static/img/perfil_pendiente.webp'">
                 </div>
             `;
         }

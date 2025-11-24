@@ -1,6 +1,14 @@
 <?php
+// Iniciar buffer de salida para capturar cualquier output no deseado
+ob_start();
+
 session_start();
 header('Content-Type: application/json');
+
+// Deshabilitar display_errors para evitar que errores se muestren en la respuesta JSON
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../../backend/config/connection.php';
 
 // Obtener acción desde GET o POST
@@ -97,40 +105,75 @@ try {
                 $estado = 'pendiente_validacion';
             }
 
-            // Procesar multimedia (solo si hay archivos)
-            $multimedia_path = null;
-            if (isset($_FILES['multimedia']) && !empty($_FILES['multimedia']['tmp_name'][0])) {
+            // Procesar multimedia (múltiples archivos)
+            $multimedia_paths = [];
+            if (isset($_FILES['multimedia']) && !empty($_FILES['multimedia']['tmp_name'])) {
                 require_once __DIR__ . '/../../backend/helpers/MultimediaValidator.php';
                 $validator = new MultimediaValidator();
                 
-                // Procesar primer archivo
-                $file_data = [
-                    'name' => $_FILES['multimedia']['name'][0],
-                    'type' => $_FILES['multimedia']['type'][0],
-                    'tmp_name' => $_FILES['multimedia']['tmp_name'][0],
-                    'error' => $_FILES['multimedia']['error'][0],
-                    'size' => $_FILES['multimedia']['size'][0]
-                ];
+                // Determinar si es un array de archivos o un solo archivo
+                $file_count = is_array($_FILES['multimedia']['tmp_name']) ? count($_FILES['multimedia']['tmp_name']) : 1;
                 
-                $result = $validator->guardarArchivo($file_data, 'imagen');
-                if ($result['exitoso']) {
-                    $multimedia_path = $result['ruta'];
-                } else {
-                    throw new Exception("Error al guardar multimedia: " . ($result['mensaje'] ?: 'Error desconocido'));
+                for ($i = 0; $i < $file_count; $i++) {
+                    // Obtener datos del archivo
+                    if (is_array($_FILES['multimedia']['tmp_name'])) {
+                        $file_data = [
+                            'name' => $_FILES['multimedia']['name'][$i],
+                            'type' => $_FILES['multimedia']['type'][$i],
+                            'tmp_name' => $_FILES['multimedia']['tmp_name'][$i],
+                            'error' => $_FILES['multimedia']['error'][$i],
+                            'size' => $_FILES['multimedia']['size'][$i]
+                        ];
+                    } else {
+                        $file_data = [
+                            'name' => $_FILES['multimedia']['name'],
+                            'type' => $_FILES['multimedia']['type'],
+                            'tmp_name' => $_FILES['multimedia']['tmp_name'],
+                            'error' => $_FILES['multimedia']['error'],
+                            'size' => $_FILES['multimedia']['size']
+                        ];
+                    }
+                    
+                    // Saltar si el archivo está vacío
+                    if (empty($file_data['tmp_name'])) {
+                        continue;
+                    }
+                    
+                    $result = $validator->guardarArchivo($file_data, 'imagen');
+                    if ($result['exitoso']) {
+                        $multimedia_paths[] = $result['ruta'];
+                    } else {
+                        throw new Exception("Error al guardar imagen: " . ($result['mensaje'] ?: 'Error desconocido'));
+                    }
                 }
             }
+            
+            // Convertir array de paths a JSON (o null si está vacío)
+            $multimedia_json = !empty($multimedia_paths) ? json_encode($multimedia_paths) : null;
 
             $pdo->beginTransaction();
 
             try {
                 if ($id) {
                     // ACTUALIZAR borrador existente
-                    $stmt = $pdo->prepare(
-                        "UPDATE publicaciones 
-                         SET titulo = ?, descripcion = ?, categoria = ?, campos_extra = ?, estado = ?, fecha_envio_validacion = ?
-                         WHERE id = ? AND usuario_id = ? AND estado = 'borrador'"
-                    );
-                    $stmt->execute([$titulo, $descripcion, $categoria, $campos_extra_json, $estado, $fecha_envio, $id, $usuario_id]);
+                    $sql = "UPDATE publicaciones 
+                         SET titulo = ?, descripcion = ?, categoria = ?, campos_extra = ?, estado = ?, fecha_envio_validacion = ?";
+                    
+                    if ($multimedia_json) {
+                        $sql .= ", multimedia = ?";
+                    }
+                    
+                    $sql .= " WHERE id = ? AND usuario_id = ? AND estado = 'borrador'";
+                    
+                    $params = [$titulo, $descripcion, $categoria, $campos_extra_json, $estado, $fecha_envio];
+                    if ($multimedia_json) {
+                        $params[] = $multimedia_json;
+                    }
+                    $params[] = $id;
+                    $params[] = $usuario_id;
+                    
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute($params);
                     
                     $message = ($estado === 'pendiente_validacion') 
                         ? 'Publicación enviada a validación con éxito.' 
@@ -138,18 +181,18 @@ try {
                 } else {
                     // CREAR nuevo borrador
                     $sql = "INSERT INTO publicaciones (usuario_id, titulo, descripcion, categoria, campos_extra, estado, fecha_envio_validacion";
-                    if ($multimedia_path) {
+                    if ($multimedia_json) {
                         $sql .= ", multimedia";
                     }
                     $sql .= ") VALUES (?, ?, ?, ?, ?, ?, ?";
-                    if ($multimedia_path) {
+                    if ($multimedia_json) {
                         $sql .= ", ?";
                     }
                     $sql .= ")";
                     
                     $params = [$usuario_id, $titulo, $descripcion, $categoria, $campos_extra_json, $estado, $fecha_envio];
-                    if ($multimedia_path) {
-                        $params[] = $multimedia_path;
+                    if ($multimedia_json) {
+                        $params[] = $multimedia_json;
                     }
                     
                     $stmt = $pdo->prepare($sql);
