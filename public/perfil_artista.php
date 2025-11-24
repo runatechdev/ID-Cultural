@@ -456,23 +456,160 @@ include(__DIR__ . '/../components/header.php');
             background: #f8f9fa;
         }
 
-        .obra-imagen-container {
+        /* === GALERÍA SLIDER === */
+        .obra-galeria-container {
             position: relative;
             background: white;
             border-radius: 1rem;
             padding: 1rem;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
             margin-bottom: 1.5rem;
+            overflow: hidden;
         }
 
-        .obra-imagen-container img {
+        .obra-galeria-slider {
+            position: relative;
+            width: 100%;
+            max-height: 500px;
+            overflow: hidden;
             border-radius: 0.75rem;
+        }
+
+        .obra-galeria-slides {
+            display: flex;
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .obra-galeria-slide {
+            min-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        .obra-galeria-slide img {
+            max-width: 100%;
             max-height: 500px;
             object-fit: contain;
-            width: 100%;
             display: block;
         }
 
+        /* Botones de navegación */
+        .galeria-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .galeria-nav-btn:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .galeria-nav-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .galeria-nav-btn i {
+            font-size: 1.5rem;
+            color: var(--color-primario, #367789);
+        }
+
+        .galeria-prev {
+            left: 1rem;
+        }
+
+        .galeria-next {
+            right: 1rem;
+        }
+
+        /* Ocultar botones si solo hay 1 imagen */
+        .galeria-single-image .galeria-nav-btn {
+            display: none;
+        }
+
+        /* Contador de imágenes */
+        .galeria-counter {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        /* Thumbnails (miniaturas) */
+        .galeria-thumbnails {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-primario, #367789) #e9ecef;
+        }
+
+        .galeria-thumbnails::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .galeria-thumbnails::-webkit-scrollbar-track {
+            background: #e9ecef;
+            border-radius: 3px;
+        }
+
+        .galeria-thumbnails::-webkit-scrollbar-thumb {
+            background: var(--color-primario, #367789);
+            border-radius: 3px;
+        }
+
+        .galeria-thumbnail {
+            min-width: 80px;
+            height: 80px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+
+        .galeria-thumbnail:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        .galeria-thumbnail.active {
+            opacity: 1;
+            border-color: var(--color-primario, #367789);
+            box-shadow: 0 4px 12px rgba(54, 119, 137, 0.3);
+        }
+
+        .galeria-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Resto de estilos... */
         .obra-info-card {
             background: white;
             border-radius: 1rem;
@@ -586,13 +723,26 @@ include(__DIR__ . '/../components/header.php');
                 font-size: 1.35rem;
             }
 
-            .obra-imagen-container {
-                margin-bottom: 1rem;
+            .galeria-nav-btn {
+                width: 40px;
+                height: 40px;
+            }
+
+            .galeria-nav-btn i {
+                font-size: 1.2rem;
+            }
+
+            .galeria-thumbnail {
+                min-width: 60px;
+                height: 60px;
             }
         }
     </style>
 
-    <!-- Modal para ver obra completa -->
+    <!-- ============================================ -->
+    <!-- PARTE 2: HTML DEL MODAL (reemplazar completamente) -->
+    <!-- ============================================ -->
+
     <div class="modal fade" id="obraModal" tabindex="-1" aria-labelledby="obraModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -605,10 +755,31 @@ include(__DIR__ . '/../components/header.php');
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <!-- Columna de imagen -->
+                        <!-- Columna de galería -->
                         <div class="col-lg-7 col-md-12">
-                            <div class="obra-imagen-container">
-                                <img id="obraImagen" src="" alt="" loading="lazy">
+                            <div class="obra-galeria-container" id="galeriaContainer">
+                                <!-- Slider principal -->
+                                <div class="obra-galeria-slider">
+                                    <div class="obra-galeria-slides" id="galeriaSlides">
+                                        <!-- Las imágenes se insertarán aquí dinámicamente -->
+                                    </div>
+
+                                    <!-- Botones de navegación -->
+                                    <button class="galeria-nav-btn galeria-prev" id="galeriaPrev" aria-label="Anterior">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </button>
+                                    <button class="galeria-nav-btn galeria-next" id="galeriaNext" aria-label="Siguiente">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+
+                                    <!-- Contador -->
+                                    <div class="galeria-counter" id="galeriaCounter">1 / 1</div>
+                                </div>
+
+                                <!-- Miniaturas -->
+                                <div class="galeria-thumbnails" id="galeriaThumbnails">
+                                    <!-- Las miniaturas se insertarán aquí -->
+                                </div>
                             </div>
                         </div>
 
@@ -694,6 +865,12 @@ include(__DIR__ . '/../components/header.php');
     <script>
         const BASE_URL = '<?php echo BASE_URL; ?>';
 
+        // Estado del slider
+        let galeriaActual = {
+            imagenes: [],
+            indiceActual: 0
+        };
+
         function mostrarObra(obra) {
             console.log('Obra recibida:', obra);
 
@@ -706,44 +883,41 @@ include(__DIR__ . '/../components/header.php');
             document.getElementById('obraDescripcion').textContent = descripcion;
             document.getElementById('obraCategoriaTexto').textContent = categoria;
 
-            // ===== CORRECCIÓN: Parsear multimedia correctamente =====
-            let imagenSrc = BASE_URL + 'static/img/paleta-de-pintura.png'; // Fallback por defecto
+            // ===== PROCESAR GALERÍA DE IMÁGENES =====
+            let imagenesArray = [];
+            const fallbackImg = BASE_URL + 'static/img/paleta-de-pintura.png';
 
             if (obra.multimedia) {
                 try {
-                    // Si multimedia es un string JSON, parsearlo
-                    let mediaArray = typeof obra.multimedia === 'string' ?
+                    let mediaData = typeof obra.multimedia === 'string' ?
                         JSON.parse(obra.multimedia) :
                         obra.multimedia;
 
-                    // Si es un array, tomar la primera imagen
-                    if (Array.isArray(mediaArray) && mediaArray.length > 0) {
-                        let primeraImagen = mediaArray[0];
-                        // Limpiar slashes y construir URL correcta
-                        primeraImagen = primeraImagen.replace(/^\/+/, ''); // Eliminar slashes al inicio
-                        imagenSrc = BASE_URL + primeraImagen;
-                    }
-                    // Si es string directo (una sola imagen)
-                    else if (typeof mediaArray === 'string') {
-                        let imagen = mediaArray.replace(/^\/+/, '');
-                        imagenSrc = BASE_URL + imagen;
+                    if (Array.isArray(mediaData)) {
+                        imagenesArray = mediaData.map(img => {
+                            let cleanImg = img.replace(/^\/+/, '');
+                            return BASE_URL + cleanImg;
+                        });
+                    } else if (typeof mediaData === 'string') {
+                        let cleanImg = mediaData.replace(/^\/+/, '');
+                        imagenesArray = [BASE_URL + cleanImg];
                     }
                 } catch (e) {
                     console.error('Error parseando multimedia:', e);
-                    // Mantener fallback
                 }
             }
 
-            const imgElement = document.getElementById('obraImagen');
-            imgElement.src = imagenSrc;
-            imgElement.alt = titulo;
+            // Si no hay imágenes, usar fallback
+            if (imagenesArray.length === 0) {
+                imagenesArray = [fallbackImg];
+            }
 
-            // Manejo de error de imagen
-            imgElement.onerror = function() {
-                console.error('Error cargando imagen:', this.src);
-                this.src = BASE_URL + 'static/img/paleta-de-pintura.png';
-                this.alt = 'Imagen no disponible';
-            };
+            // Guardar estado
+            galeriaActual.imagenes = imagenesArray;
+            galeriaActual.indiceActual = 0;
+
+            // Renderizar galería
+            renderizarGaleria();
 
             // Formatear y mostrar fechas
             const formatearFecha = (fecha) => {
@@ -768,8 +942,7 @@ include(__DIR__ . '/../components/header.php');
             if (obra.campos_extra) {
                 try {
                     camposExtra = typeof obra.campos_extra === 'string' ?
-                        JSON.parse(obra.campos_extra) :
-                        obra.campos_extra;
+                        JSON.parse(obra.campos_extra) : obra.campos_extra;
                 } catch (e) {
                     console.error('Error parsing campos_extra:', e);
                 }
@@ -789,25 +962,98 @@ include(__DIR__ . '/../components/header.php');
             };
 
             // Técnica
-            mostrarSeccion(
-                'obraTecnicaContainer',
-                'obraTecnica',
-                camposExtra.tecnica || camposExtra.técnica
-            );
+            mostrarSeccion('obraTecnicaContainer', 'obraTecnica', camposExtra.tecnica || camposExtra.técnica);
 
             // Dimensiones
-            mostrarSeccion(
-                'obraDimensionesContainer',
-                'obraDimensiones',
-                camposExtra.dimensiones
-            );
+            mostrarSeccion('obraDimensionesContainer', 'obraDimensiones', camposExtra.dimensiones);
 
             // Material
-            mostrarSeccion(
-                'obraMaterialContainer',
-                'obraMaterial',
-                camposExtra.material
-            );
+            mostrarSeccion('obraMaterialContainer', 'obraMaterial', camposExtra.material);
+        }
+
+        function renderizarGaleria() {
+            const slidesContainer = document.getElementById('galeriaSlides');
+            const thumbnailsContainer = document.getElementById('galeriaThumbnails');
+            const counter = document.getElementById('galeriaCounter');
+            const container = document.getElementById('galeriaContainer');
+
+            // Limpiar
+            slidesContainer.innerHTML = '';
+            thumbnailsContainer.innerHTML = '';
+
+            // Si solo hay una imagen, ocultar controles
+            if (galeriaActual.imagenes.length === 1) {
+                container.classList.add('galeria-single-image');
+            } else {
+                container.classList.remove('galeria-single-image');
+            }
+
+            // Renderizar slides
+            galeriaActual.imagenes.forEach((imgSrc, index) => {
+                // Slide principal
+                const slide = document.createElement('div');
+                slide.className = 'obra-galeria-slide';
+                slide.innerHTML = `<img src="${imgSrc}" alt="Imagen ${index + 1}" onerror="this.src='${BASE_URL}static/img/paleta-de-pintura.png'">`;
+                slidesContainer.appendChild(slide);
+
+                // Thumbnail
+                const thumb = document.createElement('div');
+                thumb.className = `galeria-thumbnail ${index === 0 ? 'active' : ''}`;
+                thumb.innerHTML = `<img src="${imgSrc}" alt="Miniatura ${index + 1}" onerror="this.src='${BASE_URL}static/img/paleta-de-pintura.png'">`;
+                thumb.onclick = () => irASlide(index);
+                thumbnailsContainer.appendChild(thumb);
+            });
+
+            // Actualizar contador
+            actualizarContador();
+
+            // Configurar eventos de navegación
+            configurarNavegacion();
+        }
+
+        function irASlide(indice) {
+            galeriaActual.indiceActual = indice;
+            const slidesContainer = document.getElementById('galeriaSlides');
+            const offset = -indice * 100;
+            slidesContainer.style.transform = `translateX(${offset}%)`;
+
+            // Actualizar thumbnails activos
+            document.querySelectorAll('.galeria-thumbnail').forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === indice);
+            });
+
+            actualizarContador();
+        }
+
+        function navegarSlide(direccion) {
+            const total = galeriaActual.imagenes.length;
+            let nuevoIndice = galeriaActual.indiceActual + direccion;
+
+            // Loop infinito
+            if (nuevoIndice < 0) nuevoIndice = total - 1;
+            if (nuevoIndice >= total) nuevoIndice = 0;
+
+            irASlide(nuevoIndice);
+        }
+
+        function actualizarContador() {
+            const counter = document.getElementById('galeriaCounter');
+            counter.textContent = `${galeriaActual.indiceActual + 1} / ${galeriaActual.imagenes.length}`;
+        }
+
+        function configurarNavegacion() {
+            // Botones
+            document.getElementById('galeriaPrev').onclick = () => navegarSlide(-1);
+            document.getElementById('galeriaNext').onclick = () => navegarSlide(1);
+
+            // Teclado
+            document.addEventListener('keydown', function(e) {
+                const modal = document.getElementById('obraModal');
+                if (modal.classList.contains('show')) {
+                    if (e.key === 'ArrowLeft') navegarSlide(-1);
+                    if (e.key === 'ArrowRight') navegarSlide(1);
+                }
+            });
         }
 
         function toggleBiografia(event) {
