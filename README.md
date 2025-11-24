@@ -12,7 +12,7 @@ Proyecto desarrollado para la Subsecretaría de Cultura de Santiago del Estero c
 
 ## 🗂️ Estructura del Proyecto
 ```
-```
+
 ID_Cultural/
 │
 ├── backend/ # 🔧 Backend PHP y configuraciones
@@ -69,7 +69,7 @@ ID_Cultural/
 ├── export_database.sh
 └── import_database.sh
 ```
-```
+
 ---
 
 ## ⚙️ Tecnologías Utilizadas
