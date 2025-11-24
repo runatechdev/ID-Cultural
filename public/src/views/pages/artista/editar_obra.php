@@ -4,7 +4,8 @@ require_once __DIR__ . '/../../../../../config.php';
 require_once __DIR__ . '/../../../../../backend/config/connection.php';
 
 // --- Función auxiliar para resolver la ruta física y la URL web de una imagen ---
-function resolver_url_imagen($img, $base_url) {
+function resolver_url_imagen($img, $base_url)
+{
     // Si no hay imagen, intentar cargar placeholder (si existe) o dejar vacío
     if (empty($img)) return $base_url . 'static/img/placeholder.webp';
 
@@ -16,7 +17,7 @@ function resolver_url_imagen($img, $base_url) {
     $img = ltrim($img, '/'); // Quitar barras iniciales sobrantes
 
     // 3. Construcción de la URL Correcta
-    
+
     // CASO A: Si la ruta limpia ya empieza con "uploads/"
     // Ejemplo BD: "uploads/imagenes/foto.jpg" -> URL: BASE_URL + "uploads/imagenes/foto.jpg"
     if (strpos($img, 'uploads/') === 0) {
@@ -74,6 +75,7 @@ include(__DIR__ . '/../../../../../components/header.php');
         background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
         min-height: 100vh;
     }
+
     .hero-welcome {
         background: linear-gradient(135deg, var(--color-primario, #367789) 0%, #2a5a69 100%);
         color: white;
@@ -84,6 +86,7 @@ include(__DIR__ . '/../../../../../components/header.php');
         position: relative;
         overflow: hidden;
     }
+
     .hero-welcome h1 {
         font-size: 2rem;
         font-weight: 700;
@@ -91,6 +94,7 @@ include(__DIR__ . '/../../../../../components/header.php');
         position: relative;
         z-index: 1;
     }
+
     .hero-welcome .lead {
         font-size: 1.1rem;
         opacity: 0.95;
@@ -98,6 +102,7 @@ include(__DIR__ . '/../../../../../components/header.php');
         position: relative;
         z-index: 1;
     }
+
     .section-card {
         background: white;
         border-radius: 1rem;
@@ -107,15 +112,18 @@ include(__DIR__ . '/../../../../../components/header.php');
         overflow: hidden;
         margin-bottom: 1.5rem;
     }
+
     .section-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
     }
+
     .section-header {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         padding: 1.5rem;
         border-bottom: 2px solid #dee2e6;
     }
+
     .section-header h4 {
         margin: 0 0 0.5rem 0;
         color: var(--color-primario, #367789);
@@ -125,10 +133,12 @@ include(__DIR__ . '/../../../../../components/header.php');
         align-items: center;
         gap: 0.5rem;
     }
+
     .section-header p {
         margin: 0;
         font-size: 0.9rem;
     }
+
     .drop-zone {
         border: 3px dashed #dee2e6;
         border-radius: 1rem;
@@ -139,11 +149,13 @@ include(__DIR__ . '/../../../../../components/header.php');
         padding: 2rem;
         text-align: center;
     }
+
     .drop-zone.dragover {
         border-color: #0d6efd;
         background: #e7f3ff;
     }
 </style>
+
 <body class="dashboard-body">
     <?php include(__DIR__ . '/../../../../../components/navbar.php'); ?>
     <main class="container my-5">
@@ -224,17 +236,17 @@ include(__DIR__ . '/../../../../../components/header.php');
                                 foreach ($imagenes as $img) {
                                     $src = resolver_url_imagen($img, BASE_URL);
                                 ?>
-                                <div class="col-md-3 col-sm-4 col-6" data-existing="true" data-src="<?php echo htmlspecialchars($src); ?>">
-                                    <div class="card h-100 border-0 shadow-sm position-relative">
-                                        <img src="<?php echo htmlspecialchars($src); ?>" class="card-img-top" style="height: 150px; object-fit: cover;" alt="Imagen actual">
-                                        <div class="card-footer bg-light small">
-                                            <span class="text-muted">Imagen actual</span>
-                                            <button type="button" class="btn btn-sm btn-danger float-end p-0 btn-remove-existing">
-                                                <i class="bi bi-x"></i>
-                                            </button>
+                                    <div class="col-md-3 col-sm-4 col-6" data-existing="true" data-src="<?php echo htmlspecialchars($src); ?>">
+                                        <div class="card h-100 border-0 shadow-sm position-relative">
+                                            <img src="<?php echo htmlspecialchars($src); ?>" class="card-img-top" style="height: 150px; object-fit: cover;" alt="Imagen actual">
+                                            <div class="card-footer bg-light small">
+                                                <span class="text-muted">Imagen actual</span>
+                                                <button type="button" class="btn btn-sm btn-danger float-end p-0 btn-remove-existing">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 <?php } ?>
                             </div>
                             <div id="new-images-container" class="col-12 row g-3"></div>
@@ -270,6 +282,7 @@ include(__DIR__ . '/../../../../../components/header.php');
             [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
         });
     </script>
-    <script src="<?php echo BASE_URL; ?>static/js/editar-obra.js"></script>
+    <script src="<?php echo BASE_URL; ?>static/js/editar-obra.js?v=<?php echo time(); ?>"></script>
 </body>
+
 </html>
