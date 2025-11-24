@@ -172,7 +172,7 @@ include(__DIR__ . '/../components/header.php');
                     <!-- Artistas Validados -->
                     <div class="tab-pane active" id="artistas-validados">
                         <div class="content-header">
-                            <h3>Artistas Validados de Santiago del Estero</h3>
+                            <h3>Artistas de Santiago del Estero</h3>
                             <p>Artistas locales que han pasado por nuestro proceso de validación</p>
                         </div>
                         <div class="artists-grid" id="validated-artists">
