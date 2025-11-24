@@ -3,6 +3,31 @@ session_start();
 require_once __DIR__ . '/../../../../../config.php';
 require_once __DIR__ . '/../../../../../backend/config/connection.php';
 
+// --- Función auxiliar para resolver la ruta física y la URL web de una imagen ---
+function resolver_url_imagen($img, $base_url) {
+    // Si no hay imagen, intentar cargar placeholder (si existe) o dejar vacío
+    if (empty($img)) return $base_url . 'static/img/placeholder.webp';
+
+    // 1. Si ya es una URL completa (http...), devolverla tal cual
+    if (preg_match('/^https?:\/\//i', $img)) return $img;
+
+    // 2. Limpieza agresiva: Quitar 'public' y 'static' si vienen en la ruta de la BD
+    $img = str_replace(['public/', 'static/'], '', $img);
+    $img = ltrim($img, '/'); // Quitar barras iniciales sobrantes
+
+    // 3. Construcción de la URL Correcta
+    
+    // CASO A: Si la ruta limpia ya empieza con "uploads/"
+    // Ejemplo BD: "uploads/imagenes/foto.jpg" -> URL: BASE_URL + "uploads/imagenes/foto.jpg"
+    if (strpos($img, 'uploads/') === 0) {
+        return $base_url . $img;
+    }
+
+    // CASO B: Si solo tenemos el nombre del archivo
+    // Ejemplo BD: "media_123.jpg" -> URL: BASE_URL + "uploads/imagenes/" + "media_123.jpg"
+    return $base_url . 'uploads/imagenes/' . $img;
+}
+
 // --- Bloque de seguridad para Artista ---
 if (!isset($_SESSION['user_data']) || $_SESSION['user_data']['role'] !== 'artista') {
     header('Location: ' . BASE_URL . 'src/views/pages/auth/login.php');
@@ -104,8 +129,19 @@ include(__DIR__ . '/../../../../../components/header.php');
         margin: 0;
         font-size: 0.9rem;
     }
-    @media (max-width: 768px) {
-        .hero-welcome h1 { font-size: 1.3rem; }
+    .drop-zone {
+        border: 3px dashed #dee2e6;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        min-height: 200px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: 2rem;
+        text-align: center;
+    }
+    .drop-zone.dragover {
+        border-color: #0d6efd;
+        background: #e7f3ff;
     }
 </style>
 <body class="dashboard-body">
@@ -155,38 +191,56 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <hr class="my-4">
                     <h5 class="mb-3">📷 Multimedia (Imágenes)</h5>
                     <div class="mb-3">
-                        <label for="multimedia" class="form-label">Cambiar Imágenes (Opcional)</label>
-                        <div class="input-group">
-                            <input type="file" class="form-control" id="multimedia" name="multimedia[]" accept="image/*" multiple data-bs-toggle="tooltip" title="Puedes subir nuevas imágenes para tu obra (máx. 5MB cada una)">
-                            <span class="input-group-text"><i class="bi bi-image"></i></span>
+                        <div id="drop-zone" class="drop-zone">
+                            <div class="py-4">
+                                <i class="bi bi-cloud-upload display-4 text-primary mb-3"></i>
+                                <h5>Arrastra imágenes aquí o haz clic para seleccionar</h5>
+                                <p class="text-muted mb-3">
+                                    Formatos: JPG, PNG, WEBP (máx. 5MB cada una)<br>
+                                    Puedes subir múltiples imágenes
+                                </p>
+                                <input type="file" class="d-none" id="multimedia" name="multimedia[]" accept="image/*" multiple>
+                                <button type="button" class="btn btn-primary" id="btn-select-images">
+                                    <i class="bi bi-image me-2"></i>Seleccionar Imágenes
+                                </button>
+                            </div>
                         </div>
-                        <small class="text-muted d-block mt-2">
-                            Formatos: JPG, PNG, WEBP (máx. 5MB cada una)<br>
-                            Si no seleccionas nuevas imágenes, se mantendrán las actuales
-                        </small>
                     </div>
-                    <?php if (!empty($obra['multimedia'])): ?>
-                        <div class="mb-3">
-                            <label class="form-label">Imagen Actual</label>
-                            <div class="row g-3">
-                                <div class="col-md-3 col-sm-4 col-6">
-                                    <div class="card h-100 border-0 shadow-sm">
-                                        <img src="<?php echo BASE_URL . ltrim($obra['multimedia'], '/'); ?>" 
-                                             class="card-img-top" 
-                                             style="height: 150px; object-fit: cover;" 
-                                             alt="Imagen actual">
+                    <div id="preview-container" class="mb-3" style="<?php echo !empty($obra['multimedia']) ? 'display: block;' : 'display: none;'; ?>">
+                        <h6 class="mb-3">Imágenes seleccionadas:</h6>
+                        <div class="row g-3">
+                            <div id="existing-images-container" class="col-12 row g-3">
+                                <?php
+                                $multimedia = $obra['multimedia'] ?? '';
+                                $imagenes = [];
+                                if (!empty($multimedia)) {
+                                    // Detectar si es JSON (nuevo formato)
+                                    if (is_string($multimedia) && ($arr = json_decode($multimedia, true)) && json_last_error() === JSON_ERROR_NONE) {
+                                        $imagenes = $arr;
+                                    } else {
+                                        $imagenes = [$multimedia];
+                                    }
+                                }
+                                foreach ($imagenes as $img) {
+                                    $src = resolver_url_imagen($img, BASE_URL);
+                                ?>
+                                <div class="col-md-3 col-sm-4 col-6" data-existing="true" data-src="<?php echo htmlspecialchars($src); ?>">
+                                    <div class="card h-100 border-0 shadow-sm position-relative">
+                                        <img src="<?php echo htmlspecialchars($src); ?>" class="card-img-top" style="height: 150px; object-fit: cover;" alt="Imagen actual">
                                         <div class="card-footer bg-light small">
                                             <span class="text-muted">Imagen actual</span>
+                                            <button type="button" class="btn btn-sm btn-danger float-end p-0 btn-remove-existing">
+                                                <i class="bi bi-x"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
+                                <?php } ?>
                             </div>
+                            <div id="new-images-container" class="col-12 row g-3"></div>
                         </div>
-                    <?php endif; ?>
-                    <div id="preview-container" class="mb-3" style="display: none;">
-                        <label class="form-label">Nuevas Imágenes</label>
-                        <div id="image-previews" class="row g-3"></div>
                     </div>
+                    <input type="hidden" id="imagenes_a_borrar" name="imagenes_a_borrar" value="[]">
                     <hr class="my-4">
                     <h5 class="mb-3">Detalles Específicos de la Categoría</h5>
                     <div id="campos-condicionales-container">

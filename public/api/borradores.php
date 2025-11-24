@@ -1,22 +1,23 @@
 <?php
-// Iniciar buffer de salida para capturar cualquier output no deseado
+// 1. LIMPIEZA INICIAL: Iniciar buffer para capturar cualquier warning/error visual
 ob_start();
 
 session_start();
 header('Content-Type: application/json');
 
-// Deshabilitar display_errors para evitar que errores se muestren en la respuesta JSON
+// 2. CONFIGURACIÓN DE ERRORES: No mostrar en pantalla, pero sí reportar internamente
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../backend/config/connection.php';
 
-// Obtener acción desde GET o POST
+// Obtener acción
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
-// Verificar permisos de artista
+// Helper de permisos
 function checkArtistaPermissions() {
     if (!isset($_SESSION['user_data']) || $_SESSION['user_data']['role'] !== 'artista') {
+        if (ob_get_length()) ob_clean();
         http_response_code(403);
         echo json_encode(['status' => 'error', 'message' => 'Acceso no autorizado.']);
         exit;
@@ -26,372 +27,245 @@ function checkArtistaPermissions() {
 try {
     switch ($action) {
         case 'get':
-            // OBTENER BORRADORES (solo artista)
             checkArtistaPermissions();
-            
             $artista_id = $_SESSION['user_data']['id'];
             $id = $_GET['id'] ?? 0;
 
             if ($id) {
-                // Obtener borrador específico
                 $stmt = $pdo->prepare(
-                    "SELECT id, titulo, descripcion, categoria, campos_extra, fecha_creacion 
+                    "SELECT id, titulo, descripcion, categoria, campos_extra, multimedia, fecha_creacion 
                      FROM publicaciones 
-                     WHERE id = ? AND usuario_id = ? AND estado = 'borrador'"
+                     WHERE id = ? AND usuario_id = ?" // Quitamos restricción de estado para poder editar validados/pendientes
                 );
                 $stmt->execute([$id, $artista_id]);
                 $borrador = $stmt->fetch(PDO::FETCH_ASSOC);
                 
                 if ($borrador) {
-                    // Decodificar campos extra si existen
-                    if ($borrador['campos_extra']) {
-                        $borrador['campos_extra'] = json_decode($borrador['campos_extra'], true);
-                    } else {
-                        $borrador['campos_extra'] = [];
+                    $borrador['campos_extra'] = $borrador['campos_extra'] ? json_decode($borrador['campos_extra'], true) : [];
+                    // Asegurar que multimedia sea un array o null
+                    if ($borrador['multimedia']) {
+                        // Intentar decodificar JSON, si falla asumir string simple
+                        $decoded = json_decode($borrador['multimedia'], true);
+                        $borrador['multimedia'] = is_array($decoded) ? $decoded : [$borrador['multimedia']];
                     }
+                    if (ob_get_length()) ob_clean();
                     echo json_encode($borrador);
                 } else {
-                    http_response_code(404);
-                    echo json_encode(['status' => 'error', 'message' => 'Borrador no encontrado.']);
+                    throw new Exception('Obra no encontrada.');
                 }
             } else {
-                // Obtener todos los borradores del artista
-                $stmt = $pdo->prepare(
-                    "SELECT id, titulo, fecha_creacion 
-                     FROM publicaciones 
-                     WHERE usuario_id = ? AND estado = 'borrador'
-                     ORDER BY fecha_creacion DESC"
-                );
-                
+                // Listado general
+                $stmt = $pdo->prepare("SELECT id, titulo, fecha_creacion, estado FROM publicaciones WHERE usuario_id = ? ORDER BY fecha_creacion DESC");
                 $stmt->execute([$artista_id]);
                 $borradores = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                
+                if (ob_get_length()) ob_clean();
                 echo json_encode($borradores);
             }
             break;
 
-        case 'save':
-            // GUARDAR BORRADOR (solo artista)
+        case 'save': // CREAR NUEVO
             checkArtistaPermissions();
-            
             $usuario_id = $_SESSION['user_data']['id'];
-            $id = $_POST['id'] ?? 0; // Para actualización
+            
+            // Recoger datos
             $titulo = trim($_POST['titulo'] ?? '');
             $descripcion = trim($_POST['descripcion'] ?? '');
             $categoria = trim($_POST['categoria'] ?? '');
-            $estado = trim($_POST['estado'] ?? 'borrador'); // 'borrador' o 'pendiente_validacion'
+            $estado = trim($_POST['estado'] ?? 'borrador');
 
-            // Validaciones básicas
             if (empty($titulo) || empty($descripcion) || empty($categoria)) {
-                http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'El título, la descripción y la categoría son obligatorios.']);
-                exit;
+                throw new Exception('El título, la descripción y la categoría son obligatorios.');
             }
 
-            // Recopilar campos extra
+            // Campos extra
             $campos_extra = [];
             foreach ($_POST as $key => $value) {
-                if (!in_array($key, ['id', 'titulo', 'descripcion', 'categoria', 'estado'])) {
+                if (!in_array($key, ['id', 'titulo', 'descripcion', 'categoria', 'estado', 'action', 'multimedia'])) {
                     $campos_extra[$key] = trim($value);
                 }
             }
             $campos_extra_json = json_encode($campos_extra);
-
-            // Si se envía a validación (estado='pendiente' o 'pendiente_validacion'), actualizamos la fecha de envío
             $fecha_envio = ($estado === 'pendiente' || $estado === 'pendiente_validacion') ? date('Y-m-d H:i:s') : null;
-            
-            // Normalizar el estado 'pendiente' a 'pendiente_validacion'
-            if ($estado === 'pendiente') {
-                $estado = 'pendiente_validacion';
-            }
+            if ($estado === 'pendiente') $estado = 'pendiente_validacion'; // Normalizar
 
-            // Procesar multimedia (múltiples archivos)
+            // Procesar Multimedia (NUEVO)
             $multimedia_paths = [];
             if (isset($_FILES['multimedia']) && !empty($_FILES['multimedia']['tmp_name'])) {
                 require_once __DIR__ . '/../../backend/helpers/MultimediaValidator.php';
                 $validator = new MultimediaValidator();
                 
-                // Determinar si es un array de archivos o un solo archivo
-                $file_count = is_array($_FILES['multimedia']['tmp_name']) ? count($_FILES['multimedia']['tmp_name']) : 1;
-                
-                for ($i = 0; $i < $file_count; $i++) {
-                    // Obtener datos del archivo
-                    if (is_array($_FILES['multimedia']['tmp_name'])) {
-                        $file_data = [
-                            'name' => $_FILES['multimedia']['name'][$i],
-                            'type' => $_FILES['multimedia']['type'][$i],
-                            'tmp_name' => $_FILES['multimedia']['tmp_name'][$i],
-                            'error' => $_FILES['multimedia']['error'][$i],
-                            'size' => $_FILES['multimedia']['size'][$i]
-                        ];
-                    } else {
-                        $file_data = [
-                            'name' => $_FILES['multimedia']['name'],
-                            'type' => $_FILES['multimedia']['type'],
-                            'tmp_name' => $_FILES['multimedia']['tmp_name'],
-                            'error' => $_FILES['multimedia']['error'],
-                            'size' => $_FILES['multimedia']['size']
-                        ];
-                    }
-                    
-                    // Saltar si el archivo está vacío
-                    if (empty($file_data['tmp_name'])) {
-                        continue;
-                    }
-                    
-                    $result = $validator->guardarArchivo($file_data, 'imagen');
+                // Normalizar estructura $_FILES
+                $files = $_FILES['multimedia'];
+                $count = is_array($files['tmp_name']) ? count($files['tmp_name']) : 1;
+
+                for ($i = 0; $i < $count; $i++) {
+                    $tmpName = is_array($files['tmp_name']) ? $files['tmp_name'][$i] : $files['tmp_name'];
+                    if (empty($tmpName)) continue;
+
+                    $fileData = [
+                        'name' => is_array($files['name']) ? $files['name'][$i] : $files['name'],
+                        'type' => is_array($files['type']) ? $files['type'][$i] : $files['type'],
+                        'tmp_name' => $tmpName,
+                        'error' => is_array($files['error']) ? $files['error'][$i] : $files['error'],
+                        'size' => is_array($files['size']) ? $files['size'][$i] : $files['size']
+                    ];
+
+                    $result = $validator->guardarArchivo($fileData, 'imagen');
                     if ($result['exitoso']) {
                         $multimedia_paths[] = $result['ruta'];
-                    } else {
-                        throw new Exception("Error al guardar imagen: " . ($result['mensaje'] ?: 'Error desconocido'));
                     }
                 }
             }
-            
-            // Convertir array de paths a JSON (o null si está vacío)
             $multimedia_json = !empty($multimedia_paths) ? json_encode($multimedia_paths) : null;
 
-            $pdo->beginTransaction();
+            // Insertar
+            $sql = "INSERT INTO publicaciones (usuario_id, titulo, descripcion, categoria, campos_extra, estado, fecha_envio_validacion, multimedia) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$usuario_id, $titulo, $descripcion, $categoria, $campos_extra_json, $estado, $fecha_envio, $multimedia_json]);
 
-            try {
-                if ($id) {
-                    // ACTUALIZAR borrador existente
-                    $sql = "UPDATE publicaciones 
-                         SET titulo = ?, descripcion = ?, categoria = ?, campos_extra = ?, estado = ?, fecha_envio_validacion = ?";
-                    
-                    if ($multimedia_json) {
-                        $sql .= ", multimedia = ?";
-                    }
-                    
-                    $sql .= " WHERE id = ? AND usuario_id = ? AND estado = 'borrador'";
-                    
-                    $params = [$titulo, $descripcion, $categoria, $campos_extra_json, $estado, $fecha_envio];
-                    if ($multimedia_json) {
-                        $params[] = $multimedia_json;
-                    }
-                    $params[] = $id;
-                    $params[] = $usuario_id;
-                    
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute($params);
-                    
-                    $message = ($estado === 'pendiente_validacion') 
-                        ? 'Publicación enviada a validación con éxito.' 
-                        : 'Borrador actualizado con éxito.';
-                } else {
-                    // CREAR nuevo borrador
-                    $sql = "INSERT INTO publicaciones (usuario_id, titulo, descripcion, categoria, campos_extra, estado, fecha_envio_validacion";
-                    if ($multimedia_json) {
-                        $sql .= ", multimedia";
-                    }
-                    $sql .= ") VALUES (?, ?, ?, ?, ?, ?, ?";
-                    if ($multimedia_json) {
-                        $sql .= ", ?";
-                    }
-                    $sql .= ")";
-                    
-                    $params = [$usuario_id, $titulo, $descripcion, $categoria, $campos_extra_json, $estado, $fecha_envio];
-                    if ($multimedia_json) {
-                        $params[] = $multimedia_json;
-                    }
-                    
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute($params);
-                    
-                    $message = ($estado === 'pendiente_validacion') 
-                        ? 'Publicación creada y enviada a validación con éxito.' 
-                        : 'Borrador guardado con éxito.';
-                }
-
-                // Si se envía a validación, actualizar estado del artista si es necesario
-                if ($estado === 'pendiente_validacion') {
-                    $update_artista = $pdo->prepare("UPDATE artistas SET status = 'pendiente' WHERE id = ? AND status != 'validado'");
-                    $update_artista->execute([$usuario_id]);
-                }
-
-                $pdo->commit();
-                echo json_encode(['status' => 'ok', 'message' => $message]);
-
-            } catch (PDOException $e) {
-                $pdo->rollBack();
-                throw $e;
-            }
+            if (ob_get_length()) ob_clean();
+            echo json_encode(['status' => 'ok', 'message' => 'Obra guardada exitosamente.']);
             break;
 
-        case 'delete':
-            // ELIMINAR BORRADOR (solo artista)
+        case 'update': // EDITAR EXISTENTE (Aquí estaba el error 500)
             checkArtistaPermissions();
-            
-            $id = $_POST['id'] ?? '';
-            $artista_id = $_SESSION['user_data']['id'];
-
-            if (empty($id)) {
-                http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'ID de borrador no proporcionado.']);
-                exit;
-            }
-
-            $stmt = $pdo->prepare("DELETE FROM publicaciones WHERE id = ? AND usuario_id = ? AND estado = 'borrador'");
-            $stmt->execute([$id, $artista_id]);
-
-            if ($stmt->rowCount() > 0) {
-                echo json_encode(['status' => 'ok', 'message' => 'Borrador eliminado con éxito.']);
-            } else {
-                http_response_code(404);
-                echo json_encode(['status' => 'error', 'message' => 'No se encontró el borrador a eliminar.']);
-            }
-            break;
-
-        case 'submit':
-            // ENVIAR BORRADOR A VALIDACIÓN (acción específica)
-            checkArtistaPermissions();
-            
-            $id = $_POST['id'] ?? '';
-            $artista_id = $_SESSION['user_data']['id'];
-
-            if (empty($id)) {
-                http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'ID de borrador no proporcionado.']);
-                exit;
-            }
-
-            $pdo->beginTransaction();
-
-            try {
-                // Actualizar estado a pendiente_validacion
-                $stmt = $pdo->prepare(
-                    "UPDATE publicaciones 
-                     SET estado = 'pendiente_validacion', fecha_envio_validacion = CURRENT_TIMESTAMP 
-                     WHERE id = ? AND usuario_id = ? AND estado = 'borrador'"
-                );
-                $stmt->execute([$id, $artista_id]);
-
-                if ($stmt->rowCount() > 0) {
-                    // Actualizar estado del artista si es necesario
-                    $update_artista = $pdo->prepare("UPDATE artistas SET status = 'pendiente' WHERE id = ? AND status != 'validado'");
-                    $update_artista->execute([$artista_id]);
-
-                    $pdo->commit();
-                    echo json_encode(['status' => 'ok', 'message' => 'Borrador enviado a validación con éxito.']);
-                } else {
-                    $pdo->rollBack();
-                    echo json_encode(['status' => 'error', 'message' => 'No se pudo enviar el borrador a validación.']);
-                }
-
-            } catch (PDOException $e) {
-                $pdo->rollBack();
-                throw $e;
-            }
-            break;
-
-        case 'update':
-            // ACTUALIZAR PUBLICACIÓN EXISTENTE Y REENVIAR A VALIDACIÓN
-            checkArtistaPermissions();
-            
             $usuario_id = $_SESSION['user_data']['id'];
-            $id = $_POST['id'] ?? '';
-            $titulo = trim($_POST['titulo'] ?? '');
-            $descripcion = trim($_POST['descripcion'] ?? '');
-            $categoria = trim($_POST['categoria'] ?? '');
+            $id = $_POST['id'] ?? 0;
 
-            // Validaciones básicas
-            if (empty($id)) {
-                http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'ID de publicación no proporcionado.']);
-                exit;
+            if (!$id) throw new Exception('ID de publicación no proporcionado.');
+
+            // 1. Obtener datos actuales (para saber qué imágenes ya existen)
+            $stmtCurrent = $pdo->prepare("SELECT multimedia FROM publicaciones WHERE id = ? AND usuario_id = ?");
+            $stmtCurrent->execute([$id, $usuario_id]);
+            $currentData = $stmtCurrent->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$currentData) throw new Exception('Obra no encontrada o sin permisos.');
+
+            // Normalizar imágenes actuales a Array
+            $existingImages = [];
+            if (!empty($currentData['multimedia'])) {
+                $decoded = json_decode($currentData['multimedia'], true);
+                // Si decodifica es array, si no (legacy string) lo metemos en array
+                $existingImages = is_array($decoded) ? $decoded : [$currentData['multimedia']];
             }
 
-            if (empty($titulo) || empty($descripcion) || empty($categoria)) {
-                http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'El título, la descripción y la categoría son obligatorios.']);
-                exit;
+            // 2. Procesar imágenes a borrar (que manda el frontend)
+            $imagenes_a_borrar = $_POST['imagenes_a_borrar'] ?? [];
+            if (is_string($imagenes_a_borrar)) {
+                // Por si acaso llega como string separado por comas
+                $imagenes_a_borrar = explode(',', $imagenes_a_borrar);
             }
 
-            // Recopilar campos extra
+            // Filtrar: De las existentes, quitamos las que están en "borrar"
+            $finalImages = [];
+            foreach ($existingImages as $img) {
+                // Comparamos rutas. A veces vienen con '/' al principio o no. Intentamos normalizar básico.
+                // Lo ideal es comparación directa si el frontend manda la ruta exacta.
+                if (!in_array($img, $imagenes_a_borrar)) {
+                    $finalImages[] = $img;
+                } else {
+                    // Opcional: Aquí podrías unlink() el archivo físico si quisieras limpiar disco
+                }
+            }
+
+            // 3. Procesar Nuevas Imágenes (Append)
+            if (isset($_FILES['multimedia']) && !empty($_FILES['multimedia']['tmp_name'])) {
+                require_once __DIR__ . '/../../backend/helpers/MultimediaValidator.php';
+                $validator = new MultimediaValidator();
+                
+                $files = $_FILES['multimedia'];
+                $count = is_array($files['tmp_name']) ? count($files['tmp_name']) : 1;
+
+                for ($i = 0; $i < $count; $i++) {
+                    $tmpName = is_array($files['tmp_name']) ? $files['tmp_name'][$i] : $files['tmp_name'];
+                    if (empty($tmpName)) continue;
+
+                    $fileData = [
+                        'name' => is_array($files['name']) ? $files['name'][$i] : $files['name'],
+                        'type' => is_array($files['type']) ? $files['type'][$i] : $files['type'],
+                        'tmp_name' => $tmpName,
+                        'error' => is_array($files['error']) ? $files['error'][$i] : $files['error'],
+                        'size' => is_array($files['size']) ? $files['size'][$i] : $files['size']
+                    ];
+
+                    $result = $validator->guardarArchivo($fileData, 'imagen');
+                    if ($result['exitoso']) {
+                        $finalImages[] = $result['ruta'];
+                    }
+                }
+            }
+
+            // 4. Preparar datos finales
+            $titulo = trim($_POST['titulo']);
+            $descripcion = trim($_POST['descripcion']);
+            $categoria = trim($_POST['categoria']);
+            
             $campos_extra = [];
             foreach ($_POST as $key => $value) {
-                if (!in_array($key, ['action', 'id', 'titulo', 'descripcion', 'categoria'])) {
+                if (!in_array($key, ['id', 'titulo', 'descripcion', 'categoria', 'estado', 'action', 'multimedia', 'imagenes_a_borrar'])) {
                     $campos_extra[$key] = trim($value);
                 }
             }
             $campos_extra_json = json_encode($campos_extra);
+            
+            // Codificar array final de imágenes a JSON para la BD
+            // Usamos array_values para reindexar (0, 1, 2...) y que no queden huecos
+            $multimedia_final_json = !empty($finalImages) ? json_encode(array_values($finalImages)) : null;
 
-            // Procesar multimedia (solo si hay archivos nuevos)
-            $multimedia_path = null;
-            if (isset($_FILES['multimedia']) && !empty($_FILES['multimedia']['tmp_name'][0])) {
-                require_once __DIR__ . '/../../backend/helpers/MultimediaValidator.php';
-                $validator = new MultimediaValidator();
-                
-                // Procesar primer archivo
-                $file_data = [
-                    'name' => $_FILES['multimedia']['name'][0],
-                    'type' => $_FILES['multimedia']['type'][0],
-                    'tmp_name' => $_FILES['multimedia']['tmp_name'][0],
-                    'error' => $_FILES['multimedia']['error'][0],
-                    'size' => $_FILES['multimedia']['size'][0]
-                ];
-                
-                $result = $validator->guardarArchivo($file_data, 'imagen');
-                if ($result['exitoso']) {
-                    $multimedia_path = $result['ruta'];
-                } else {
-                    throw new Exception("Error al guardar multimedia: " . ($result['mensaje'] ?: 'Error desconocido'));
-                }
-            }
+            // 5. Update SQL
+            $sql = "UPDATE publicaciones 
+                    SET titulo = ?, descripcion = ?, categoria = ?, campos_extra = ?, 
+                        multimedia = ?, estado = 'pendiente', fecha_envio_validacion = CURRENT_TIMESTAMP
+                    WHERE id = ? AND usuario_id = ?";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                $titulo, 
+                $descripcion, 
+                $categoria, 
+                $campos_extra_json, 
+                $multimedia_final_json, 
+                $id, 
+                $usuario_id
+            ]);
 
-            $pdo->beginTransaction();
+            if (ob_get_length()) ob_clean();
+            echo json_encode(['status' => 'ok', 'message' => 'Obra actualizada correctamente.']);
+            break;
+            
+        case 'delete':
+            checkArtistaPermissions();
+            $id = $_POST['id'] ?? '';
+            $artista_id = $_SESSION['user_data']['id'];
 
-            try {
-                // Actualizar la publicación y cambiar estado a pendiente
-                $sql = "UPDATE publicaciones 
-                        SET titulo = ?, descripcion = ?, categoria = ?, campos_extra = ?, 
-                            estado = 'pendiente', fecha_envio_validacion = CURRENT_TIMESTAMP";
-                
-                $params = [$titulo, $descripcion, $categoria, $campos_extra_json];
-                
-                if ($multimedia_path) {
-                    $sql .= ", multimedia = ?";
-                    $params[] = $multimedia_path;
-                }
-                
-                $sql .= " WHERE id = ? AND usuario_id = ?";
-                $params[] = $id;
-                $params[] = $usuario_id;
-                
-                error_log("UPDATE borradores.php: id={$id}, usuario_id={$usuario_id}, titulo={$titulo}");
-                
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute($params);
-                
-                error_log("UPDATE borradores.php: rowCount=" . $stmt->rowCount());
+            if (!$id) throw new Exception('ID no proporcionado');
 
-                if ($stmt->rowCount() > 0) {
-                    $pdo->commit();
-                    echo json_encode(['status' => 'ok', 'message' => 'Obra actualizada y enviada a validación con éxito.']);
-                } else {
-                    $pdo->rollBack();
-                    http_response_code(404);
-                    echo json_encode(['status' => 'error', 'message' => 'No se encontró la publicación o no tienes permiso para modificarla.']);
-                }
+            $stmt = $pdo->prepare("DELETE FROM publicaciones WHERE id = ? AND usuario_id = ?");
+            $stmt->execute([$id, $artista_id]);
 
-            } catch (PDOException $e) {
-                $pdo->rollBack();
-                throw $e;
+            if (ob_get_length()) ob_clean();
+            if ($stmt->rowCount() > 0) {
+                echo json_encode(['status' => 'ok', 'message' => 'Borrado exitoso.']);
+            } else {
+                http_response_code(404);
+                echo json_encode(['status' => 'error', 'message' => 'No encontrado o sin permisos.']);
             }
             break;
 
         default:
-            http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Acción no válida. Acciones permitidas: get, save, delete, submit, update']);
-            break;
+            throw new Exception('Acción no válida');
     }
 
-} catch (PDOException $e) {
-    // Rollback si hay alguna transacción activa
-    if ($pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
+} catch (Exception $e) {
+    // CAPTURA DE ERRORES GLOBAL
+    // Limpiamos cualquier salida previa (HTML sucio, warnings)
+    if (ob_get_length()) ob_clean();
+    
+    // Devolvemos JSON limpio con el error real
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => 'Error en la base de datos: ' . $e->getMessage()]);
+    echo json_encode([
+        'status' => 'error', 
+        'message' => $e->getMessage()
+    ]);
 }
 ?>
