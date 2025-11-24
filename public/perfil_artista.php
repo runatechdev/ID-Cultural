@@ -61,6 +61,8 @@ try {
 $page_title = "{$artista['nombre']} {$artista['apellido']} - ID Cultural";
 $specific_css_files = ['perfil-artista.css'];
 
+$version = time(); // O usa un número de versión fijo como '1.0.1'
+
 include(__DIR__ . '/../components/header.php');
 ?>
 
@@ -1135,7 +1137,7 @@ include(__DIR__ . '/../components/header.php');
             });
         }
     </script>
-    <script src="<?php echo BASE_URL; ?>static/js/perfil-artista.js"></script>
+<script src="<?php echo BASE_URL; ?>static/js/perfil-artista.js?v=<?php echo $version; ?>"></script>
 </body>
 
 </html>
