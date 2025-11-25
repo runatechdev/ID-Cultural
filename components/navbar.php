@@ -59,19 +59,26 @@ if (!defined('BASE_URL')) {
 
 
         <!-- Botón de Video Instructivo - En registro y cuando artista logueado -->
-        <?php
-        $current_uri = $_SERVER['REQUEST_URI'];
-        $is_registro = strpos($current_uri, '/src/views/pages/auth/registro.php') !== false;
-        $is_artista_logueado = isset($_SESSION['user_data']) && ($_SESSION['user_data']['role'] === 'artista' || $_SESSION['user_data']['role'] === 'artista_validado');
+<!-- Botón de Video Instructivo - En registro, login y cuando artista logueado -->
+<?php
+$current_uri = $_SERVER['REQUEST_URI'];
+$is_registro = strpos($current_uri, '/src/views/pages/auth/registro.php') !== false;
+$is_login = strpos($current_uri, '/src/views/pages/auth/login.php') !== false;
+$is_artista_logueado = isset($_SESSION['user_data']) && ($_SESSION['user_data']['role'] === 'artista' || $_SESSION['user_data']['role'] === 'artista_validado');
 
-        if ($is_registro || $is_artista_logueado):
-        ?>
-          <li class="nav-item">
-            <button class="btn btn-link nav-link" id="open-video-btn" aria-label="Ver video instructivo" title="Ver video instructivo">
-              <i class="bi bi-play-circle fs-5"></i>
-            </button>
-          </li>
-        <?php endif; ?>
+if ($is_registro || $is_login || $is_artista_logueado):
+  // Determinar qué video mostrar
+  $video_src = $is_registro ? '/static/video/Registro.mp4' : '/static/video/Artista.mp4';
+?>
+  <li class="nav-item">
+    <button class="btn btn-link nav-link" id="open-video-btn" 
+            data-video-src="<?php echo $video_src; ?>"
+            aria-label="Ver video instructivo" 
+            title="Ver video instructivo">
+      <i class="bi bi-play-circle fs-5"></i>
+    </button>
+  </li>
+<?php endif; ?>
 
         <!-- Botón de Búsqueda -->
         <li class="nav-item">
@@ -241,7 +248,7 @@ if (!defined('BASE_URL')) {
       <div class="modal-body bg-black p-0">
         <div class="ratio ratio-16x9">
           <video id="instructionVideo" controls preload="metadata" style="width: 100%; height: 100%; object-fit: contain;">
-            <source src="/static/video/Registro.mp4" type="video/mp4">
+            <source src="" type="video/mp4" id="videoSource">
             Tu navegador no soporta la etiqueta de video.
           </video>
         </div>
@@ -268,47 +275,33 @@ if (!defined('BASE_URL')) {
 
 <!-- Script para controlar el modal del video -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const openVideoBtn = document.getElementById('open-video-btn');
-    const videoModal = document.getElementById('videoModal');
-    const instructionVideo = document.getElementById('instructionVideo');
-
-    if (openVideoBtn && videoModal) {
-      openVideoBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        try {
-          const modal = new bootstrap.Modal(videoModal, {
-            backdrop: 'static',
-            keyboard: true
-          });
-          modal.show();
-
-          // Reproducir video cuando se abre el modal
-          setTimeout(() => {
-            if (instructionVideo) {
-              instructionVideo.play().catch(err => {
-                console.log('Autoplay bloqueado:', err);
-              });
-            }
-          }, 300);
-        } catch (error) {
-          console.error('Error al abrir modal:', error);
-        }
-      });
-    }
-
-    // Pausar video cuando se cierra el modal
-    if (videoModal) {
-      videoModal.addEventListener('hidden.bs.modal', function() {
-        if (instructionVideo) {
-          instructionVideo.pause();
-          instructionVideo.currentTime = 0;
-        }
-      });
-    }
+document.addEventListener('DOMContentLoaded', function() {
+  const openVideoBtn = document.getElementById('open-video-btn');
+  const videoModalElement = document.getElementById('videoModal');
+  const videoModal = new bootstrap.Modal(videoModalElement);
+  const video = document.getElementById('instructionVideo');
+  const videoSource = document.getElementById('videoSource');
+  
+  if (openVideoBtn) {
+    openVideoBtn.addEventListener('click', function() {
+      const videoSrc = this.getAttribute('data-video-src');
+      videoSource.setAttribute('src', videoSrc);
+      video.load();
+      videoModal.show();
+    });
+  }
+  
+  // Autoplay cuando el modal se muestra completamente
+  videoModalElement.addEventListener('shown.bs.modal', function() {
+    video.play();
   });
+  
+  // Pausar y reiniciar video cuando se cierra el modal
+  videoModalElement.addEventListener('hidden.bs.modal', function() {
+    video.pause();
+    video.currentTime = 0;
+  });
+});
 </script>
 
 <style>
