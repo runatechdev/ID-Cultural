@@ -52,45 +52,37 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filtro-categoria')?.addEventListener('change', aplicarFiltros);
     document.getElementById('filtro-municipio')?.addEventListener('change', aplicarFiltros);
 
-    async function cargarTodosPendientes() {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando pendientes...</p></td></tr>';
+async function cargarTodosPendientes() {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando obras pendientes...</p></td></tr>';
+    
+    try {
+        // ✅ SOLO cargar obras, NO perfiles
+        const responseObras = await fetch(`${BASE_URL}api/get_publicaciones.php?estado=pendiente`);
         
-        try {
-            // Cargar obras y perfiles en paralelo
-            const [responseObras, responsePerfiles] = await Promise.all([
-                fetch(`${BASE_URL}api/get_publicaciones.php?estado=pendiente`),
-                fetch(`${BASE_URL}api/get_perfiles_pendientes.php`)
-            ]);
-            
-            if (!responseObras.ok) throw new Error('Error al obtener obras.');
-            if (!responsePerfiles.ok) throw new Error('Error al obtener perfiles.');
-            
-            obrasPendientes = await responseObras.json();
-            perfilesPendientes = await responsePerfiles.json();
-            
-            // Marcar tipo para diferenciarlos
-            obrasPendientes.forEach(obra => obra.tipo_pendiente = 'obra');
-            perfilesPendientes.forEach(perfil => perfil.tipo_pendiente = 'perfil');
-            
-            // Combinar ambos arrays
-            todosPendientes = [...obrasPendientes, ...perfilesPendientes];
-            filtrados = [...todosPendientes];
-            
-            //console.log('Obras pendientes:', obrasPendientes.length);
-            //console.log('Perfiles pendientes:', perfilesPendientes.length);
-            //console.log('Total pendientes:', todosPendientes.length);
-            
-            // Llenar select de municipios
-            llenarSelectMunicipios();
-            
-            // Mostrar items
-            mostrarItems(filtrados);
+        if (!responseObras.ok) throw new Error('Error al obtener obras.');
+        
+        obrasPendientes = await responseObras.json();
+        
+        // Marcar tipo para consistencia
+        obrasPendientes.forEach(obra => obra.tipo_pendiente = 'obra');
+        
+        // SOLO obras, sin perfiles
+        todosPendientes = [...obrasPendientes];
+        filtrados = [...todosPendientes];
+        
+        console.log('Obras pendientes cargadas:', obrasPendientes.length);
+        
+        // Llenar select de municipios
+        llenarSelectMunicipios();
+        
+        // Mostrar items
+        mostrarItems(filtrados);
 
-        } catch (error) {
-            console.error('Error completo:', error);
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle fs-1"></i><p class="mt-2">Error al cargar pendientes.</p></td></tr>';
-        }
+    } catch (error) {
+        console.error('Error completo:', error);
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle fs-1"></i><p class="mt-2">Error al cargar obras pendientes.</p></td></tr>';
     }
+}
 
     function mostrarItems(items) {
         //console.log('mostrarItems llamada con:', items.length, 'items');
