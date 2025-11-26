@@ -25,7 +25,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h1 class="mb-0">Editar Página Principal</h1>
-                        <p class="lead">Modifica los textos y las imágenes que se muestran en la página de inicio.</p>
+                        <p class="l|ead">Modifica los textos y las imágenes que se muestran en la página de inicio.</p>
                     </div>
                     <a href="<?php echo BASE_URL; ?>src/views/pages/editor/panel_editor.php" class="btn btn-outline-secondary">
                         <i class="bi bi-arrow-left"></i> Volver al Panel
@@ -48,9 +48,9 @@ include(__DIR__ . '/../../../../../components/header.php');
                         <div id="editor_welcome_slogan" style="height: 100px;"></div>
                     </div>
 
-                    <hr class="my-4">
+                     <hr class="my-4">
 
-                    <!-- Sección del Carrusel -->
+                    <!--Sección del Carrusel
                     <h4 class="mb-3">Carrusel de Imágenes</h4>
                     <div class="row">
                         <div class="col-md-4 mb-3">
@@ -65,7 +65,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                             <label for="carousel_image_3" class="form-label">Imagen 3</label>
                             <input class="form-control" type="file" id="carousel_image_3">
                         </div>
-                    </div>
+                    </div> -->
                     
                     <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
                 </form>

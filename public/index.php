@@ -81,9 +81,8 @@ include(__DIR__ . '/../components/header.php');
               <?php echo $site_content['welcome_paragraph'] ?? ''; ?>
             </div>
             <div class="h5 text-primary fst-italic">
-              <i class="bi bi-quote me-2"></i>
               <?php 
-                $slogan = $site_content['welcome_slogan'] ?? '<p>La identidad de un pueblo, en un solo lugar.</p>';
+                $slogan = $site_content['welcome_slogan'] ?? '';
                 // Si contiene HTML de Quill, no escapar; si es texto plano, escapar
                 echo (strpos($slogan, '<p>') !== false) ? $slogan : htmlspecialchars($slogan);
               ?>
