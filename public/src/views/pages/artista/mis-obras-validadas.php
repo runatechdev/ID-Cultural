@@ -28,9 +28,12 @@ try {
 // --- Variables para el header ---
 $page_title = "Mis Obras Publicadas - ID Cultural";
 $specific_css_files = ['dashboard.css'];
+// Variable de versión para cache busting
+$static_version = date('YmdHis'); // Puedes cambiar por un número manual si prefieres
 // --- Incluir la cabecera ---
 include(__DIR__ . '/../../../../../components/header.php');
 ?>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/dashboard.css?v=<?php echo $static_version; ?>">
 <style>
     .dashboard-body {
         background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
