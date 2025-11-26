@@ -71,7 +71,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <div class="stat-card h-100">
                         <div class="stat-card-icon icon-users"><i class="bi bi-people-fill"></i></div>
                         <div class="stat-card-info">
-                            <p class="stat-card-title">Total de Usuarios</p>
+                            <p class="stat-card-title">Total de Personal</p>
                             <h3 class="stat-card-number"><?php echo $total_usuarios; ?></h3>
                         </div>
                     </div>

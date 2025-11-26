@@ -99,37 +99,6 @@ include(__DIR__ . '/../../../../../components/header.php');
                     </div>
                 </div>
 
-                <!-- Fila de Tarjetas de Obras/Publicaciones -->
-                <div class="row g-4 mb-4">
-                    <div class="col-lg-4 col-md-6">
-                        <div class="stat-card h-100">
-                            <div class="stat-card-icon" style="background: #fff3cd;"><i class="bi bi-clock-history" style="color: #856404;"></i></div>
-                            <div class="stat-card-info">
-                                <p class="stat-card-title">Obras Pendientes</p>
-                                <h3 class="stat-card-number"><?php echo $statsObras['obras_pendientes']; ?></h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="stat-card h-100">
-                            <div class="stat-card-icon" style="background: #d1e7dd;"><i class="bi bi-check2-square" style="color: #0a3622;"></i></div>
-                            <div class="stat-card-info">
-                                <p class="stat-card-title">Obras Validadas</p>
-                                <h3 class="stat-card-number"><?php echo $statsObras['obras_validadas']; ?></h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="stat-card h-100">
-                            <div class="stat-card-icon" style="background: #f8d7da;"><i class="bi bi-x-square" style="color: #58151c;"></i></div>
-                            <div class="stat-card-info">
-                                <p class="stat-card-title">Obras Rechazadas</p>
-                                <h3 class="stat-card-number"><?php echo $statsObras['obras_rechazadas']; ?></h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Menú de Acciones del Validador -->
                 <div class="card">
                     <div class="card-header">
