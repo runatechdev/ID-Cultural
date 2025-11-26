@@ -517,15 +517,38 @@
     height: 300px;
   }
 
-  .carousel-obra-badge {
-    font-size: 0.7rem;
-    padding: 0.25rem 0.75rem;
-    margin-bottom: 0.25rem;
+  .carousel-obra-titulo {
+    font-size: 1.5rem;
+  }
+
+  .carousel-obra-artista {
+    font-size: 0.9rem;
+  }
+
+  .carousel-obra-descripcion {
+    font-size: 0.85rem;
+    padding: 0 1rem;
+    -webkit-line-clamp: 1; /* Solo 1 línea en móvil */
+    line-clamp: 1; /* Standard property for compatibility */
+  }
+
+  .carousel-obra-btn {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .carousel-loading {
+    height: 300px;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel-obras {
+    height: 280px;
   }
 
   .carousel-obra-titulo {
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
+    font-size: 1.25rem;
   }
 
   .carousel-obra-artista {
@@ -534,7 +557,7 @@
   }
 
   .carousel-obra-descripcion {
-    display: none; /* Ocultar descripción en tablet/móvil */
+    display: none; /* Ocultar descripción en pantallas muy pequeñas */
   }
 
   .carousel-obra-btn {
@@ -543,63 +566,7 @@
   }
 
   .carousel-loading {
-    height: 300px;
-  }
-
-  /* Indicadores más abajo */
-  .carousel-obras .carousel-indicators {
-    bottom: 0.5rem;
-  }
-
-  /* Reducir padding del contenedor */
-  .carousel-obra-content {
-    padding: 1rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .carousel-obras {
-    height: 300px;
-  }
-
-  .carousel-obra-badge {
-    font-size: 0.65rem;
-    padding: 0.2rem 0.6rem;
-  }
-
-  .carousel-obra-titulo {
-    font-size: 1.25rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .carousel-obra-artista {
-    font-size: 0.75rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .carousel-obra-descripcion {
-    display: none;
-  }
-
-  .carousel-obra-btn {
-    padding: 0.45rem 1rem;
-    font-size: 0.75rem;
-  }
-
-  .carousel-loading {
     height: 280px;
-  }
-
-  /* Indicadores aún más pequeños en móvil */
-  .carousel-obras .carousel-indicators [data-bs-target] {
-    width: 8px;
-    height: 8px;
-    margin: 0 0.25rem;
-  }
-
-  /* Reducir padding del contenedor */
-  .carousel-obra-content {
-    padding: 0.75rem 0.5rem;
   }
 }
 
