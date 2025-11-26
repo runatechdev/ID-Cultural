@@ -16,12 +16,11 @@ try {
 // Variables para el header
 $page_title = "Inicio - ID Cultural";
 $specific_css_files = ['index.css'];
-// Variable de versión para cache busting
-$static_version = date('YmdHis'); // Puedes cambiar por un número manual si prefieres
+$static_version = date('YmdHis'); // Variable de versión para cache busting
 
 include(__DIR__ . '/../components/header.php');
 ?>
-
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>static/css/index.css?v=<?php echo $static_version; ?>">
 <body>
 
   <?php include __DIR__ . '/../components/navbar.php'; ?>
