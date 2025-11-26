@@ -25,76 +25,38 @@ include(__DIR__ . '/../components/header.php');
   <?php include __DIR__ . '/../components/navbar.php'; ?>
 
   <main>
-    <!-- Hero Section con Carrusel Mejorado -->
-    <section class="hero-section">
-      <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
-        <div class="carousel-indicators">
-          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+
+<!-- Hero Section con Carrusel de Obras -->
+<section class="hero-section">
+    <div id="heroCarouselObras" class="carousel slide carousel-fade carousel-obras" data-bs-ride="carousel" data-bs-interval="6000">
+        <!-- Loading State -->
+        <div class="carousel-loading" id="carouselLoading">
+            <div class="text-center">
+                <div class="spinner-border mb-3" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mb-0">Cargando obras destacadas...</p>
+            </div>
         </div>
+
+        <!-- Indicadores (se generan dinámicamente) -->
+        <div class="carousel-indicators" id="carouselIndicators"></div>
         
-        <div class="carousel-inner">
-          <!-- Slide 1 -->
-          <div class="carousel-item active">
-            <div class="carousel-image" style="background-image: url('<?php echo htmlspecialchars($site_content['carousel_image_1'] ?? 'https://placehold.co/1920x800/367789/FFFFFF?text=Cultura+Santiagueña'); ?>');">
-              <div class="carousel-overlay"></div>
-            </div>
-            <div class="carousel-caption-custom">
-              <div class="container">
-                <h1 class="display-3 fw-bold mb-3" data-aos="fade-up">Visibilizar y Preservar</h1>
-                <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">Un espacio para la identidad artística y cultural de Santiago del Estero</p>
-                <a href="/wiki.php?tab=obras-validadas" class="btn btn-light btn-lg rounded-pill px-5" data-aos="fade-up" data-aos-delay="200">
-                  <i class="bi bi-compass me-2"></i>Explorar Wiki
-                </a>
-              </div>
-            </div>
-          </div>
+        <!-- Slides (se generan dinámicamente) -->
+        <div class="carousel-inner" id="carouselInner"></div>
 
-          <!-- Slide 2 -->
-          <div class="carousel-item">
-            <div class="carousel-image" style="background-image: url('<?php echo htmlspecialchars($site_content['carousel_image_2'] ?? 'https://placehold.co/1920x800/C30135/FFFFFF?text=Nuestros+Artistas'); ?>');">
-              <div class="carousel-overlay"></div>
-            </div>
-            <div class="carousel-caption-custom">
-              <div class="container">
-                <h1 class="display-3 fw-bold mb-3" data-aos="fade-up">Nuestros Artistas</h1>
-                <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">Explora la trayectoria de talentos locales, actuales e históricos</p>
-                <a href="/wiki.php?tab=artistas-validados" class="btn btn-light btn-lg rounded-pill px-5" data-aos="fade-up" data-aos-delay="200">
-                  <i class="bi bi-people me-2"></i>Ver Artistas
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Slide 3 -->
-          <div class="carousel-item">
-            <div class="carousel-image" style="background-image: url('<?php echo htmlspecialchars($site_content['carousel_image_3'] ?? 'https://placehold.co/1920x800/efc892/333333?text=Biblioteca+Digital'); ?>');">
-              <div class="carousel-overlay"></div>
-            </div>
-            <div class="carousel-caption-custom">
-              <div class="container">
-                <h1 class="display-3 fw-bold mb-3" data-aos="fade-up">Biblioteca Digital</h1>
-                <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">Accede a un archivo único con material exclusivo de nuestra región</p>
-                <a href="/busqueda.php?categoria=Arte" class="btn btn-light btn-lg rounded-pill px-5" data-aos="fade-up" data-aos-delay="200">
-                  <i class="bi bi-book me-2"></i>Explorar Biblioteca
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Controles del Carrusel -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Anterior</span>
+        <!-- Controles -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarouselObras" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Siguiente</span>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarouselObras" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
         </button>
-      </div>
-    </section>
+    </div>
+</section>
+
 
     <!-- Sección de Bienvenida -->
     <section class="welcome-section py-5">

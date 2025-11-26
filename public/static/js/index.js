@@ -28,26 +28,194 @@ function construirURLImagen(urlOriginal) {
     return BASE_URL + urlOriginal;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar animaciones AOS
-    if (typeof AOS !== 'undefined') {
-        AOS.init({
-            duration: 800,
-            easing: 'ease-out',
-            once: true,
-            offset: 100
-        });
+/**
+ * Cargar y mostrar carrusel de obras destacadas
+ */
+async function cargarCarruselObras() {
+    const loading = document.getElementById('carouselLoading');
+    const inner = document.getElementById('carouselInner');
+    const indicators = document.getElementById('carouselIndicators');
+
+    try {
+        const response = await fetch(`${BASE_URL}api/get_obras_wiki.php`);
+        const data = await response.json();
+
+        if (data.status === 'success' && data.obras && data.obras.length > 0) {
+            // Tomar las últimas 3 obras
+            const obrasDestacadas = data.obras.slice(0, 3);
+
+            // Generar indicadores
+            indicators.innerHTML = obrasDestacadas.map((obra, index) => `
+                <button type="button" 
+                        data-bs-target="#heroCarouselObras" 
+                        data-bs-slide-to="${index}" 
+                        ${index === 0 ? 'class="active" aria-current="true"' : ''}
+                        aria-label="Obra ${index + 1}">
+                </button>
+            `).join('');
+
+            // Generar slides
+            inner.innerHTML = obrasDestacadas.map((obra, index) => {
+                const imagenUrl = construirURLImagen(obra.imagen_url);
+                const descripcionCorta = truncarTexto(obra.descripcion, 120);
+                const categoria = formatearCategoria(obra.categoria);
+
+                return `
+                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                        <div class="carousel-obra-image" 
+                             style="background-image: url('${imagenUrl}');"
+                             onerror="this.style.backgroundImage='url(${BASE_URL}static/img/placeholder-obra.png)'">
+                        </div>
+                        <div class="carousel-obra-overlay"></div>
+                        <div class="carousel-obra-content">
+                            <div class="container">
+                                <span class="carousel-obra-badge" data-aos="fade-down">
+                                    <i class="bi bi-palette me-2"></i>${escapeHtml(categoria)}
+                                </span>
+                                <h1 class="carousel-obra-titulo" data-aos="fade-up" data-aos-delay="100">
+                                    ${escapeHtml(obra.titulo)}
+                                </h1>
+                                <p class="carousel-obra-artista" data-aos="fade-up" data-aos-delay="200">
+                                    <i class="bi bi-person-circle me-2"></i>
+                                    por ${escapeHtml(obra.artista_nombre)}
+                                </p>
+                                <p class="carousel-obra-descripcion" data-aos="fade-up" data-aos-delay="300">
+                                    ${escapeHtml(descripcionCorta)}
+                                </p>
+                                <a href="${BASE_URL}perfil_artista.php?id=${obra.artista_id}" 
+                                   class="btn carousel-obra-btn" 
+                                   data-aos="fade-up" 
+                                   data-aos-delay="400">
+                                    <i class="bi bi-eye me-2"></i>Ver Perfil del Artista
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Ocultar loading
+            loading.style.display = 'none';
+
+            // Inicializar carrusel
+            const carouselElement = document.getElementById('heroCarouselObras');
+            new bootstrap.Carousel(carouselElement, {
+                interval: 6000,
+                ride: 'carousel',
+                pause: 'hover'
+            });
+
+            // Re-inicializar AOS para las animaciones
+            if (typeof AOS !== 'undefined') {
+                AOS.refresh();
+            }
+
+        } else {
+            // Mostrar fallback si no hay obras
+            mostrarCarruselFallback();
+        }
+
+    } catch (error) {
+        console.error('Error al cargar carrusel de obras:', error);
+        mostrarCarruselFallback();
     }
+}
 
-    // Cargar estadísticas
-    cargarEstadisticas();
+/**
+ * Mostrar carrusel fallback si no hay obras disponibles
+ */
+function mostrarCarruselFallback() {
+    const loading = document.getElementById('carouselLoading');
+    const inner = document.getElementById('carouselInner');
+    const indicators = document.getElementById('carouselIndicators');
 
-    // Cargar noticias
-    cargarNoticias();
+    // Datos de fallback
+    const slidesFallback = [
+        {
+            titulo: 'Visibilizar y Preservar',
+            descripcion: 'Un espacio para la identidad artística y cultural de Santiago del Estero',
+            imagen: 'https://placehold.co/1920x800/367789/FFFFFF?text=Cultura+Santiagueña',
+            btn_texto: 'Explorar Wiki',
+            btn_link: '/wiki.php?tab=obras-validadas',
+            icon: 'bi-compass'
+        },
+        {
+            titulo: 'Nuestros Artistas',
+            descripcion: 'Explora la trayectoria de talentos locales, actuales e históricos',
+            imagen: 'https://placehold.co/1920x800/C30135/FFFFFF?text=Nuestros+Artistas',
+            btn_texto: 'Ver Artistas',
+            btn_link: '/wiki.php?tab=artistas-validados',
+            icon: 'bi-people'
+        },
+        {
+            titulo: 'Biblioteca Digital',
+            descripcion: 'Accede a un archivo único con material exclusivo de nuestra región',
+            imagen: 'https://placehold.co/1920x800/efc892/333333?text=Biblioteca+Digital',
+            btn_texto: 'Explorar Biblioteca',
+            btn_link: '/busqueda.php?categoria=Arte',
+            icon: 'bi-book'
+        }
+    ];
 
-    // Animar números de estadísticas cuando entren en viewport
-    observarEstadisticas();
-});
+    // Generar indicadores
+    indicators.innerHTML = slidesFallback.map((_, index) => `
+        <button type="button" 
+                data-bs-target="#heroCarouselObras" 
+                data-bs-slide-to="${index}" 
+                ${index === 0 ? 'class="active" aria-current="true"' : ''}
+                aria-label="Slide ${index + 1}">
+        </button>
+    `).join('');
+
+    // Generar slides
+    inner.innerHTML = slidesFallback.map((slide, index) => `
+        <div class="carousel-item ${index === 0 ? 'active' : ''}">
+            <div class="carousel-obra-image" style="background-image: url('${slide.imagen}');"></div>
+            <div class="carousel-obra-overlay"></div>
+            <div class="carousel-obra-content">
+                <div class="container">
+                    <h1 class="carousel-obra-titulo" data-aos="fade-up">
+                        ${slide.titulo}
+                    </h1>
+                    <p class="carousel-obra-descripcion" data-aos="fade-up" data-aos-delay="100">
+                        ${slide.descripcion}
+                    </p>
+                    <a href="${slide.btn_link}" 
+                       class="btn carousel-obra-btn" 
+                       data-aos="fade-up" 
+                       data-aos-delay="200">
+                        <i class="${slide.icon} me-2"></i>${slide.btn_texto}
+                    </a>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    loading.style.display = 'none';
+
+    // Re-inicializar AOS
+    if (typeof AOS !== 'undefined') {
+        AOS.refresh();
+    }
+}
+
+/**
+ * Formatear categoría
+ */
+function formatearCategoria(categoria) {
+    const categorias = {
+        'musica': 'Música',
+        'artes_visuales': 'Artes Visuales',
+        'literatura': 'Literatura',
+        'teatro': 'Teatro',
+        'danza': 'Danza',
+        'fotografia': 'Fotografía',
+        'artesanias': 'Artesanías',
+        'escultura': 'Escultura',
+        'otros': 'Otros'
+    };
+    return categorias[categoria] || categoria;
+}
 
 /**
  * Cargar estadísticas del sitio
@@ -313,6 +481,65 @@ function escapeHtml(text) {
 }
 
 /**
+ * Precargar próxima imagen del carrusel de obras
+ */
+const preloadNextCarouselImage = () => {
+    const activeItem = document.querySelector('#heroCarouselObras .carousel-item.active');
+    const nextItem = activeItem?.nextElementSibling || document.querySelector('#heroCarouselObras .carousel-item:first-child');
+    
+    if (nextItem) {
+        const img = nextItem.querySelector('.carousel-obra-image');
+        if (img) {
+            const bgImage = img.style.backgroundImage;
+            const url = bgImage.match(/url\(['"]?(.*?)['"]?\)/)?.[1];
+            if (url) {
+                const preloader = new Image();
+                preloader.src = url;
+            }
+        }
+    }
+};
+
+// ===== INICIALIZAR TODO AL CARGAR LA PÁGINA =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Cargar carrusel de obras
+    cargarCarruselObras();
+
+    // Inicializar animaciones AOS
+    if (typeof AOS !== 'undefined') {
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out',
+            once: true,
+            offset: 100
+        });
+    }
+
+    // Cargar estadísticas
+    cargarEstadisticas();
+
+    // Cargar noticias
+    cargarNoticias();
+
+    // Animar números de estadísticas cuando entren en viewport
+    observarEstadisticas();
+
+    // Pausar carrusel cuando el usuario interactúa
+    const carousel = document.querySelector('#heroCarouselObras');
+    if (carousel) {
+        carousel.addEventListener('mouseenter', function() {
+            const bsCarousel = bootstrap.Carousel.getInstance(carousel);
+            if (bsCarousel) bsCarousel.pause();
+        });
+
+        carousel.addEventListener('mouseleave', function() {
+            const bsCarousel = bootstrap.Carousel.getInstance(carousel);
+            if (bsCarousel) bsCarousel.cycle();
+        });
+    }
+});
+
+/**
  * Mejora de accesibilidad: navegación con teclado en cards
  */
 document.addEventListener('keydown', function(e) {
@@ -324,22 +551,6 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
-
-/**
- * Pausar carrusel cuando el usuario interactúa
- */
-const carousel = document.querySelector('#heroCarousel');
-if (carousel) {
-    carousel.addEventListener('mouseenter', function() {
-        const bsCarousel = bootstrap.Carousel.getInstance(carousel);
-        if (bsCarousel) bsCarousel.pause();
-    });
-
-    carousel.addEventListener('mouseleave', function() {
-        const bsCarousel = bootstrap.Carousel.getInstance(carousel);
-        if (bsCarousel) bsCarousel.cycle();
-    });
-}
 
 /**
  * Optimización: Lazy loading para imágenes
@@ -378,26 +589,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
-
-/**
- * Precargar próxima imagen del carrusel
- */
-const preloadNextCarouselImage = () => {
-    const activeItem = document.querySelector('.carousel-item.active');
-    const nextItem = activeItem?.nextElementSibling || document.querySelector('.carousel-item:first-child');
-    
-    if (nextItem) {
-        const img = nextItem.querySelector('.carousel-image');
-        if (img) {
-            const bgImage = img.style.backgroundImage;
-            const url = bgImage.match(/url\(['"]?(.*?)['"]?\)/)?.[1];
-            if (url) {
-                const preloader = new Image();
-                preloader.src = url;
-            }
-        }
-    }
-};
 
 // Ejecutar precarga después de que la página cargue
 window.addEventListener('load', preloadNextCarouselImage);

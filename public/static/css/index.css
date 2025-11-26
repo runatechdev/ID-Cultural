@@ -3,93 +3,194 @@
    Estilos para la página de inicio
 =================================== */
 
-/* Hero Section con Carrusel Mejorado */
+/* ===================================
+   HERO SECTION - CARRUSEL DE OBRAS
+=================================== */
+
 .hero-section {
   position: relative;
   width: 100%;
   overflow: hidden;
 }
 
-.carousel-image {
-  height: 320px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  position: relative;
+/* Carrusel de Obras Dinámico */
+.carousel-obras {
+  height: 300px;
 }
 
-.carousel-overlay {
+.carousel-obras .carousel-inner,
+.carousel-obras .carousel-item {
+  height: 100%;
+}
+
+.carousel-obra-image {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 100%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-.carousel-caption-custom {
+.carousel-obra-overlay {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 0;
-  right: 0;
-  transform: translateY(-50%);
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(54, 119, 137, 0.85) 0%,
+    rgba(195, 1, 53, 0.75) 100%
+  );
+}
+
+.carousel-obra-content {
+  position: relative;
   z-index: 10;
-  color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
+  color: white;
+  padding: 2rem;
 }
 
-.carousel-caption-custom h1 {
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
-  animation: fadeInUp 0.8s ease-out;
+/* Carrusel de Obras Dinámico */
+.carousel-obras {
+  height: 320px; /* Mismo tamaño que el anterior */
 }
 
-.carousel-caption-custom p {
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
-  font-size: 1.25rem;
+.carousel-obra-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 0.35rem 1rem; /* Reducido */
+  border-radius: 2rem;
+  font-size: 0.8rem; /* Reducido */
+  font-weight: 600;
+  margin-bottom: 0.5rem; /* Reducido */
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-.carousel-caption-custom .btn {
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+.carousel-obra-titulo {
+  font-size: 2rem; /* Reducido de 3.5rem */
+  font-weight: 700;
+  margin-bottom: 0.5rem; /* Reducido */
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  line-height: 1.1; /* Reducido */
+}
+
+.carousel-obra-artista {
+  font-size: 1rem; /* Reducido de 1.5rem */
+  font-weight: 400;
+  margin-bottom: 0.75rem; /* Reducido */
+  opacity: 0.95;
+}
+
+.carousel-obra-descripcion {
+  font-size: 0.9rem; /* Reducido de 1.1rem */
+  max-width: 600px; /* Reducido */
+  margin: 0 auto 0.5rem; /* Reducido */
+  opacity: 0.9;
+  line-height: 1.4; /* Reducido */
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Solo 2 líneas */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.carousel-obra-btn {
+  padding: 0.65rem 2rem; /* Reducido */
+  font-size: 0.95rem; /* Reducido */
+  font-weight: 600;
+  border-radius: 3rem;
   transition: all 0.3s ease;
+  background: white;
+  color: var(--color-primario, #367789);
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
-.carousel-caption-custom .btn:hover {
+.carousel-obra-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+  background: #f8f9fa;
+  color: var(--color-primario, #367789);
 }
 
-/* Controles del carrusel más visibles */
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
+/* Controles del carrusel personalizados */
+.carousel-obras .carousel-control-prev,
+.carousel-obras .carousel-control-next {
+  width: 5%;
+  opacity: 0.8;
+}
+
+.carousel-obras .carousel-control-prev:hover,
+.carousel-obras .carousel-control-next:hover {
+  opacity: 1;
+}
+
+.carousel-obras .carousel-control-prev-icon,
+.carousel-obras .carousel-control-next-icon {
   width: 3rem;
   height: 3rem;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(10px);
-}
-
-.carousel-control-prev:hover .carousel-control-prev-icon,
-.carousel-control-next:hover .carousel-control-next-icon {
-  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  padding: 0.75rem;
 }
 
 /* Indicadores del carrusel mejorados */
-.carousel-indicators [data-bs-target] {
+.carousel-obras .carousel-indicators {
+  bottom: 0.5rem;
+}
+
+.carousel-obras .carousel-indicators [data-bs-target] {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  margin: 0 5px;
+  background-color: rgba(255, 255, 255, 0.5);
   border: 2px solid white;
+  margin: 0 0.5rem;
   opacity: 0.6;
   transition: all 0.3s ease;
 }
 
-.carousel-indicators .active {
+.carousel-obras .carousel-indicators .active {
+  background-color: white;
   opacity: 1;
   transform: scale(1.2);
 }
 
-/* Sección de Bienvenida */
+/* Loading state */
+.carousel-loading {
+  height: 320px; /* Mismo que el carrusel */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #367789 0%, #c30135 100%);
+  color: white;
+}
+
+/* Transición suave para el carrusel */
+.carousel-fade .carousel-item {
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
+}
+
+.carousel-fade .carousel-item.active {
+  opacity: 1;
+}
+
+/* ===================================
+   SECCIÓN DE BIENVENIDA
+=================================== */
+
 .welcome-section {
   background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
 }
@@ -153,7 +254,10 @@
   }
 }
 
-/* Sección de Estadísticas */
+/* ===================================
+   SECCIÓN DE ESTADÍSTICAS
+=================================== */
+
 .stats-section {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
@@ -192,7 +296,10 @@
   font-weight: 500;
 }
 
-/* Sección de Noticias */
+/* ===================================
+   SECCIÓN DE NOTICIAS
+=================================== */
+
 .noticias-section {
   background: white;
 }
@@ -237,6 +344,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
 .noticia-excerpt {
   color: #6c757d;
   font-size: 0.95rem;
@@ -247,7 +355,6 @@
   overflow: hidden;
   margin-bottom: 1rem;
 }
-
 
 .noticia-meta {
   display: flex;
@@ -278,7 +385,10 @@
   text-decoration: underline;
 }
 
-/* Call to Action Section */
+/* ===================================
+   CALL TO ACTION SECTION
+=================================== */
+
 .cta-section {
   background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
   position: relative;
@@ -320,7 +430,10 @@
   transform: translateY(-3px);
 }
 
-/* Modal de Noticia */
+/* ===================================
+   MODAL DE NOTICIA
+=================================== */
+
 .modal-noticia .modal-content {
   border: none;
   border-radius: 15px;
@@ -363,7 +476,10 @@
   border-top: 1px solid #dee2e6;
 }
 
-/* Animaciones AOS personalizadas */
+/* ===================================
+   ANIMACIONES AOS PERSONALIZADAS
+=================================== */
+
 [data-aos="fade-up"] {
   opacity: 0;
   transform: translateY(50px);
@@ -375,62 +491,10 @@
   transform: translateY(0);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .carousel-image {
-    height: 400px;
-  }
+/* ===================================
+   LOADING SKELETON
+=================================== */
 
-  .carousel-caption-custom h1 {
-    font-size: 2rem;
-  }
-
-  .carousel-caption-custom p {
-    font-size: 1rem;
-  }
-
-  .stat-number {
-    font-size: 2rem;
-  }
-
-  .stat-icon {
-    font-size: 2.5rem;
-  }
-
-  .noticia-card img {
-    height: 200px;
-  }
-}
-
-@media (max-width: 576px) {
-  .carousel-image {
-    height: 350px;
-  }
-
-  .carousel-caption-custom h1 {
-    font-size: 1.5rem;
-  }
-
-  .carousel-caption-custom .btn {
-    padding: 0.5rem 1.5rem;
-    font-size: 0.9rem;
-  }
-
-  .cta-section .btn {
-    display: block;
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-}
-
-/* Mejoras de accesibilidad */
-.btn:focus,
-.noticia-card:focus {
-  outline: 3px solid #0d6efd;
-  outline-offset: 2px;
-}
-
-/* Loading skeleton para noticias */
 .noticia-skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
@@ -446,12 +510,87 @@
   }
 }
 
-/* Transición suave para el carrusel */
-.carousel-fade .carousel-item {
-  opacity: 0;
-  transition: opacity 0.6s ease-in-out;
+/* Responsive */
+@media (max-width: 768px) {
+  .carousel-obras {
+    height: 300px;
+  }
+
+  .carousel-obra-titulo {
+    font-size: 1.5rem;
+  }
+
+  .carousel-obra-artista {
+    font-size: 0.9rem;
+  }
+
+  .carousel-obra-descripcion {
+    font-size: 0.85rem;
+    padding: 0 1rem;
+    -webkit-line-clamp: 1; /* Solo 1 línea en móvil */
+  }
+
+  .carousel-obra-btn {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .carousel-loading {
+    height: 300px;
+  }
 }
 
-.carousel-fade .carousel-item.active {
-  opacity: 1;
+@media (max-width: 576px) {
+  .carousel-obras {
+    height: 280px;
+  }
+
+  .carousel-obra-titulo {
+    font-size: 1.25rem;
+  }
+
+  .carousel-obra-artista {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .carousel-obra-descripcion {
+    display: none; /* Ocultar descripción en pantallas muy pequeñas */
+  }
+
+  .carousel-obra-btn {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.8rem;
+  }
+
+  .carousel-loading {
+    height: 280px;
+  }
+}
+
+/* ===================================
+   MEJORAS DE ACCESIBILIDAD
+=================================== */
+
+.btn:focus,
+.noticia-card:focus {
+  outline: 3px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+.carousel-obra-btn:focus {
+  outline: 3px solid white;
+  outline-offset: 3px;
+}
+
+/* Animaciones de entrada suaves */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
