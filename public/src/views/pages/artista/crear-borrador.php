@@ -401,11 +401,6 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <!-- Preview de imágenes -->
                     <div id="preview-container" class="mb-3" style="display: none;">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0">
-                                <i class="bi bi-images me-2"></i>
-                                Imágenes seleccionadas
-                            </h6>
-                            <span class="badge bg-success" id="image-count">0 imágenes</span>
                         </div>
                         <div id="image-previews" class="row g-3"></div>
                     </div>

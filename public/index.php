@@ -30,6 +30,13 @@ include(__DIR__ . '/../components/header.php');
 <!-- Hero Section con Carrusel de Obras -->
 <section class="hero-section">
     <div id="heroCarouselObras" class="carousel slide carousel-fade carousel-obras" data-bs-ride="carousel" data-bs-interval="6000">
+        
+        <!-- Título flotante -->
+        <div class="carousel-title-badge">
+            <i class="bi bi-stars me-2"></i>
+            <span>Últimas Obras</span>
+        </div>
+        
         <!-- Loading State -->
         <div class="carousel-loading" id="carouselLoading">
             <div class="text-center">
