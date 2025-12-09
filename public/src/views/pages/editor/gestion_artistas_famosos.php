@@ -16,6 +16,7 @@ $nombre_editor = $_SESSION['user_data']['nombre'] ?? 'Editor';
 // --- Incluir la cabecera ---
 include(__DIR__ . '/../../../../../components/header.php');
 ?>
+
 <body class="dashboard-body">
 
     <?php include(__DIR__ . '/../../../../../components/navbar.php'); ?>
@@ -73,7 +74,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                 <div class="modal-body">
                     <form id="formArtista" enctype="multipart/form-data">
                         <input type="hidden" id="inputIdArtista" name="id" value="">
-                        
+
                         <div class="mb-3">
                             <label for="inputImagen" class="form-label">Imagen del Artista</label>
                             <div class="input-group">
@@ -143,12 +144,12 @@ include(__DIR__ . '/../../../../../components/header.php');
     </div>
 
     <?php include(__DIR__ . '/../../../../../components/footer.php'); ?>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         // URLs de la API
-        const apiBase = '<?php echo BASE_URL; ?>api/artistas_famosos.php';
+        const apiBase = '<?php echo BASE_URL; ?>api/artistas.php?action=featured';
         const modalArtista = new bootstrap.Modal(document.getElementById('modalArtista'));
 
         // Cargar artistas al iniciar
@@ -181,7 +182,7 @@ include(__DIR__ . '/../../../../../components/header.php');
             try {
                 const response = await axios.get(apiBase);
                 const artistas = response.data.data || [];
-                
+
                 const tbody = document.getElementById('tbodyArtistas');
                 tbody.innerHTML = '';
 
@@ -206,10 +207,10 @@ include(__DIR__ . '/../../../../../components/header.php');
                         'Teatro': '🎭'
                     };
                     const emoji = emojiPorCategoria[artista.categoria] || '⭐';
-                    const imagenHtml = artista.imagen 
-                        ? `<img src="<?php echo BASE_URL; ?>uploads/artistas_famosos/${artista.imagen}" alt="${artista.nombre_completo}" style="max-width: 60px; max-height: 60px; border-radius: 8px; object-fit: cover;">` 
-                        : `<span class="text-muted text-center" style="display: block;">-</span>`;
-                    
+                    const imagenHtml = artista.imagen ?
+                        `<img src="<?php echo BASE_URL; ?>uploads/artistas_famosos/${artista.imagen}" alt="${artista.nombre_completo}" style="max-width: 60px; max-height: 60px; border-radius: 8px; object-fit: cover;">` :
+                        `<span class="text-muted text-center" style="display: block;">-</span>`;
+
                     row.innerHTML = `
                         <td>${imagenHtml}</td>
                         <td>${artista.id}</td>
@@ -251,7 +252,7 @@ include(__DIR__ . '/../../../../../components/header.php');
 
         async function editarArtista(id) {
             try {
-                const response = await axios.get(apiBase + '?id=' + id);
+                const response = await axios.get(apiBase + '&id=' + id);
                 const artista = response.data.data;
 
                 document.getElementById('inputIdArtista').value = artista.id;
@@ -292,36 +293,36 @@ include(__DIR__ . '/../../../../../components/header.php');
                 // Crear FormData manualmente, solo con campos que tengan valor
                 const formData = new FormData();
                 const id = document.getElementById('inputIdArtista').value;
-                
+
                 // Agregar ID (siempre)
                 formData.append('id', id);
-                
+
                 // Agregar solo campos con valor
                 const nombre = document.getElementById('inputNombre').value.trim();
                 if (nombre) formData.append('nombre_completo', nombre);
-                
+
                 const categoria = document.getElementById('inputCategoria').value.trim();
                 if (categoria) formData.append('categoria', categoria);
-                
+
                 const subcategoria = document.getElementById('inputSubcategoria').value.trim();
                 if (subcategoria) formData.append('subcategoria', subcategoria);
-                
+
                 const biografia = document.getElementById('inputBiografia').value.trim();
                 if (biografia) formData.append('biografia', biografia);
-                
+
                 const badge = document.getElementById('inputBadge').value.trim();
                 if (badge) formData.append('badge', badge);
-                
+
                 const logros = document.getElementById('inputLogros').value.trim();
                 if (logros) formData.append('logros', logros);
-                
+
                 // Agregar imagen solo si se seleccionó
                 const imagenInput = document.getElementById('inputImagen');
                 if (imagenInput.files.length > 0) {
                     formData.append('imagen', imagenInput.files[0]);
                 }
-                
-                const url = id ? apiBase + '?id=' + id : apiBase;
+
+                const url = id ? apiBase + '&id=' + id : apiBase;
                 const method = 'POST';
 
                 // Usar fetch con credentials
@@ -354,7 +355,7 @@ include(__DIR__ . '/../../../../../components/header.php');
             if (!confirm('¿Está seguro que desea eliminar este artista?')) return;
 
             try {
-                await axios.delete(apiBase + '?id=' + id);
+                await axios.delete(apiBase + '&id=' + id);
                 alert('Artista eliminado correctamente');
                 cargarArtistas();
             } catch (error) {
@@ -370,4 +371,5 @@ include(__DIR__ . '/../../../../../components/header.php');
         }
     </script>
 </body>
+
 </html>

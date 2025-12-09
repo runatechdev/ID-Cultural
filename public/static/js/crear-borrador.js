@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const previewContainer = document.getElementById('preview-container');
     const imagePreviews = document.getElementById('image-previews');
     const btnSelectImages = document.getElementById('btn-select-images');
-    
+
     console.log('Elementos inicializados:', {
         categoriaSelect,
         camposContainer,
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         imagePreviews,
         btnSelectImages
     });
-    
+
     let selectedFiles = [];
 
     const camposPorCategoria = {
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ===== DRAG & DROP FUNCTIONALITY =====
-    
+
     // Prevenir comportamiento por defecto
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropZone.addEventListener(eventName, preventDefaults, false);
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Manejar drop
     dropZone.addEventListener('drop', handleDrop, false);
-    
+
     function handleDrop(e) {
         const dt = e.dataTransfer;
         const files = dt.files;
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('handleFiles called with:', files);
         files = [...files];
         console.log('Files array:', files);
-        
+
         // Filtrar solo imágenes y verificar tamaño
         const validFiles = files.filter(file => {
             if (!file.type.startsWith('image/')) {
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         selectedFiles.forEach((file, index) => {
             const reader = new FileReader();
-            
+
             reader.onload = (e) => {
                 const col = document.createElement('div');
                 col.className = 'col-md-3 col-sm-4 col-6';
@@ -169,33 +169,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 imagePreviews.appendChild(col);
             };
-            
+
             reader.readAsDataURL(file);
         });
     }
 
     // Función global para eliminar imágenes
-    window.removeImage = function(index) {
+    window.removeImage = function (index) {
         selectedFiles.splice(index, 1);
         updatePreviews();
     };
 
     // ===== SUBMIT FORM =====
-    
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const estado = e.submitter.id === 'btn-enviar-validacion' ? 'pendiente' : 'borrador';
-        
+
         // Validaciones básicas
         const titulo = document.getElementById('titulo').value.trim();
         const descripcion = document.getElementById('descripcion').value.trim();
         const categoria = document.getElementById('categoria').value;
-        
+
         if (!titulo || !descripcion || !categoria) {
             Swal.fire('Error', 'Por favor completa todos los campos obligatorios.', 'error');
             return;
         }
-        
+
         const formData = new FormData();
         formData.append('action', 'save');
         formData.append('titulo', titulo);
@@ -229,24 +229,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         try {
-            console.log('Enviando formulario a:', `${BASE_URL}api/borradores.php`);
-            
-            const response = await fetch(`${BASE_URL}api/borradores.php`, {
+            console.log('Enviando formulario a:', `${BASE_URL}api/obras.php?action=save`);
+
+            const response = await fetch(`${BASE_URL}api/obras.php?action=save`, {
                 method: 'POST',
                 body: formData
             });
-            
+
             console.log('Response status:', response.status);
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
+
             const responseText = await response.text();
             console.log('Raw response:', responseText);
             console.log('Response length:', responseText.length);
             console.log('First 500 chars:', responseText.substring(0, 500));
-            
+
             let result;
             try {
                 result = JSON.parse(responseText);
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Full response text:', responseText);
                 throw new Error('La respuesta del servidor no es JSON válido. Ver consola para detalles.');
             }
-            
+
             console.log('Parsed response:', result);
 
             if (result.status === 'ok') {

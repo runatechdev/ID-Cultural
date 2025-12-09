@@ -378,7 +378,7 @@ function hideLoadingState() {
 async function loadStats() {
     try {
         // Intentar cargar desde la API de estadísticas
-        const response = await fetch(WIKI.BASE_URL + 'api/get_estadisticas_inicio.php');
+        const response = await fetch(WIKI.BASE_URL + 'api/stats.php?action=public');
         if (response.ok) {
             const data = await response.json();
             WIKI.data.stats = {
@@ -466,7 +466,7 @@ async function loadArtists() {
  */
 async function loadWorks() {
     try {
-        const response = await fetch(WIKI.BASE_URL + 'api/get_obras_wiki.php');
+        const response = await fetch(WIKI.BASE_URL + 'api/obras.php?action=public_gallery');
         if (response.ok) {
             const data = await response.json();
             //console.log('Respuesta API obras:', data); // Debug
@@ -813,7 +813,9 @@ function createWorkCard(work) {
         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
             <div class="work-card-professional border-0 shadow-sm h-100">
                 <div class="work-image-container">
-                    <img src="${escaparHTML(imageSrc)}" class="work-main-image" alt="${escaparHTML(work.titulo)}">
+                    <img src="${escaparHTML(imageSrc)}" class="work-main-image" alt="${escaparHTML(work.titulo)}" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=No+Image';">
+
                     <div class="work-overlay">
                         <div class="work-category-badge">
                             <i class="bi bi-palette-fill"></i>
@@ -974,7 +976,8 @@ function viewArtistDetail(artistId) {
                 <div class="row">
                     <div class="col-md-4 text-center mb-3">
                         <img src="${artist.foto_perfil || '/static/img/perfil-del-usuario.png'}" 
-                             class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                             class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;"
+                             onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=User';">
                     </div>
                     <div class="col-md-8">
                         <p><strong>Email:</strong> ${escaparHTML(artist.email || 'No disponible')}</p>
@@ -1169,7 +1172,8 @@ function viewWorkDetail(workId) {
                     ` : ''}
                     
                     <div class="gallery-lightbox-image-wrapper">
-                        <img src="${escaparHTML(images[0])}" class="gallery-lightbox-image" id="gallery-lightbox-image" alt="Imagen">
+                        <img src="${escaparHTML(images[0])}" class="gallery-lightbox-image" id="gallery-lightbox-image" alt="Imagen" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/800x600?text=No+Image';">
                     </div>
                     
                     ${currentGalleryState.images.length > 1 ? `
@@ -1189,6 +1193,7 @@ function viewWorkDetail(workId) {
                             <img src="${escaparHTML(img)}" 
                                  class="gallery-lightbox-thumb ${idx === 0 ? 'active' : ''}" 
                                  onclick="jumpToLightboxImage(${idx})"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/100x100?text=No+Image';"
                                  alt="Thumb ${idx + 1}">
                         `).join('')}
                     </div>

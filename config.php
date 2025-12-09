@@ -5,6 +5,33 @@
  * Detecta automáticamente el entorno y configura BASE_URL
  */
 
+// Autoloader manual para namespace Backend\ (ya que no podemos correr composer dump-autoload en este entorno)
+spl_autoload_register(function ($class) {
+    $prefix = 'Backend\\';
+    $base_dir = __DIR__ . '/backend/';
+
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
+
+    $relative_class = substr($class, $len);
+
+    // Fix case mismatch: Controllers -> controllers, Helpers -> helpers, Config -> config
+    $parts = explode('\\', $relative_class);
+    if (isset($parts[0])) {
+        if ($parts[0] === 'Controllers') $parts[0] = 'controllers';
+        if ($parts[0] === 'Helpers') $parts[0] = 'helpers';
+        if ($parts[0] === 'Config') $parts[0] = 'config';
+    }
+
+    $file = $base_dir . implode('/', $parts) . '.php';
+
+    if (file_exists($file)) {
+        require $file;
+    }
+});
+
 // Detectar si estamos en desarrollo local o producción
 $is_local = in_array($_SERVER['SERVER_NAME'] ?? '', ['localhost', '127.0.0.1', 'idcultural_web']);
 $is_tailscale = strpos($_SERVER['HTTP_HOST'] ?? '', '.ts.net') !== false;
@@ -46,4 +73,5 @@ if ($is_local) {
     ini_set('error_log', __DIR__ . '/logs/php-errors.log');
 }
 
-?>
+// Global Database Connection
+require_once __DIR__ . '/backend/config/connection.php';

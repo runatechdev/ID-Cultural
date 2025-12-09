@@ -16,7 +16,7 @@ try {
     $stmt = $pdo->prepare("SELECT * FROM artistas WHERE id = ?");
     $stmt->execute([$usuario_id]);
     $artista = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if (!$artista) {
         header('Location: ' . BASE_URL . 'src/views/pages/auth/login.php');
         exit();
@@ -38,6 +38,7 @@ include(__DIR__ . '/../../../../../components/header.php');
         background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
         min-height: 100vh;
     }
+
     .hero-welcome {
         background: linear-gradient(135deg, var(--color-primario, #367789) 0%, #2a5a69 100%);
         color: white;
@@ -48,6 +49,7 @@ include(__DIR__ . '/../../../../../components/header.php');
         position: relative;
         overflow: hidden;
     }
+
     .hero-welcome h1 {
         font-size: 2rem;
         font-weight: 700;
@@ -55,6 +57,7 @@ include(__DIR__ . '/../../../../../components/header.php');
         position: relative;
         z-index: 1;
     }
+
     .hero-welcome .lead {
         font-size: 1.1rem;
         opacity: 0.95;
@@ -62,6 +65,7 @@ include(__DIR__ . '/../../../../../components/header.php');
         position: relative;
         z-index: 1;
     }
+
     .section-card {
         background: white;
         border-radius: 1rem;
@@ -71,15 +75,18 @@ include(__DIR__ . '/../../../../../components/header.php');
         overflow: hidden;
         margin-bottom: 1.5rem;
     }
+
     .section-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
     }
+
     .section-header {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         padding: 1.5rem;
         border-bottom: 2px solid #dee2e6;
     }
+
     .section-header h4 {
         margin: 0 0 0.5rem 0;
         color: var(--color-primario, #367789);
@@ -89,14 +96,19 @@ include(__DIR__ . '/../../../../../components/header.php');
         align-items: center;
         gap: 0.5rem;
     }
+
     .section-header p {
         margin: 0;
         font-size: 0.9rem;
     }
+
     @media (max-width: 768px) {
-        .hero-welcome h1 { font-size: 1.3rem; }
+        .hero-welcome h1 {
+            font-size: 1.3rem;
+        }
     }
 </style>
+
 <body class="dashboard-body">
     <?php include(__DIR__ . '/../../../../../components/navbar.php'); ?>
     <main class="container my-5">
@@ -213,9 +225,11 @@ include(__DIR__ . '/../../../../../components/header.php');
                         telefono: document.getElementById('telefono').value.trim()
                     };
                     try {
-                        const res = await fetch('/api/actualizar_datos_contacto.php', {
+                        const res = await fetch('/api/artistas.php?action=update_personal', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
                             body: JSON.stringify(datos)
                         });
                         const data = await res.json();
@@ -243,4 +257,5 @@ include(__DIR__ . '/../../../../../components/header.php');
         });
     </script>
 </body>
+
 </html>

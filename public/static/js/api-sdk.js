@@ -103,7 +103,7 @@ class IdCulturalAPI {
      * Actualizar perfil artista
      */
     actualizarArtista(data) {
-        return this.request('POST', 'actualizar_perfil_artista.php', data);
+        return this.request('POST', 'artistas.php?action=update_personal', data);
     }
 
     /**
@@ -116,21 +116,21 @@ class IdCulturalAPI {
      * Obtener borradores del artista
      */
     getBorradores() {
-        return this.request('POST', 'borradores.php?action=get');
+        return this.request('POST', 'obras.php?action=get');
     }
 
     /**
-     * Guardar borrador
+     * Guardar borrador/publicación
      */
     guardarBorrador(data) {
-        return this.request('POST', 'borradores.php?action=save', data);
+        return this.request('POST', 'obras.php?action=save', data);
     }
 
     /**
      * Eliminar borrador
      */
     eliminarBorrador(id) {
-        return this.request('POST', 'borradores.php?action=delete', { id });
+        return this.request('POST', 'obras.php?action=delete', { id });
     }
 
     /**
@@ -148,21 +148,17 @@ class IdCulturalAPI {
      */
 
     /**
-     * Obtener solicitudes pendientes (solo validador/admin)
+     * Obtener solicitudes (Admin/Validador)
      */
     getSolicitudes() {
-        return this.request('GET', 'solicitudes.php?action=get_all');
+        return this.request('GET', 'obras.php?action=get');
     }
 
     /**
-     * Validar perfil de artista
+     * Actualizar estado solicitud
      */
-    validarPerfil(artistaId, estado, comentario = '') {
-        return this.request('POST', 'solicitudes.php?action=update', {
-            artista_id: artistaId,
-            estado: estado,
-            comentario: comentario
-        });
+    actualizarSolicitud(data) {
+        return this.request('POST', 'obras.php?action=update_status', data);
     }
 
     /**
@@ -198,9 +194,9 @@ class IdCulturalAPI {
      * Cambiar contraseña
      */
     cambiarPassword(passwordActual, passwordNueva) {
-        return this.request('POST', 'cambiar_clave.php', {
-            password_actual: passwordActual,
-            password_nueva: passwordNueva
+        return this.request('POST', 'auth.php?action=change_password', {
+            clave_actual: passwordActual,
+            nueva_clave: passwordNueva
         });
     }
 
@@ -221,7 +217,7 @@ class IdCulturalAPI {
      * Obtener obras para wiki pública
      */
     getObrasWiki() {
-        return this.request('GET', 'get_obras_wiki.php');
+        return this.request('GET', 'obras.php?action=public_gallery');
     }
 
     /**
@@ -234,14 +230,14 @@ class IdCulturalAPI {
      * Obtener estadísticas de inicio
      */
     getEstadisticas() {
-        return this.request('GET', 'get_estadisticas_inicio.php');
+        return this.request('GET', 'stats.php?action=public');
     }
 
     /**
      * Obtener estadísticas de validador
      */
-    getEstadisticasValidador() {
-        return this.request('GET', 'get_estadisticas_validador.php');
+    getStatsValidador() {
+        return this.request('GET', 'stats.php?action=admin');
     }
 
     /**

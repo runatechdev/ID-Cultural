@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function cargarBorradores() {
         tbody.innerHTML = '<tr><td colspan="3" class="text-center">Cargando tus borradores...</td></tr>';
         try {
-            const response = await fetch(`${BASE_URL}api/borradores.php?action=get`);
+            const response = await fetch(`${BASE_URL}api/obras.php?action=get`);
             if (!response.ok) throw new Error('Error al obtener los datos.');
             const borradores = await response.json();
 
@@ -70,14 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         const formData = new FormData();
                         formData.append('id', id);
                         formData.append('action', 'delete');
-                        
-                        const response = await fetch(`${BASE_URL}api/borradores.php`, { 
-                            method: 'POST', 
-                            body: formData 
+
+                        const response = await fetch(`${BASE_URL}api/borradores.php`, {
+                            method: 'POST',
+                            body: formData
                         });
-                        
+
                         const res = await response.json();
-                        
+
                         if (response.ok && res.status === 'ok') {
                             Swal.fire('¡Eliminado!', res.message, 'success');
                             cargarBorradores();
@@ -107,14 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         const formData = new FormData();
                         formData.append('id', id);
                         formData.append('action', 'submit');
-                        
-                        const response = await fetch(`${BASE_URL}api/borradores.php`, { 
-                            method: 'POST', 
-                            body: formData 
+
+                        const response = await fetch(`${BASE_URL}api/borradores.php`, {
+                            method: 'POST',
+                            body: formData
                         });
-                        
+
                         const res = await response.json();
-                        
+
                         if (response.ok && res.status === 'ok') {
                             Swal.fire('¡Enviado!', res.message, 'success');
                             cargarBorradores(); // Recargar la lista

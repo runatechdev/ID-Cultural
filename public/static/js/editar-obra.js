@@ -4,13 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('multimedia');
     const btnSelectImages = document.getElementById('btn-select-images');
-    
+
     // Contenedores separados (Clave para que no desaparezcan las viejas)
     const newImagesContainer = document.getElementById('new-images-container');
     const existingImagesContainer = document.getElementById('existing-images-container');
     const previewContainer = document.getElementById('preview-container');
     const inputBorrar = document.getElementById('imagenes_a_borrar');
-    
+
     // Contenedor de campos condicionales
     const categoriaSelect = document.getElementById('categoria');
     const camposContainer = document.getElementById('campos-condicionales-container');
@@ -61,14 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderCamposExtras(cat) {
         camposContainer.innerHTML = camposPorCategoria[cat] || '<div class="text-center text-muted p-3">No hay campos específicos para esta categoría</div>';
-        
+
         // Rellenar valores si existen en obraData
         if (obraData && obraData.campos_extra) {
             let extras = obraData.campos_extra;
             if (typeof extras === 'string') {
-                try { extras = JSON.parse(extras); } catch (e) {}
+                try { extras = JSON.parse(extras); } catch (e) { }
             }
-            
+
             Object.keys(extras).forEach(key => {
                 const input = document.getElementById(key);
                 if (input) input.value = extras[key];
@@ -84,25 +84,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const col = btn.closest('.col-md-3');
         const src = col.dataset.src; // Asegúrate de que PHP ponga data-src
-        
+
         // Agregar a la lista de borrado (usando la URL o el identificador que tengas)
         // Nota: Idealmente deberíamos guardar la ruta relativa tal como está en la BD.
         // Aquí asumimos que obraData.multimedia tiene las rutas originales.
-        
+
         // Vamos a intentar sacar la ruta relativa limpia
         // Un truco es usar el índice si fuera necesario, pero por ahora usaremos el src limpio
         // O mejor: obtenemos la ruta original del array de JS si es posible
-        
+
         // Estrategia simple: Agregar al array visualmente y que el backend decida
         // Para ser más precisos, enviaremos el src del tag img, pero el backend filtrará
-        
+
         let pathToDelete = col.querySelector('img').getAttribute('src');
         // Limpiamos la URL base si está presente para enviar solo path relativo si es posible,
         // pero el backend que te pasé ya maneja comparación inteligente.
-        
+
         imagenesBorrar.push(pathToDelete);
         inputBorrar.value = JSON.stringify(imagenesBorrar);
-        
+
         // Eliminar visualmente
         col.remove();
         checkVisibility();
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- 3. Drag & Drop para Nuevas Imágenes ---
-    
+
     // Prevenir defaults
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropZone.addEventListener(eventName, preventDefaults, false);
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Drop
     dropZone.addEventListener('drop', handleDrop, false);
-    
+
     function handleDrop(e) {
         const dt = e.dataTransfer;
         handleFiles(dt.files);
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
         fileInput.click();
     });
-    
+
     // Click en zona (fuera del botón)
     dropZone.addEventListener('click', (e) => {
         if (!e.target.closest('#btn-select-images')) {
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleFiles(files) {
         files = [...files];
-        
+
         const validFiles = files.filter(file => {
             if (!file.type.startsWith('image/')) {
                 Swal.fire('Error', `El archivo ${file.name} no es una imagen`, 'error');
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Función global para borrar nuevas (necesaria para el onclick inline)
-    window.removeNewFile = function(index) {
+    window.removeNewFile = function (index) {
         selectedFiles.splice(index, 1);
         updateNewPreviews();
         checkVisibility();
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('titulo', document.getElementById('titulo').value);
         formData.append('descripcion', document.getElementById('descripcion').value);
         formData.append('categoria', categoriaSelect.value);
-        
+
         // Array de imagenes a borrar
         formData.append('imagenes_a_borrar', JSON.stringify(imagenesBorrar));
 
@@ -289,14 +289,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         try {
-            const response = await fetch(`${BASE_URL}api/borradores.php`, {
+            const response = await fetch(`${BASE_URL}api/obras.php?action=update`, {
                 method: 'POST',
                 body: formData
             });
 
             // Leer respuesta como texto primero para debug si falla JSON
             const text = await response.text();
-            
+
             let result;
             try {
                 result = JSON.parse(text);

@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '<tr><td colspan="4" class="text-center">Cargando registros...</td></tr>';
         try {
             // CORRECCIÓN: Usamos la variable global BASE_URL que definimos en el archivo PHP.
-            const response = await fetch(`${BASE_URL}api/get_logs.php`);
+            const response = await fetch(`${BASE_URL}api/logs.php?action=get_all`);
             if (!response.ok) throw new Error('Error al obtener los datos.');
             const logs = await response.json();
 

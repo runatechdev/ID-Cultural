@@ -4,15 +4,15 @@ session_start();
 
 // Si el usuario ya está logueado, redirigir
 if (isset($_SESSION['user_data'])) {
-    header('Location: /index.php');
-    exit;
+  header('Location: /index.php');
+  exit;
 }
 
 $token = $_GET['token'] ?? '';
 $paso = 1; // 1: solicitar email, 2: cambiar contraseña
 
 if ($token) {
-    $paso = 2;
+  $paso = 2;
 }
 
 require_once __DIR__ . '/../config.php';
@@ -35,13 +35,12 @@ include(__DIR__ . '/../components/header.php');
           <form id="form-solicitar-email" class="login-form">
             <div class="form-group">
               <label for="email">Email</label>
-              <input 
-                type="email" 
-                id="email" 
-                name="email" 
+              <input
+                type="email"
+                id="email"
+                name="email"
                 required
-                placeholder="tu@email.com"
-              >
+                placeholder="tu@email.com">
             </div>
 
             <button type="submit" class="btn-login">
@@ -49,7 +48,7 @@ include(__DIR__ . '/../components/header.php');
             </button>
 
             <p class="form-footer">
-              ¿Recuerdas tu contraseña? 
+              ¿Recuerdas tu contraseña?
               <a href="/login.php">Inicia sesión aquí</a>
             </p>
           </form>
@@ -61,26 +60,24 @@ include(__DIR__ . '/../components/header.php');
 
             <div class="form-group">
               <label for="nueva-clave">Nueva Contraseña</label>
-              <input 
-                type="password" 
-                id="nueva-clave" 
-                name="nueva_clave" 
+              <input
+                type="password"
+                id="nueva-clave"
+                name="nueva_clave"
                 required
                 minlength="6"
-                placeholder="Mínimo 6 caracteres"
-              >
+                placeholder="Mínimo 6 caracteres">
             </div>
 
             <div class="form-group">
               <label for="confirmar-clave">Confirmar Contraseña</label>
-              <input 
-                type="password" 
-                id="confirmar-clave" 
-                name="confirmar_clave" 
+              <input
+                type="password"
+                id="confirmar-clave"
+                name="confirmar_clave"
                 required
                 minlength="6"
-                placeholder="Repite tu contraseña"
-              >
+                placeholder="Repite tu contraseña">
             </div>
 
             <button type="submit" class="btn-login">
@@ -107,18 +104,20 @@ include(__DIR__ . '/../components/header.php');
     if (formEmail) {
       formEmail.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const email = document.getElementById('email').value.trim();
-        
+
         try {
-          const res = await fetch('/api/solicitar_recuperacion_clave.php', {
+          const res = await fetch('/api/auth.php?action=request_reset', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
             body: 'email=' + encodeURIComponent(email)
           });
-          
+
           const data = await res.json();
-          
+
           if (res.ok && data.success) {
             Swal.fire({
               title: '✓ Email Enviado',
@@ -143,31 +142,33 @@ include(__DIR__ . '/../components/header.php');
     if (formClave) {
       formClave.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const token = document.querySelector('input[name="token"]').value;
         const nueva = document.getElementById('nueva-clave').value;
         const confirmar = document.getElementById('confirmar-clave').value;
-        
+
         if (nueva !== confirmar) {
           Swal.fire('Error', 'Las contraseñas no coinciden', 'error');
           return;
         }
-        
+
         if (nueva.length < 6) {
           Swal.fire('Error', 'La contraseña debe tener mínimo 6 caracteres', 'error');
           return;
         }
-        
+
         try {
-          const res = await fetch('/api/cambiar_clave_token.php', {
+          const res = await fetch('/api/auth.php?action=reset_token', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'token=' + encodeURIComponent(token) + 
-                  '&nueva_clave=' + encodeURIComponent(nueva)
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'token=' + encodeURIComponent(token) +
+              '&nueva_clave=' + encodeURIComponent(nueva)
           });
-          
+
           const data = await res.json();
-          
+
           if (res.ok && data.success) {
             Swal.fire({
               title: '✓ Contraseña Actualizada',
@@ -188,4 +189,5 @@ include(__DIR__ . '/../components/header.php');
     }
   </script>
 </body>
+
 </html>

@@ -15,6 +15,7 @@ $specific_css_files = ['dashboard.css', 'abm_usuarios.css'];
 // --- Incluir la cabecera ---
 include(__DIR__ . '/../../../../../components/header.php');
 ?>
+
 <body class="dashboard-body">
 
     <?php include(__DIR__ . '/../../../../../components/navbar.php'); ?>
@@ -52,8 +53,8 @@ include(__DIR__ . '/../../../../../components/header.php');
                                         <textarea class="form-control" id="contenido" rows="5" required></textarea>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="imagen" class="form-label">Imagen de Portada (opcional)</label>
-                                        <input class="form-control" type="file" id="imagen" accept="image/*">
+                                        <label for="imagen" class="form-label">Imagen de Portada</label>
+                                        <input class="form-control" type="file" id="imagen" accept="image/*" required>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Guardar Noticia</button>
                                 </form>
@@ -100,7 +101,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                             <textarea class="form-control" id="edit-contenido" rows="5" required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="edit-imagen" class="form-label">Cambiar Imagen (opcional)</label>
+                            <label for="edit-imagen" class="form-label">Cambiar Imagen</label>
                             <input class="form-control" type="file" id="edit-imagen" accept="image/*">
                             <div class="form-text">Si no seleccionas una nueva imagen, se conservará la actual.</div>
                         </div>
@@ -115,7 +116,7 @@ include(__DIR__ . '/../../../../../components/header.php');
     </div>
 
     <?php include(__DIR__ . '/../../../../../components/footer.php'); ?>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
     <script>
@@ -123,4 +124,5 @@ include(__DIR__ . '/../../../../../components/header.php');
     </script>
     <script src="<?php echo BASE_URL; ?>static/js/panel_editor.js"></script>
 </body>
+
 </html>

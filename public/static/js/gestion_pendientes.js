@@ -26,19 +26,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Buscar tbody de manera flexible (puede ser tabla-obras-pendientes-body o tabla-artistas-body con clase tabla-obras-body)
     let tbody = document.getElementById('tabla-obras-pendientes-body');
     //console.log('Buscando tbody con ID tabla-obras-pendientes-body:', tbody);
-    
+
     if (!tbody) {
         tbody = document.querySelector('tbody.tabla-obras-body');
         //console.log('Buscando tbody con selector .tabla-obras-body:', tbody);
     }
-    
+
     if (!tbody) {
         console.error('No se encontró el elemento tbody para cargar las obras');
         //console.log('Elementos tbody disponibles:', document.querySelectorAll('tbody'));
         return;
     }
     //console.log('Tbody encontrado:', tbody.id, tbody.className);
-    
+
     let obrasPendientes = [];
     let perfilesPendientes = [];
     let todosPendientes = []; // Combinación de obras y perfiles
@@ -52,46 +52,58 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filtro-categoria')?.addEventListener('change', aplicarFiltros);
     document.getElementById('filtro-municipio')?.addEventListener('change', aplicarFiltros);
 
-async function cargarTodosPendientes() {
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando obras pendientes...</p></td></tr>';
-    
-    try {
-        // ✅ SOLO cargar obras, NO perfiles
-        const responseObras = await fetch(`${BASE_URL}api/get_publicaciones.php?estado=pendiente`);
-        
-        if (!responseObras.ok) throw new Error('Error al obtener obras.');
-        
-        obrasPendientes = await responseObras.json();
-        
-        // Marcar tipo para consistencia
-        obrasPendientes.forEach(obra => obra.tipo_pendiente = 'obra');
-        
-        // SOLO obras, sin perfiles
-        todosPendientes = [...obrasPendientes];
-        filtrados = [...todosPendientes];
-        
-        console.log('Obras pendientes cargadas:', obrasPendientes.length);
-        
-        // Llenar select de municipios
-        llenarSelectMunicipios();
-        
-        // Mostrar items
-        mostrarItems(filtrados);
+    async function cargarTodosPendientes() {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando obras pendientes...</p></td></tr>';
 
-    } catch (error) {
-        console.error('Error completo:', error);
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle fs-1"></i><p class="mt-2">Error al cargar obras pendientes.</p></td></tr>';
+        try {
+            // ✅ Parse URL params to support "Ver Obras" from Artist Manager
+            const urlParams = new URLSearchParams(window.location.search);
+            const artistaId = urlParams.get('artista_id');
+            // If viewing specific artist, default to ALL states, otherwise 'pendiente'
+            const estadoDefault = artistaId ? 'all' : 'pendiente';
+            // Allow override via query param ?estado=...
+            const estado = urlParams.get('estado') || estadoDefault;
+
+            let apiUrl = `${BASE_URL}api/obras.php?action=get_validator_list&estado=${estado}`;
+            if (artistaId) {
+                apiUrl += `&artista_id=${artistaId}`;
+            }
+
+            const responseObras = await fetch(apiUrl);
+
+            if (!responseObras.ok) throw new Error('Error al obtener obras.');
+
+            obrasPendientes = await responseObras.json();
+
+            // Marcar tipo para consistencia
+            obrasPendientes.forEach(obra => obra.tipo_pendiente = 'obra');
+
+            // SOLO obras, sin perfiles
+            todosPendientes = [...obrasPendientes];
+            filtrados = [...todosPendientes];
+
+            console.log('Obras pendientes cargadas:', obrasPendientes.length);
+
+            // Llenar select de municipios
+            llenarSelectMunicipios();
+
+            // Mostrar items
+            mostrarItems(filtrados);
+
+        } catch (error) {
+            console.error('Error completo:', error);
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle fs-1"></i><p class="mt-2">Error al cargar obras pendientes.</p></td></tr>';
+        }
     }
-}
 
     function mostrarItems(items) {
         //console.log('mostrarItems llamada con:', items.length, 'items');
-        
+
         if (!items || items.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><i class="bi bi-inbox fs-1 text-muted"></i><p class="mt-3 text-muted">No hay elementos pendientes de validación</p></td></tr>';
             return;
         }
-        
+
         tbody.innerHTML = items.map(item => {
             if (item.tipo_pendiente === 'perfil') {
                 return renderizarFilaPerfil(item);
@@ -99,17 +111,17 @@ async function cargarTodosPendientes() {
                 return renderizarFilaObra(item);
             }
         }).join('');
-        
+
         // Agregar event listeners después de renderizar
         agregarEventListeners();
     }
-    
+
     function renderizarFilaPerfil(perfil) {
         // Determinar qué imagen mostrar
-        const foto_mostrar = perfil.cambios.foto_perfil 
-            ? `${BASE_URL}static/img/perfil_pendiente.webp` 
+        const foto_mostrar = perfil.cambios.foto_perfil
+            ? `${BASE_URL}static/img/perfil_pendiente.webp`
             : (perfil.valores_actuales.foto_perfil || `${BASE_URL}static/img/default-avatar.png`);
-        
+
         return `
             <tr id="perfil-${perfil.id}" class="perfil-row">
                 <td class="ps-3">
@@ -118,7 +130,8 @@ async function cargarTodosPendientes() {
                              alt="Perfil" 
                              class="rounded-circle me-3" 
                              style="width: 50px; height: 50px; object-fit: cover;"
-                             onerror="this.src='${BASE_URL}static/img/default-avatar.png'">
+                             style="width: 50px; height: 50px; object-fit: cover;"
+                             onerror="this.onerror=null; this.src='https://placehold.co/50x50?text=User'">
                         <div>
                             <strong class="d-block">Cambios de Perfil</strong>
                             <small class="text-muted">
@@ -145,7 +158,7 @@ async function cargarTodosPendientes() {
             </tr>
         `;
     }
-    
+
     function renderizarFilaObra(obra) {
         return `
             <tr id="obra-${obra.id}" class="obra-row">
@@ -210,9 +223,11 @@ async function cargarTodosPendientes() {
 
     async function verDetalleObra(obraId) {
         try {
-            const response = await fetch(`${BASE_URL}api/get_publicacion_detalle.php?id=${obraId}`);
+            // Use 'get' action which allows admins/validators to see pending works
+            // 'public_detail' filters by visible/validated only
+            const response = await fetch(`${BASE_URL}api/obras.php?action=get&id=${obraId}`);
             if (!response.ok) throw new Error('Error al obtener detalles');
-            
+
             const obra = await response.json();
             mostrarModalDetalle(obra);
 
@@ -232,13 +247,13 @@ async function cargarTodosPendientes() {
                     <h6><i class="bi bi-images"></i> Imágenes:</h6>
                     <div class="row g-2">
                         ${multimedia.map((file, index) => {
-                            // Si el multimedia es solo una string (URL directa)
-                            const url = typeof file === 'string' ? file : file.url;
-                            const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url) || 
-                                          (file.type && file.type === 'image');
-                            
-                            if (isImage) {
-                                return `
+                // Si el multimedia es solo una string (URL directa)
+                const url = typeof file === 'string' ? file : file.url;
+                const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url) ||
+                    (file.type && file.type === 'image');
+
+                if (isImage) {
+                    return `
                                     <div class="col-md-3 col-sm-4 col-6">
                                         <div class="card h-100 shadow-sm hover-zoom" style="cursor: pointer;">
                                             <img src="${BASE_URL}${escapeHtml(url)}" 
@@ -246,13 +261,14 @@ async function cargarTodosPendientes() {
                                                  alt="Imagen ${index + 1}"
                                                  style="height: 150px; object-fit: cover;"
                                                  onclick="expandirImagen('${BASE_URL}${escapeHtml(url)}', event)"
-                                                 onerror="this.src='${BASE_URL}static/img/no-image.png'">
+                                                 onclick="expandirImagen('${BASE_URL}${escapeHtml(url)}', event)"
+                                                 onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=No+Image';">
                                         </div>
                                     </div>
                                 `;
-                            }
-                            return '';
-                        }).join('')}
+                }
+                return '';
+            }).join('')}
                     </div>
                 </div>
             `;
@@ -280,9 +296,9 @@ async function cargarTodosPendientes() {
                         <span class="badge bg-info">${formatearCategoria(obra.categoria)}</span>
                         ${obra.es_artista_validado ? '<span class="badge bg-success">Artista Validado</span>' : '<span class="badge bg-secondary">Usuario</span>'}
                     </div>
-                    <p><strong><i class="bi bi-person"></i> Artista:</strong> ${escapeHtml(obra.artista_nombre)}</p>
+                    <p><strong><i class="bi bi-person"></i> Artista:</strong> ${escapeHtml(obra.artista_nombre || obra.nombre_artista)}</p>
                     <p><strong><i class="bi bi-geo-alt"></i> Ubicación:</strong> ${escapeHtml(obra.municipio)}, ${escapeHtml(obra.provincia)}</p>
-                    <p><strong><i class="bi bi-envelope"></i> Email:</strong> ${escapeHtml(obra.artista_email)}</p>
+                    <p><strong><i class="bi bi-envelope"></i> Email:</strong> ${escapeHtml(obra.artista_email || obra.email)}</p>
                     <hr>
                     <h6><i class="bi bi-file-text"></i> Descripción:</h6>
                     <p>${escapeHtml(obra.descripcion)}</p>
@@ -330,7 +346,7 @@ async function cargarTodosPendientes() {
             formData.append('id', obraId);
             formData.append('accion', 'validar');
 
-            const response = await fetch(`${BASE_URL}api/validar_publicacion.php`, {
+            const response = await fetch(`${BASE_URL}api/obras.php?action=validate`, {
                 method: 'POST',
                 body: formData
             });
@@ -389,7 +405,7 @@ async function cargarTodosPendientes() {
             formData.append('accion', 'rechazar');
             formData.append('motivo', motivo);
 
-            const response = await fetch(`${BASE_URL}api/validar_publicacion.php`, {
+            const response = await fetch(`${BASE_URL}api/obras.php?action=validate`, {
                 method: 'POST',
                 body: formData
             });
@@ -417,17 +433,17 @@ async function cargarTodosPendientes() {
     // ============================================
     // FUNCIONES PARA PERFILES PENDIENTES
     // ============================================
-    
-    window.verDetallesPerfil = async function(perfilId) {
+
+    window.verDetallesPerfil = async function (perfilId) {
         const perfil = perfilesPendientes.find(p => p.id === perfilId);
         if (!perfil) {
             Swal.fire('Error', 'No se encontró el perfil', 'error');
             return;
         }
-        
+
         // Construir HTML de cambios
         let cambiosHTML = '<div class="text-start">';
-        
+
         if (perfil.cambios.foto_perfil) {
             cambiosHTML += `
                 <div class="mb-3">
@@ -437,7 +453,7 @@ async function cargarTodosPendientes() {
                 </div>
             `;
         }
-        
+
         if (perfil.cambios.biografia) {
             cambiosHTML += `
                 <div class="mb-3">
@@ -448,7 +464,7 @@ async function cargarTodosPendientes() {
                 </div>
             `;
         }
-        
+
         if (perfil.cambios.especialidades) {
             cambiosHTML += `
                 <div class="mb-3">
@@ -459,14 +475,14 @@ async function cargarTodosPendientes() {
                 </div>
             `;
         }
-        
+
         // Redes sociales
         const redesSociales = [];
         if (perfil.cambios.instagram) redesSociales.push(`<i class="bi bi-instagram"></i> ${escapeHtml(perfil.cambios.instagram)}`);
         if (perfil.cambios.facebook) redesSociales.push(`<i class="bi bi-facebook"></i> ${escapeHtml(perfil.cambios.facebook)}`);
         if (perfil.cambios.twitter) redesSociales.push(`<i class="bi bi-twitter"></i> ${escapeHtml(perfil.cambios.twitter)}`);
         if (perfil.cambios.sitio_web) redesSociales.push(`<i class="bi bi-globe"></i> ${escapeHtml(perfil.cambios.sitio_web)}`);
-        
+
         if (redesSociales.length > 0) {
             cambiosHTML += `
                 <div class="mb-3">
@@ -477,9 +493,9 @@ async function cargarTodosPendientes() {
                 </div>
             `;
         }
-        
+
         cambiosHTML += '</div>';
-        
+
         // Mostrar modal con opciones
         Swal.fire({
             title: `Cambios de Perfil - ${perfil.nombre_artista}`,
@@ -501,14 +517,14 @@ async function cargarTodosPendientes() {
             }
         });
     }
-    
+
     async function aprobarPerfil(artistaId) {
         try {
             const formData = new FormData();
             formData.append('id', artistaId);
             formData.append('accion', 'validar');
 
-            const response = await fetch(`${BASE_URL}api/validar_perfil.php`, {
+            const response = await fetch(`${BASE_URL}api/artistas.php?action=validate_profile`, {
                 method: 'POST',
                 body: formData
             });
@@ -532,7 +548,7 @@ async function cargarTodosPendientes() {
             Swal.fire('Error', 'Error de conexión al servidor', 'error');
         }
     }
-    
+
     function solicitarMotivoRechazoPerfil(artistaId) {
         Swal.fire({
             title: 'Rechazar Cambios de Perfil',
@@ -559,7 +575,7 @@ async function cargarTodosPendientes() {
             }
         });
     }
-    
+
     async function rechazarPerfil(artistaId, motivo) {
         try {
             const formData = new FormData();
@@ -603,10 +619,10 @@ async function cargarTodosPendientes() {
                 ? `${item.nombre_artista}`.toLowerCase()
                 : `${item.titulo} ${item.artista_nombre}`.toLowerCase();
             const coincideBusqueda = textoBusqueda.includes(busqueda);
-            
+
             // Filtro de categoría (solo para obras)
             const coincideCategoria = !categoria || item.tipo_pendiente === 'perfil' || item.categoria === categoria;
-            
+
             // Filtro de municipio
             const coincideMunicipio = !municipio || item.municipio === municipio;
 
@@ -621,7 +637,7 @@ async function cargarTodosPendientes() {
         if (!select) return;
 
         const municipios = [...new Set(todosPendientes.map(o => o.municipio).filter(Boolean))].sort();
-        
+
         select.innerHTML = '<option value="">Todos los municipios</option>';
         municipios.forEach(mun => {
             const option = document.createElement('option');
@@ -650,9 +666,9 @@ async function cargarTodosPendientes() {
     function formatearFecha(fecha) {
         if (!fecha) return 'No disponible';
         const date = new Date(fecha);
-        return date.toLocaleDateString('es-AR', { 
-            year: 'numeric', 
-            month: 'short', 
+        return date.toLocaleDateString('es-AR', {
+            year: 'numeric',
+            month: 'short',
             day: 'numeric'
         });
     }
@@ -678,11 +694,11 @@ async function cargarTodosPendientes() {
     // ============================================
     // LIGHTBOX PARA IMÁGENES
     // ============================================
-    
-    window.expandirImagen = function(url, event) {
+
+    window.expandirImagen = function (url, event) {
         // Evitar que se cierre el modal de validación
         event.stopPropagation();
-        
+
         // Crear overlay para lightbox
         const lightbox = document.createElement('div');
         lightbox.id = 'image-lightbox';
@@ -699,7 +715,7 @@ async function cargarTodosPendientes() {
             align-items: center;
             cursor: pointer;
         `;
-        
+
         // Crear contenedor de imagen
         const imgContainer = document.createElement('div');
         imgContainer.style.cssText = `
@@ -707,7 +723,7 @@ async function cargarTodosPendientes() {
             max-height: 90%;
             position: relative;
         `;
-        
+
         // Crear imagen
         const img = document.createElement('img');
         img.src = url;
@@ -718,7 +734,7 @@ async function cargarTodosPendientes() {
             border-radius: 8px;
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
         `;
-        
+
         // Crear botón de cerrar
         const closeBtn = document.createElement('button');
         closeBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
@@ -747,18 +763,18 @@ async function cargarTodosPendientes() {
             closeBtn.style.background = 'rgba(255, 255, 255, 0.2)';
             closeBtn.style.color = 'white';
         };
-        
+
         // Función para cerrar lightbox
         const cerrarLightbox = (e) => {
             if (e) e.stopPropagation();
             lightbox.remove();
         };
-        
+
         // Event listeners
         closeBtn.onclick = cerrarLightbox;
         lightbox.onclick = cerrarLightbox;
         img.onclick = (e) => e.stopPropagation(); // Evitar cerrar al hacer click en la imagen
-        
+
         // Cerrar con tecla ESC
         const handleEsc = (e) => {
             if (e.key === 'Escape') {
@@ -767,13 +783,13 @@ async function cargarTodosPendientes() {
             }
         };
         document.addEventListener('keydown', handleEsc);
-        
+
         // Ensamblar elementos
         imgContainer.appendChild(img);
         imgContainer.appendChild(closeBtn);
         lightbox.appendChild(imgContainer);
         document.body.appendChild(lightbox);
-        
+
         // Animación de entrada
         lightbox.style.opacity = '0';
         setTimeout(() => {

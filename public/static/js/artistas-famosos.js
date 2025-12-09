@@ -18,7 +18,7 @@ const emojiPorCategoria = {
 };
 
 // Cargar al ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     cargarArtistasFamosos();
 });
 
@@ -30,9 +30,9 @@ async function cargarArtistasFamosos() {
     }
 
     try {
-        const response = await fetch(window.BASE_URL + 'api/artistas_famosos.php');
+        const response = await fetch(window.BASE_URL + 'api/artistas.php?action=featured');
         const data = await response.json();
-        
+
         if (!data.data || data.data.length === 0) {
             container.innerHTML = '<div class="col-12 text-center text-muted"><p>No hay artistas registrados</p></div>';
             return;
@@ -40,12 +40,12 @@ async function cargarArtistasFamosos() {
 
         // Limpiar
         container.innerHTML = '';
-        
+
         // Agregar tarjetas sin parpadeo
         data.data.forEach(artist => {
             container.innerHTML += crearTarjetaArtista(artist);
         });
-        
+
         console.log('Cargados ' + data.data.length + ' artistas famosos');
     } catch (error) {
         console.error('Error cargando artistas:', error);
@@ -67,21 +67,21 @@ function crearTarjetaArtista(artist) {
         "teatro": "Teatro"
     };
     const categoryClass = categoryMap[artist.categoria] || "Musica";
-    
+
     // Obtener emoji de la API (ya viene configurado) o usar mapa
     const emoji = artist.emoji || emojiPorCategoria[artist.categoria] || '⭐';
-    
+
     // Procesar logros
     let logrosHTML = '';
     if (artist.logros_premios) {
-        const logros = typeof artist.logros_premios === 'string' 
+        const logros = typeof artist.logros_premios === 'string'
             ? artist.logros_premios.split(',').map(l => l.trim()).filter(l => l)
             : artist.logros_premios;
-        logrosHTML = logros.map(logro => 
+        logrosHTML = logros.map(logro =>
             `<span class="achievement">🏆 ${logro}</span>`
         ).join('');
     }
-    
+
     return `
         <div class="col-lg-6 col-md-6 famous-artist-item" data-category="${categoryClass}">
             <div class="famous-artist-card">

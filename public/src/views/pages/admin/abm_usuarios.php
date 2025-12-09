@@ -114,7 +114,7 @@ include(__DIR__ . '/../../../../../components/header.php');
 
             </div>
         </div>
-         <!-- ===== FIN DEL CONTENEDOR PRINCIPAL UNIFICADO ===== -->
+        <!-- ===== FIN DEL CONTENEDOR PRINCIPAL UNIFICADO ===== -->
 
     </main>
 
@@ -161,10 +161,10 @@ include(__DIR__ . '/../../../../../components/header.php');
     </div>
 
     <?php include(__DIR__ . '/../../../../../components/footer.php'); ?>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
-    
+
     <!-- ===== INICIO DEL SCRIPT DE GESTIÓN (ABM) ===== -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -210,7 +210,7 @@ include(__DIR__ . '/../../../../../components/header.php');
 
             async function cargarPersonal() {
                 try {
-                    const response = await fetch('<?php echo BASE_URL; ?>api/personal.php?action=get');
+                    const response = await fetch('<?php echo BASE_URL; ?>api/admin.php?action=get_personal');
                     if (!response.ok) throw new Error('Error en la respuesta de la red.');
                     listaPersonal = await response.json();
                     renderizarTabla(listaPersonal);
@@ -228,7 +228,10 @@ include(__DIR__ . '/../../../../../components/header.php');
                 formData.append('rol', document.getElementById('add-rol').value);
 
                 try {
-                    const response = await fetch('<?php echo BASE_URL; ?>api/personal.php?action=add', { method: 'POST', body: formData });
+                    const response = await fetch('<?php echo BASE_URL; ?>api/admin.php?action=add_personal', {
+                        method: 'POST',
+                        body: formData
+                    });
                     const result = await response.json();
 
                     if (response.ok && result.status === 'ok') {
@@ -247,7 +250,7 @@ include(__DIR__ . '/../../../../../components/header.php');
 
             document.getElementById('buscador').addEventListener('keyup', (e) => {
                 const texto = e.target.value.toLowerCase();
-                const personalFiltrado = listaPersonal.filter(usuario => 
+                const personalFiltrado = listaPersonal.filter(usuario =>
                     usuario.nombre.toLowerCase().includes(texto) || usuario.email.toLowerCase().includes(texto)
                 );
                 renderizarTabla(personalFiltrado);
@@ -260,14 +263,22 @@ include(__DIR__ . '/../../../../../components/header.php');
                 if (deleteBtn) {
                     const userId = deleteBtn.dataset.id;
                     Swal.fire({
-                        title: '¿Estás seguro?', text: "¡No podrás revertir esta acción!", icon: 'warning',
-                        showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Sí, ¡eliminar!', cancelButtonText: 'Cancelar'
+                        title: '¿Estás seguro?',
+                        text: "¡No podrás revertir esta acción!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, ¡eliminar!',
+                        cancelButtonText: 'Cancelar'
                     }).then(async (result) => {
                         if (result.isConfirmed) {
                             const formData = new FormData();
                             formData.append('id', userId);
-                            const response = await fetch('<?php echo BASE_URL; ?>api/personal.php?action=delete', { method: 'POST', body: formData });
+                            const response = await fetch('<?php echo BASE_URL; ?>api/admin.php?action=delete_personal', {
+                                method: 'POST',
+                                body: formData
+                            });
                             const res = await response.json();
                             if (response.ok && res.status === 'ok') {
                                 Swal.fire('¡Eliminado!', res.message, 'success');
@@ -278,7 +289,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                         }
                     });
                 }
-                
+
                 if (editBtn) {
                     const userId = editBtn.dataset.id;
                     const usuario = listaPersonal.find(u => u.id == userId);
@@ -288,7 +299,7 @@ include(__DIR__ . '/../../../../../components/header.php');
                         document.getElementById('edit-email').value = usuario.email;
                         document.getElementById('edit-rol').value = usuario.role;
                         document.getElementById('edit-password').value = '';
-                        
+
                         const editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
                         editModal.show();
                     }
@@ -301,16 +312,19 @@ include(__DIR__ . '/../../../../../components/header.php');
                 formData.append('nombre', document.getElementById('edit-nombre').value);
                 formData.append('email', document.getElementById('edit-email').value);
                 formData.append('role', document.getElementById('edit-rol').value);
-                
+
                 const newPassword = document.getElementById('edit-password').value;
                 if (newPassword) {
                     formData.append('password', newPassword);
                 }
 
                 try {
-                    const response = await fetch('<?php echo BASE_URL; ?>api/personal.php?action=update', { method: 'POST', body: formData });
+                    const response = await fetch('<?php echo BASE_URL; ?>api/admin.php?action=update_personal', {
+                        method: 'POST',
+                        body: formData
+                    });
                     const result = await response.json();
-                    
+
                     if (response.ok && result.status === 'ok') {
                         const editModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
                         editModal.hide();
@@ -328,4 +342,5 @@ include(__DIR__ . '/../../../../../components/header.php');
         });
     </script>
 </body>
+
 </html>

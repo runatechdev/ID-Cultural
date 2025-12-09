@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function cargarSolicitudes() {
         tbody.innerHTML = '<tr><td colspan="3" class="text-center">Cargando tus solicitudes...</td></tr>';
         try {
-            const response = await fetch(`${BASE_URL}api/solicitudes.php?action=get_my`);
+            const response = await fetch(`${BASE_URL}api/obras.php?action=get`);
             if (!response.ok) throw new Error('Error al obtener los datos.');
             const solicitudes = await response.json();
 
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (solicitud.estado === 'rechazado') badgeClass = 'bg-danger';
 
                 const fechaEnvio = new Date(solicitud.fecha_envio_validacion).toLocaleDateString('es-AR');
-                
+
                 const fila = `
                     <tr>
                         <td class="ps-3"><strong>${solicitud.titulo}</strong></td>

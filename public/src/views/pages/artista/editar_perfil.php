@@ -16,7 +16,7 @@ try {
     $stmt = $pdo->prepare("SELECT * FROM artistas WHERE id = ?");
     $stmt->execute([$usuario_id]);
     $artista = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if (!$artista) {
         header('Location: ' . BASE_URL . 'src/views/pages/auth/login.php');
         exit();
@@ -33,6 +33,7 @@ $specific_css_files = ['dashboard.css'];
 // --- Incluir la cabecera ---
 include(__DIR__ . '/../../../../../components/header.php');
 ?>
+
 <body class="dashboard-body">
 
     <?php include(__DIR__ . '/../../../../../components/navbar.php'); ?>
@@ -56,26 +57,24 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="nombre" class="form-label">Nombre</label>
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="nombre" 
-                                name="nombre" 
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="nombre"
+                                name="nombre"
                                 value="<?php echo htmlspecialchars($artista['nombre']); ?>"
-                                required
-                            >
+                                required>
                             <div class="invalid-feedback">Por favor ingresa tu nombre.</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="apellido" class="form-label">Apellido</label>
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="apellido" 
-                                name="apellido" 
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="apellido"
+                                name="apellido"
                                 value="<?php echo htmlspecialchars($artista['apellido']); ?>"
-                                required
-                            >
+                                required>
                             <div class="invalid-feedback">Por favor ingresa tu apellido.</div>
                         </div>
                     </div>
@@ -83,14 +82,13 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                            <input 
-                                type="date" 
-                                class="form-control" 
-                                id="fecha_nacimiento" 
-                                name="fecha_nacimiento" 
+                            <input
+                                type="date"
+                                class="form-control"
+                                id="fecha_nacimiento"
+                                name="fecha_nacimiento"
                                 value="<?php echo htmlspecialchars($artista['fecha_nacimiento']); ?>"
-                                required
-                            >
+                                required>
                             <div class="invalid-feedback">Por favor selecciona tu fecha de nacimiento.</div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -111,38 +109,35 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="pais" class="form-label">País</label>
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="pais" 
-                                name="pais" 
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="pais"
+                                name="pais"
                                 value="<?php echo htmlspecialchars($artista['pais'] ?? ''); ?>"
-                                required
-                            >
+                                required>
                             <div class="invalid-feedback">Por favor ingresa tu país.</div>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="provincia" class="form-label">Provincia</label>
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="provincia" 
-                                name="provincia" 
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="provincia"
+                                name="provincia"
                                 value="<?php echo htmlspecialchars($artista['provincia'] ?? ''); ?>"
-                                required
-                            >
+                                required>
                             <div class="invalid-feedback">Por favor ingresa tu provincia.</div>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="municipio" class="form-label">Municipio</label>
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="municipio" 
-                                name="municipio" 
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="municipio"
+                                name="municipio"
                                 value="<?php echo htmlspecialchars($artista['municipio'] ?? ''); ?>"
-                                required
-                            >
+                                required>
                             <div class="invalid-feedback">Por favor ingresa tu municipio.</div>
                         </div>
                     </div>
@@ -152,14 +147,13 @@ include(__DIR__ . '/../../../../../components/header.php');
                     <div class="row">
                         <div class="col-md-12 mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input 
-                                type="email" 
-                                class="form-control" 
-                                id="email" 
-                                name="email" 
+                            <input
+                                type="email"
+                                class="form-control"
+                                id="email"
+                                name="email"
                                 value="<?php echo htmlspecialchars($artista['email']); ?>"
-                                disabled
-                            >
+                                disabled>
                             <small class="text-muted">El email no puede ser modificado. Contacta con soporte si necesitas cambiar tu email.</small>
                         </div>
                     </div>
@@ -211,9 +205,11 @@ include(__DIR__ . '/../../../../../components/header.php');
                     };
 
                     try {
-                        const res = await fetch('/api/actualizar_perfil_artista.php', {
+                        const res = await fetch('/api/artistas.php?action=update_personal', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
                             body: JSON.stringify(datos)
                         });
 
@@ -241,4 +237,5 @@ include(__DIR__ . '/../../../../../components/header.php');
     </script>
 
 </body>
+
 </html>

@@ -1,24 +1,19 @@
 <?php
-// ID-CULTURAL/public/logout.php
-session_start(); // Inicia la sesión para poder destruirla
 
-// Destruye todas las variables de sesión
-$_SESSION = array();
+/**
+ * Unified Logout Endpoint
+ */
 
-// Si se desea destruir la sesión completamente, borre también la cookie de sesión.
-// Nota: ¡Esto destruirá la sesión, y no solo los datos de sesión!
-if (ini_get("session.use_cookies")) {
-    $params = session_get_cookie_params();
-    setcookie(session_name(), '', time() - 42000,
-        $params["path"], $params["domain"],
-        $params["secure"], $params["httponly"]
-    );
-}
+require_once __DIR__ . '/../config.php'; // config.php in root handles autoloader
+use Backend\Controllers\Api\AuthController;
 
-// Finalmente, destruye la sesión
-session_destroy();
+$controller = new AuthController();
 
-// Redirige al usuario a la página de inicio o de login
-header("Location: /"); // Redirige a la raíz del sitio
+// Capture JSON output to prevent it from being shown to user
+ob_start();
+$controller->logout();
+ob_end_clean();
+
+// Redirect to login page
+header('Location: /src/views/pages/auth/login.php');
 exit;
-?>

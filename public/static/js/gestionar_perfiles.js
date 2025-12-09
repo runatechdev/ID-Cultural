@@ -5,7 +5,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     let tbody = document.getElementById('tabla-perfiles-body');
-    
+
     if (!tbody) {
         console.error('No se encontró el elemento tbody para cargar los perfiles');
         return;
@@ -24,28 +24,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function cargarPerfiles() {
         tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando perfiles...</p></td></tr>';
-        
+
         try {
             // Cargar CAMBIOS PENDIENTES de perfil, no perfiles completos
             console.log('Fetching:', `${BASE_URL}api/get_perfiles_pendientes.php`);
-            const response = await fetch(`${BASE_URL}api/get_perfiles_pendientes.php`);
+            const response = await fetch(`${BASE_URL}api/artistas.php?action=get_pending`);
             console.log('Response status:', response.status);
-            
+
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error('Error response:', errorText);
                 throw new Error('Error al obtener los datos.');
             }
-            
+
             perfilesPendientes = await response.json();
             console.log('Cambios pendientes recibidos:', perfilesPendientes.length);
             console.log('Datos:', perfilesPendientes);
-            
+
             perfilesFiltrados = [...perfilesPendientes];
-            
+
             // Llenar select de provincias
             llenarSelectProvincias();
-            
+
             // Mostrar perfiles
             mostrarPerfiles(perfilesFiltrados);
 
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function mostrarPerfiles(perfiles) {
         console.log('mostrarPerfiles llamada con:', perfiles.length, 'perfiles');
-        
+
         if (!perfiles || perfiles.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><i class="bi bi-inbox fs-1 text-muted"></i><p class="mt-3 text-muted">No hay cambios de perfil pendientes de validación</p></td></tr>';
             return;
@@ -72,17 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (perfil.cambios.instagram || perfil.cambios.facebook || perfil.cambios.twitter || perfil.cambios.sitio_web) {
                 cambios.push('Redes sociales');
             }
-            
+
             const cambiosTexto = cambios.length > 0 ? cambios.join(', ') : 'Sin cambios';
-            
+
             return `
                 <tr id="perfil-${perfil.id}" class="perfil-row">
                     <td>
                         <div class="d-flex align-items-center">
-                            ${perfil.cambios.foto_perfil ? 
-                                '<img src="' + BASE_URL + 'static/img/perfil_pendiente.webp" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">' : 
-                                '<i class="bi bi-person-circle fs-3 me-2 text-muted"></i>'
-                            }
+                            ${perfil.cambios.foto_perfil ?
+                    '<img src="' + BASE_URL + 'static/img/perfil_pendiente.webp" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">' :
+                    '<i class="bi bi-person-circle fs-3 me-2 text-muted"></i>'
+                }
                             <div>
                                 <strong class="d-block">${escapeHtml(perfil.nombre_artista)}</strong>
                                 <small class="text-muted">
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('id', perfilId);
             formData.append('accion', 'validar');
 
-            const response = await fetch(`${BASE_URL}api/validar_perfil.php`, {
+            const response = await fetch(`${BASE_URL}api/artistas.php?action=validate_profile`, {
                 method: 'POST',
                 body: formData
             });
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('accion', 'rechazar');
             formData.append('motivo', motivo);
 
-            const response = await fetch(`${BASE_URL}api/validar_perfil.php`, {
+            const response = await fetch(`${BASE_URL}api/artistas.php?action=validate_profile`, {
                 method: 'POST',
                 body: formData
             });
@@ -331,9 +331,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const provincia = document.getElementById('filtro-provincia')?.value || '';
 
         perfilesFiltrados = perfilesPendientes.filter(perfil => {
-            const coincideBusqueda = perfil.nombre.toLowerCase().includes(busqueda) || 
-                                     perfil.apellido.toLowerCase().includes(busqueda) ||
-                                     perfil.email.toLowerCase().includes(busqueda);
+            const coincideBusqueda = perfil.nombre.toLowerCase().includes(busqueda) ||
+                perfil.apellido.toLowerCase().includes(busqueda) ||
+                perfil.email.toLowerCase().includes(busqueda);
             const coincideEstado = !estado || perfil.status_perfil === estado;
             const coincideProvincia = !provincia || perfil.provincia === provincia;
 
@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!select) return;
 
         const provincias = [...new Set(perfilesPendientes.map(p => p.provincia).filter(Boolean))].sort();
-        
+
         provincias.forEach(prov => {
             const option = document.createElement('option');
             option.value = prov;
@@ -360,16 +360,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     // FUNCIONES PARA CAMBIOS PENDIENTES
     // ============================================
-    
-    window.verDetallesCambios = function(perfilId) {
+
+    window.verDetallesCambios = function (perfilId) {
         const perfil = perfilesPendientes.find(p => p.id === perfilId);
         if (!perfil) {
             Swal.fire('Error', 'No se encontró el perfil', 'error');
             return;
         }
-        
+
         let cambiosHTML = '<div class="text-start">';
-        
+
         if (perfil.cambios.foto_perfil) {
             cambiosHTML += `
                 <div class="mb-3">
@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
         }
-        
+
         if (perfil.cambios.biografia) {
             cambiosHTML += `
                 <div class="mb-3">
@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
         }
-        
+
         if (perfil.cambios.especialidades) {
             cambiosHTML += `
                 <div class="mb-3">
@@ -396,13 +396,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
         }
-        
+
         const redesSociales = [];
         if (perfil.cambios.instagram) redesSociales.push(`<i class="bi bi-instagram"></i> ${escapeHtml(perfil.cambios.instagram)}`);
         if (perfil.cambios.facebook) redesSociales.push(`<i class="bi bi-facebook"></i> ${escapeHtml(perfil.cambios.facebook)}`);
         if (perfil.cambios.twitter) redesSociales.push(`<i class="bi bi-twitter"></i> ${escapeHtml(perfil.cambios.twitter)}`);
         if (perfil.cambios.sitio_web) redesSociales.push(`<i class="bi bi-globe"></i> ${escapeHtml(perfil.cambios.sitio_web)}`);
-        
+
         if (redesSociales.length > 0) {
             cambiosHTML += `
                 <div class="mb-3">
@@ -411,9 +411,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
         }
-        
+
         cambiosHTML += '</div>';
-        
+
         Swal.fire({
             title: `Cambios de Perfil - ${perfil.nombre_artista}`,
             html: cambiosHTML,
@@ -422,8 +422,8 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmButtonText: 'Cerrar'
         });
     }
-    
-    window.aprobarCambios = async function(artistaId) {
+
+    window.aprobarCambios = async function (artistaId) {
         const confirm = await Swal.fire({
             title: '¿Aprobar cambios?',
             text: 'Los cambios se aplicarán al perfil del artista',
@@ -433,15 +433,15 @@ document.addEventListener('DOMContentLoaded', () => {
             cancelButtonText: 'Cancelar',
             confirmButtonColor: '#28a745'
         });
-        
+
         if (!confirm.isConfirmed) return;
-        
+
         try {
             const formData = new FormData();
             formData.append('id', artistaId);
             formData.append('accion', 'validar');
 
-            const response = await fetch(`${BASE_URL}api/validar_perfil.php`, {
+            const response = await fetch(`${BASE_URL}api/artistas.php?action=validate_profile`, {
                 method: 'POST',
                 body: formData
             });
@@ -465,8 +465,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Swal.fire('Error', 'Error de conexión', 'error');
         }
     }
-    
-    window.rechazarCambios = function(artistaId) {
+
+    window.rechazarCambios = function (artistaId) {
         Swal.fire({
             title: 'Rechazar Cambios',
             input: 'textarea',
@@ -490,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     formData.append('accion', 'rechazar');
                     formData.append('motivo', result.value);
 
-                    const response = await fetch(`${BASE_URL}api/validar_perfil.php`, {
+                    const response = await fetch(`${BASE_URL}api/artistas.php?action=validate_profile`, {
                         method: 'POST',
                         body: formData
                     });
@@ -536,9 +536,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatearFecha(fecha) {
         if (!fecha) return 'No disponible';
         const date = new Date(fecha);
-        return date.toLocaleDateString('es-AR', { 
-            year: 'numeric', 
-            month: 'short', 
+        return date.toLocaleDateString('es-AR', {
+            year: 'numeric',
+            month: 'short',
             day: 'numeric'
         });
     }

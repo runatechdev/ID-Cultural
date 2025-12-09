@@ -8,22 +8,22 @@
  */
 function construirURLImagen(urlOriginal) {
     if (!urlOriginal) return '';
-    
+
     // Si ya es una URL completa HTTPS, devolverla
     if (urlOriginal.startsWith('https://')) {
         return urlOriginal;
     }
-    
+
     // Si es HTTP de localhost, convertir a ruta relativa
     if (urlOriginal.includes('http://localhost')) {
         urlOriginal = urlOriginal.replace(/^.*\/static\//, '/static/');
     }
-    
+
     // Si es una ruta relativa o comienza con /, usarla con BASE_URL
     if (urlOriginal.startsWith('/')) {
         return BASE_URL + urlOriginal.substring(1);
     }
-    
+
     // Si es una ruta relativa, agregarla a BASE_URL
     return BASE_URL + urlOriginal;
 }
@@ -37,7 +37,7 @@ async function cargarCarruselObras() {
     const indicators = document.getElementById('carouselIndicators');
 
     try {
-        const response = await fetch(`${BASE_URL}api/get_obras_wiki.php`);
+        const response = await fetch(`${BASE_URL}api/obras.php?action=public_gallery`);
         const data = await response.json();
 
         if (data.status === 'success' && data.obras && data.obras.length > 0) {
@@ -64,7 +64,7 @@ async function cargarCarruselObras() {
                     <div class="carousel-item ${index === 0 ? 'active' : ''}">
                         <div class="carousel-obra-image" 
                              style="background-image: url('${imagenUrl}');"
-                             onerror="this.style.backgroundImage='url(${BASE_URL}static/img/placeholder-obra.png)'">
+                             onerror="this.onerror=null; this.style.backgroundImage='url(https://placehold.co/1920x800?text=No+Image)'">
                         </div>
                         <div class="carousel-obra-overlay"></div>
                         <div class="carousel-obra-content">
@@ -222,7 +222,7 @@ function formatearCategoria(categoria) {
  */
 async function cargarEstadisticas() {
     try {
-        const response = await fetch(`${BASE_URL}api/get_estadisticas_inicio.php`);
+        const response = await fetch(`${BASE_URL}api/stats.php?action=public`);
         const data = await response.json();
 
         if (data.status === 'ok' || data.artistas !== undefined) {
@@ -250,7 +250,7 @@ function animarContador(elementId, valorFinal) {
     const pasos = 60;
     const incremento = valorFinal / pasos;
     const intervalo = duracion / pasos;
-    
+
     let valorActual = 0;
     let paso = 0;
 
@@ -290,7 +290,7 @@ function observarEstadisticas() {
  */
 async function cargarNoticias() {
     const contenedor = document.getElementById('contenedor-noticias');
-    
+
     try {
         const response = await fetch(`${BASE_URL}api/noticias.php?action=get`);
         const data = await response.json();
@@ -310,7 +310,7 @@ async function cargarNoticias() {
 
         // Si data es un array vacío o no hay noticias
         const noticias = Array.isArray(data) ? data.slice(0, 6) : (data.noticias || []);
-        
+
         if (noticias.length === 0) {
             contenedor.innerHTML = `
                 <div class="col-12 text-center py-5">
@@ -454,10 +454,10 @@ function formatearFecha(fecha) {
 function formatearFechaCompleta(fecha) {
     if (!fecha) return '';
     const date = new Date(fecha);
-    const opciones = { 
+    const opciones = {
         weekday: 'long',
-        year: 'numeric', 
-        month: 'long', 
+        year: 'numeric',
+        month: 'long',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
@@ -486,7 +486,7 @@ function escapeHtml(text) {
 const preloadNextCarouselImage = () => {
     const activeItem = document.querySelector('#heroCarouselObras .carousel-item.active');
     const nextItem = activeItem?.nextElementSibling || document.querySelector('#heroCarouselObras .carousel-item:first-child');
-    
+
     if (nextItem) {
         const img = nextItem.querySelector('.carousel-obra-image');
         if (img) {
@@ -501,7 +501,7 @@ const preloadNextCarouselImage = () => {
 };
 
 // ===== INICIALIZAR TODO AL CARGAR LA PÁGINA =====
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Cargar carrusel de obras
     cargarCarruselObras();
 
@@ -527,12 +527,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Pausar carrusel cuando el usuario interactúa
     const carousel = document.querySelector('#heroCarouselObras');
     if (carousel) {
-        carousel.addEventListener('mouseenter', function() {
+        carousel.addEventListener('mouseenter', function () {
             const bsCarousel = bootstrap.Carousel.getInstance(carousel);
             if (bsCarousel) bsCarousel.pause();
         });
 
-        carousel.addEventListener('mouseleave', function() {
+        carousel.addEventListener('mouseleave', function () {
             const bsCarousel = bootstrap.Carousel.getInstance(carousel);
             if (bsCarousel) bsCarousel.cycle();
         });
@@ -542,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function() {
 /**
  * Mejora de accesibilidad: navegación con teclado en cards
  */
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' || e.key === ' ') {
         const target = e.target.closest('.noticia-card');
         if (target) {
@@ -578,7 +578,7 @@ if ('IntersectionObserver' in window) {
  * Smooth scroll para enlaces internos
  */
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
+    anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {

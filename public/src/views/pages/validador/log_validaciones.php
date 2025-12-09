@@ -15,6 +15,7 @@ $specific_css_files = ['dashboard.css', 'abm_usuarios.css'];
 // --- Incluir la cabecera ---
 include(__DIR__ . '/../../../../../components/header.php');
 ?>
+
 <body class="dashboard-body">
 
     <?php include(__DIR__ . '/../../../../../components/navbar.php'); ?>
@@ -74,7 +75,7 @@ include(__DIR__ . '/../../../../../components/header.php');
     </main>
 
     <?php include(__DIR__ . '/../../../../../components/footer.php'); ?>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -95,7 +96,7 @@ include(__DIR__ . '/../../../../../components/header.php');
 
                 logs.forEach(log => {
                     const fecha = new Date(log.timestamp).toLocaleString('es-AR');
-                    
+
                     // Lógica para asignar colores a las acciones
                     let badgeClass = 'bg-secondary'; // Color por defecto
                     if (log.action.includes('VALIDACIÓN')) badgeClass = 'bg-success';
@@ -133,24 +134,24 @@ include(__DIR__ . '/../../../../../components/header.php');
                         return logDate === dateValue;
                     });
                 }
-                
+
                 renderLogs(filteredLogs);
             }
 
             async function cargarLogs() {
                 tbody.innerHTML = '<tr><td colspan="4" class="text-center">Cargando registros...</td></tr>';
                 try {
-                    const response = await fetch('<?php echo BASE_URL; ?>api/get_logs.php');
+                    const response = await fetch('<?php echo BASE_URL; ?>api/logs.php?action=get_all');
                     if (!response.ok) throw new Error('Error al obtener los datos.');
                     const todosLogs = await response.json();
-                    
+
                     // Filtrar solo logs de validaciones
-                    allLogs = todosLogs.filter(log => 
-                        log.action.includes('VALIDACIÓN') || 
-                        log.action.includes('VALIDACION') || 
+                    allLogs = todosLogs.filter(log =>
+                        log.action.includes('VALIDACIÓN') ||
+                        log.action.includes('VALIDACION') ||
                         log.action.includes('RECHAZO')
                     );
-                    
+
                     renderLogs(allLogs);
                 } catch (error) {
                     tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error al cargar los registros.</td></tr>';
@@ -167,4 +168,5 @@ include(__DIR__ . '/../../../../../components/header.php');
         });
     </script>
 </body>
+
 </html>
