@@ -1,168 +1,239 @@
 <?php
+
 /**
- * Sistema de Rate Limiting - ID Cultural
- * Limita requests por IP para prevenir abuso
+ * Rate Limiter - Previene abuso de APIs
+ * Usa sistema de archivos temporales
  */
+class RateLimiter
+{
+    private string $storageDir;
+    private int $maxRequests;
+    private int $windowSeconds;
+    private bool $enabled;
 
-class RateLimiter {
-    private static $storageFile = __DIR__ . '/../../storage/rate_limits.json';
-    private static $limits = [
-        'login' => ['max' => 5, 'window' => 300],              // 5 intentos por 5 min
-        'register' => ['max' => 3, 'window' => 3600],          // 3 por hora
-        'password_reset' => ['max' => 3, 'window' => 3600],    // 3 por hora
-        'api_general' => ['max' => 100, 'window' => 60],       // 100 por minuto
-        'search' => ['max' => 30, 'window' => 60],             // 30 búsquedas por minuto
-        'upload' => ['max' => 10, 'window' => 3600],           // 10 uploads por hora
-    ];
+    public function __construct()
+    {
+        $this->storageDir = sys_get_temp_dir() . '/idcultural_ratelimit';
+        $this->maxRequests = (int)($_ENV['RATE_LIMIT_MAX_REQUESTS'] ?? 100);
+        $this->windowSeconds = (int)($_ENV['RATE_LIMIT_WINDOW'] ?? 3600);
+        $this->enabled = filter_var(
+            $_ENV['RATE_LIMIT_ENABLED'] ?? true,
+            FILTER_VALIDATE_BOOLEAN
+        );
 
-    public static function init() {
-        // Crear directorio de storage si no existe
-        if (!is_dir(dirname(self::$storageFile))) {
-            mkdir(dirname(self::$storageFile), 0755, true);
+        if (!is_dir($this->storageDir)) {
+            @mkdir($this->storageDir, 0777, true);
         }
     }
 
     /**
-     * Verificar si está dentro del límite
-     * @param string $action - Tipo de acción (login, register, etc)
-     * @return bool - true si está permitido, false si está limitado
+     * Verifica si el cliente excedió el límite
+     * 
+     * @param string|null $identifier IP o user_id
+     * @return bool true si está permitido, false si excedió
      */
-    public static function check($action = 'api_general') {
-        self::init();
-
-        $ip = self::getClientIp();
-        $key = "{$ip}:{$action}";
-        $limit = self::$limits[$action] ?? self::$limits['api_general'];
-
-        $data = self::loadData();
-        $now = time();
-
-        // Limpiar registros antiguos
-        if (!isset($data[$key])) {
-            $data[$key] = [];
+    public function attempt(?string $identifier = null): bool
+    {
+        if (!$this->enabled) {
+            return true;
         }
 
-        $data[$key] = array_filter($data[$key], function($timestamp) use ($now, $limit) {
-            return $now - $timestamp < $limit['window'];
+        $identifier = $identifier ?? $this->getClientIdentifier();
+        $key = $this->getKey($identifier);
+        $file = $this->getFilePath($key);
+
+        // Limpiar archivos viejos (raramente)
+        $this->cleanup();
+
+        // Leer intentos actuales
+        $attempts = $this->getAttempts($file);
+        $now = time();
+
+        // Filtrar solo intentos dentro de la ventana
+        $validAttempts = array_filter($attempts, function($timestamp) use ($now) {
+            return ($now - $timestamp) < $this->windowSeconds;
         });
 
-        // Verificar si excedió el límite
-        if (count($data[$key]) >= $limit['max']) {
-            self::saveData($data);
+        // Verificar límite
+        if (count($validAttempts) >= $this->maxRequests) {
+            $this->logBlocked($identifier, count($validAttempts));
             return false;
         }
 
-        // Registrar nuevo request
-        $data[$key][] = $now;
-        self::saveData($data);
+        // Registrar nuevo intento
+        $validAttempts[] = $now;
+        @file_put_contents($file, implode("\n", $validAttempts));
+
         return true;
     }
 
     /**
-     * Obtener información de límite actual
+     * Envía respuesta HTTP 429 y termina ejecución
      */
-    public static function getInfo($action = 'api_general') {
-        self::init();
+    public function tooManyRequests(): void
+    {
+        http_response_code(429);
+        header('Content-Type: application/json');
+        header("Retry-After: {$this->windowSeconds}");
+        
+        echo json_encode([
+            'error' => 'Too Many Requests',
+            'message' => 'Has excedido el límite de solicitudes. Intenta nuevamente más tarde.',
+            'retry_after' => $this->windowSeconds
+        ]);
+        
+        exit;
+    }
 
-        $ip = self::getClientIp();
-        $key = "{$ip}:{$action}";
-        $limit = self::$limits[$action] ?? self::$limits['api_general'];
-
-        $data = self::loadData();
-        $now = time();
-
-        if (!isset($data[$key])) {
-            $data[$key] = [];
+    /**
+     * Middleware helper para APIs
+     */
+    public function check(?string $identifier = null): void
+    {
+        if (!$this->attempt($identifier)) {
+            $this->tooManyRequests();
         }
-
-        // Limpiar registros antiguos
-        $data[$key] = array_filter($data[$key], function($timestamp) use ($now, $limit) {
-            return $now - $timestamp < $limit['window'];
-        });
-
-        $remaining = $limit['max'] - count($data[$key]);
-        $resetIn = !empty($data[$key]) ? $limit['window'] - ($now - min($data[$key])) : 0;
-
-        return [
-            'limit' => $limit['max'],
-            'remaining' => max(0, $remaining),
-            'reset_in' => max(0, $resetIn),
-            'reset_at' => date('Y-m-d H:i:s', $now + max(0, $resetIn))
-        ];
     }
 
     /**
-     * Agregar headers de rate limit a la respuesta
+     * Obtiene identificador del cliente (IP + User Agent)
      */
-    public static function addHeaders($action = 'api_general') {
-        $info = self::getInfo($action);
-        header("X-RateLimit-Limit: {$info['limit']}");
-        header("X-RateLimit-Remaining: {$info['remaining']}");
-        header("X-RateLimit-Reset: {$info['reset_at']}");
+    private function getClientIdentifier(): string
+    {
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] 
+            ?? $_SERVER['HTTP_X_REAL_IP'] 
+            ?? $_SERVER['REMOTE_ADDR'] 
+            ?? 'unknown';
+
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+
+        return md5($ip . $userAgent);
     }
 
     /**
-     * Resetear límite para una acción
+     * Genera key única para el identificador
      */
-    public static function reset($action) {
-        self::init();
-        $ip = self::getClientIp();
-        $key = "{$ip}:{$action}";
-        $data = self::loadData();
-        unset($data[$key]);
-        self::saveData($data);
+    private function getKey(string $identifier): string
+    {
+        return 'rl_' . hash('sha256', $identifier);
     }
 
     /**
-     * Resetear todos los límites para una IP
+     * Obtiene path del archivo de rate limit
      */
-    public static function resetAll() {
-        self::init();
-        $ip = self::getClientIp();
-        $data = self::loadData();
-
-        foreach (array_keys($data) as $key) {
-            if (strpos($key, $ip . ':') === 0) {
-                unset($data[$key]);
-            }
-        }
-
-        self::saveData($data);
+    private function getFilePath(string $key): string
+    {
+        return $this->storageDir . '/' . $key . '.txt';
     }
 
     /**
-     * Obtener IP del cliente
+     * Lee intentos del archivo
      */
-    private static function getClientIp() {
-        if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-            return $_SERVER['HTTP_CF_CONNECTING_IP']; // Cloudflare
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            return explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
-        } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
-            return $_SERVER['REMOTE_ADDR'];
-        }
-        return 'UNKNOWN';
-    }
-
-    /**
-     * Cargar datos de archivo
-     */
-    private static function loadData() {
-        if (!file_exists(self::$storageFile)) {
+    private function getAttempts(string $file): array
+    {
+        if (!file_exists($file)) {
             return [];
         }
 
-        $data = json_decode(file_get_contents(self::$storageFile), true);
-        return is_array($data) ? $data : [];
+        $content = @file_get_contents($file);
+        if (empty($content)) {
+            return [];
+        }
+
+        return array_map('intval', explode("\n", trim($content)));
     }
 
     /**
-     * Guardar datos a archivo
+     * Limpia archivos viejos (más de 24hs)
      */
-    private static function saveData($data) {
-        file_put_contents(self::$storageFile, json_encode($data, JSON_PRETTY_PRINT));
+    private function cleanup(): void
+    {
+        // Ejecutar limpieza solo 1% de las veces
+        if (rand(1, 100) > 1) {
+            return;
+        }
+
+        $files = @glob($this->storageDir . '/rl_*.txt') ?: [];
+        $now = time();
+        $maxAge = 86400; // 24 horas
+
+        foreach ($files as $file) {
+            if (($now - @filemtime($file)) > $maxAge) {
+                @unlink($file);
+            }
+        }
+    }
+
+    /**
+     * Log de bloqueos
+     */
+    private function logBlocked(string $identifier, int $attempts): void
+    {
+        $logFile = $this->storageDir . '/blocked.log';
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $uri = $_SERVER['REQUEST_URI'] ?? 'unknown';
+        
+        $entry = sprintf(
+            "[%s] BLOCKED: %s | IP: %s | URI: %s | Attempts: %d\n",
+            date('Y-m-d H:i:s'),
+            $identifier,
+            $ip,
+            $uri,
+            $attempts
+        );
+
+        @file_put_contents($logFile, $entry, FILE_APPEND);
+    }
+
+    /**
+     * Reinicia el contador para un identificador
+     */
+    public function reset(?string $identifier = null): void
+    {
+        $identifier = $identifier ?? $this->getClientIdentifier();
+        $key = $this->getKey($identifier);
+        $file = $this->getFilePath($key);
+
+        if (file_exists($file)) {
+            @unlink($file);
+        }
+    }
+
+    /**
+     * Obtiene info de rate limit para el cliente
+     */
+    public function getInfo(?string $identifier = null): array
+    {
+        if (!$this->enabled) {
+            return [
+                'enabled' => false,
+                'limit' => $this->maxRequests,
+                'remaining' => $this->maxRequests,
+                'reset' => 0
+            ];
+        }
+
+        $identifier = $identifier ?? $this->getClientIdentifier();
+        $key = $this->getKey($identifier);
+        $file = $this->getFilePath($key);
+        
+        $attempts = $this->getAttempts($file);
+        $now = time();
+
+        $validAttempts = array_filter($attempts, function($timestamp) use ($now) {
+            return ($now - $timestamp) < $this->windowSeconds;
+        });
+
+        $remaining = max(0, $this->maxRequests - count($validAttempts));
+        $oldestAttempt = !empty($validAttempts) ? min($validAttempts) : $now;
+        $resetTime = $oldestAttempt + $this->windowSeconds;
+
+        return [
+            'enabled' => true,
+            'limit' => $this->maxRequests,
+            'remaining' => $remaining,
+            'reset' => $resetTime,
+            'reset_in' => max(0, $resetTime - $now)
+        ];
     }
 }
-
-// Inicializar
-RateLimiter::init();

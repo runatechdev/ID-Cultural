@@ -7,7 +7,11 @@
 
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../../backend/controllers/Api/AuthController.php';
+require_once __DIR__ . '/../../config.php';
+
+// Rate Limiting para prevenir brute force
+$rateLimiter = new RateLimiter();
+$rateLimiter->check();
 
 use Backend\Controllers\Api\AuthController;
 

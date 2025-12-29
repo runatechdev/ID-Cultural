@@ -7,7 +7,10 @@
 
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../config.php';
-header('Content-Type: application/json');
+
+// Rate Limiting
+$rateLimiter = new RateLimiter();
+$rateLimiter->check();
 
 use Backend\Controllers\Api\ArtistaController;
 

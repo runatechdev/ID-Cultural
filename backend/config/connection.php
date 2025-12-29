@@ -1,22 +1,53 @@
 <?php
-// Configuración para la conexión a MariaDB (MySQL) en Docker
-$db_host = 'db';      // Nombre del servicio de la base de datos en tu docker-compose.yml
-$db_user = 'runatechdev';   // Usuario de la base de datos (según tu docker-compose.yml)
-$db_pass = '1234';    // Contraseña de la base de datos (según tu docker-compose.yml)
-$db_name = 'idcultural'; // Nombre de la base de datos (según tu docker-compose.yml)
+
+/**
+ * Configuración de Conexión a Base de Datos
+ * Usa prepared statements por defecto para prevenir SQL Injection
+ */
 
 try {
-    // Crea una nueva instancia de PDO para MySQL
-    $pdo = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass);
+    // Usar credenciales desde constantes (ya cargadas desde .env en config.php)
+    $dsn = sprintf(
+        "mysql:host=%s;dbname=%s;charset=utf8mb4",
+        DB_HOST,
+        DB_NAME
+    );
 
-    // Establece el modo de error para que PDO lance excepciones en caso de errores
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $options = [
+        // Modo de error: lanzar excepciones
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        
+        // Usar prepared statements nativos
+        PDO::ATTR_EMULATE_PREPARES => false,
+        
+        // Fetch asociativo por defecto
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        
+        // Convertir strings vacíos a NULL
+        PDO::ATTR_ORACLE_NULLS => PDO::NULL_EMPTY_STRING,
+        
+        // Timeout de conexión
+        PDO::ATTR_TIMEOUT => 5,
+        
+        // Persistencia de conexión (optimización)
+        PDO::ATTR_PERSISTENT => false
+    ];
 
-    // Opcional: Para verificar la conexión (puedes comentar o borrar esta línea después)
-    // echo "Conexión a MariaDB exitosa desde connection.php!";
+    $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+
+    // Log de conexión exitosa (solo en desarrollo)
+    if (defined('Backend\Config\Environment') && Backend\Config\Environment::isDevelopment()) {
+        error_log("Database connection established successfully");
+    }
 
 } catch (PDOException $e) {
-    // Captura cualquier error de conexión y termina el script
-    die("Error de conexión a la base de datos: " . $e->getMessage());
+    // Log del error (no mostrar detalles al usuario en producción)
+    error_log("Database connection failed: " . $e->getMessage());
+    
+    // Mostrar error genérico
+    http_response_code(503);
+    die(json_encode([
+        'error' => 'Service Unavailable',
+        'message' => 'No se pudo conectar a la base de datos. Intenta nuevamente más tarde.'
+    ]));
 }
-?>

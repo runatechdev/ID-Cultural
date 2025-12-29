@@ -4,6 +4,8 @@ namespace Backend\Controllers\Api;
 
 require_once __DIR__ . '/../../config/connection.php';
 require_once __DIR__ . '/../../helpers/MultimediaValidator.php';
+require_once __DIR__ . '/../../repositories/BaseRepository.php';
+require_once __DIR__ . '/../../repositories/ArtistaRepository.php';
 // AuthMiddleware moved to global/mapped namespace, verify if it's Backend\Helpers or global
 // In step 73 I reverted it to global namespace "class AuthMiddleware".
 // So I will use \AuthMiddleware.
@@ -12,16 +14,19 @@ use PDO;
 use Exception;
 use PDOException;
 use MultimediaValidator; // Global namespace
+use Backend\Repositories\ArtistaRepository;
 
 class ArtistaController
 {
 
     private $pdo;
+    private ArtistaRepository $artistaRepo;
 
     public function __construct()
     {
         global $pdo;
         $this->pdo = $pdo;
+        $this->artistaRepo = new ArtistaRepository($pdo);
     }
 
     /**
@@ -87,26 +92,30 @@ class ArtistaController
             $estado = 'pendiente';
         }
 
-        $sql = "SELECT id, nombre, apellido, email, provincia, municipio, especialidades, 
-                biografia, foto_perfil, instagram, facebook, twitter, sitio_web, 
-                status_perfil, motivo_rechazo FROM artistas WHERE 1=1";
-
-        $params = [];
-        if ($estado !== 'todos') {
-            $sql .= " AND status_perfil = ?";
-            $params[] = $estado;
+        // Usar repositorio en lugar de SQL directo
+        if ($estado === 'todos') {
+            // Obtener todos con filtros opcionales
+            $filters = [
+                'limit' => $limite,
+                'offset' => $offset
+            ];
+            
+            if ($provincia) {
+                $filters['provincia'] = $provincia;
+            }
+            
+            $perfiles = $this->artistaRepo->findValidados($filters);
+        } else {
+            // Obtener por estado específico
+            $perfiles = $this->artistaRepo->findByStatus($estado, $limite, $offset);
+            
+            // Filtrar por provincia si se especifica
+            if ($provincia) {
+                $perfiles = array_filter($perfiles, function($p) use ($provincia) {
+                    return $p['provincia'] === $provincia;
+                });
+            }
         }
-        if ($provincia) {
-            $sql .= " AND provincia = ?";
-            $params[] = $provincia;
-        }
-
-        $sql .= " ORDER BY FIELD(status_perfil, 'pendiente', 'rechazado', 'validado') ASC, id DESC";
-        $sql .= " LIMIT $limite OFFSET $offset";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        $perfiles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode($perfiles);
     }
@@ -692,12 +701,15 @@ class ArtistaController
     {
         $this->requireAuth(['admin', 'validador']);
 
-        $stats = [
-            'pendientes' => $this->pdo->query("SELECT COUNT(*) FROM artistas WHERE status = 'pendiente'")->fetchColumn(),
-            'validados' => $this->pdo->query("SELECT COUNT(*) FROM artistas WHERE status = 'validado'")->fetchColumn(),
-            'rechazados' => $this->pdo->query("SELECT COUNT(*) FROM artistas WHERE status = 'rechazado'")->fetchColumn()
-        ];
-        echo json_encode($stats);
+        // Usar método del repositorio
+        $stats = $this->artistaRepo->getStats();
+        
+        echo json_encode([
+            'pendientes' => $stats['pendiente'] ?? 0,
+            'validados' => $stats['validado'] ?? 0,
+            'rechazados' => $stats['rechazado'] ?? 0,
+            'total' => $stats['total'] ?? 0
+        ]);
     }
 
     // --- Helpers ---
