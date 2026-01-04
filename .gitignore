@@ -12,13 +12,13 @@ composer.lock
 /storage/logs/*.log
 *.log
 
-# Uploads
-/public/uploads/*
-!/public/uploads/.gitkeep
-/storage/uploads/*
-!/storage/uploads/.gitkeep
-public/static/uploads/*
-!public/static/uploads/.gitkeep
+# Uploads - Permitir imágenes para demo/desarrollo
+# /public/uploads/*
+# !/public/uploads/.gitkeep
+# /storage/uploads/*
+# !/storage/uploads/.gitkeep
+# public/static/uploads/*
+# !public/static/uploads/.gitkeep
 
 # Cache
 /storage/cache/*
