@@ -1,5 +1,5 @@
-# Environment
-.env
+# Environment - Permitir .env para desarrollo compartido
+# .env
 .env.local
 .env.*.local
 
