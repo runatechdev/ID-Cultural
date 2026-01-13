@@ -1,8 +1,11 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../backend/helpers/security_headers.php';
+require_once __DIR__ . '/../../backend/helpers/cors.php';
+require_once __DIR__ . '/../../backend/helpers/auth_guard.php';
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../backend/config/connection.php';
-require_once __DIR__ . '/../../backend/helpers/auth_guard.php';
+
 
 
 // Obtener acción desde GET o POST

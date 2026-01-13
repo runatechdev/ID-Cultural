@@ -13,6 +13,9 @@ ini_set('display_errors', '0');
 error_reporting(E_ERROR | E_PARSE);
 
 session_start();
+require_once __DIR__ . '/../../backend/helpers/security_headers.php';
+require_once __DIR__ . '/../../backend/helpers/cors.php';
+require_once __DIR__ . '/../../backend/helpers/auth_guard.php';
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../../backend/config/connection.php';
 require_once __DIR__ . '/../../config.php';

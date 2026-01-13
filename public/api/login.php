@@ -12,6 +12,9 @@ session_set_cookie_params([
 ]);
 
 session_start();
+require_once __DIR__ . '/../../backend/helpers/security_headers.php';
+require_once __DIR__ . '/../../backend/helpers/cors.php';
+require_once __DIR__ . '/../../backend/helpers/auth_guard.php';
 
 header('Content-Type: application/json');
 

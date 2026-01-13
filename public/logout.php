@@ -1,6 +1,15 @@
 <?php
 // public/logout.php
 session_start();
+<?php
+require_once __DIR__ . '/../../backend/helpers/security_headers.php';
+require_once __DIR__ . '/../../backend/helpers/cors.php';
+
+
+header('Content-Type: application/json');
+
+// resto del código
+
 
 require_once __DIR__ . '/../backend/helpers/security_logger.php';
 require_once __DIR__ . '/../backend/config/connection.php';
