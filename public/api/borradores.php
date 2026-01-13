@@ -2,6 +2,8 @@
 session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../backend/config/connection.php';
+require_once __DIR__ . '/../../backend/helpers/auth_guard.php';
+
 
 // Obtener acción desde GET o POST
 $action = $_GET['action'] ?? $_POST['action'] ?? '';

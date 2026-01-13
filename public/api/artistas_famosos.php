@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../../backend/helpers/auth_guard.php';
+
+
 /**
  * API para obtener y gestionar artistas famosos de Santiago del Estero
  * Archivo: /public/api/artistas_famosos.php

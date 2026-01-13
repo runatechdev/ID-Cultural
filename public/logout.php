@@ -1,12 +1,21 @@
 <?php
-// ID-CULTURAL/public/logout.php
-session_start(); // Inicia la sesión para poder destruirla
+// public/logout.php
+session_start();
 
-// Destruye todas las variables de sesión
-$_SESSION = array();
+require_once __DIR__ . '/../backend/helpers/security_logger.php';
+require_once __DIR__ . '/../backend/config/connection.php';
 
-// Si se desea destruir la sesión completamente, borre también la cookie de sesión.
-// Nota: ¡Esto destruirá la sesión, y no solo los datos de sesión!
+global $pdo;
+
+if (isset($_SESSION['user_data']['id'])) {
+    log_security_event($pdo, 'LOGOUT', 'INFO', [
+        'user_id' => $_SESSION['user_data']['id']
+    ]);
+}
+
+// Limpiar sesión
+$_SESSION = [];
+
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(session_name(), '', time() - 42000,
@@ -15,10 +24,9 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// Finalmente, destruye la sesión
 session_destroy();
 
-// Redirige al usuario a la página de inicio o de login
-header("Location: /"); // Redirige a la raíz del sitio
+// Redirigir
+header("Location: /");
 exit;
 ?>

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/connection.php'; // Incluye config y la conexión
+require_once __DIR__ . '/../helpers/auth_guard.php';
 
 header('Content-Type: application/json');
 

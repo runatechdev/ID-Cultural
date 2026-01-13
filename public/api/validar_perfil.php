@@ -15,6 +15,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../../backend/config/connection.php';
 require_once __DIR__ . '/../../backend/helpers/EmailHelper.php';
+require_once __DIR__ . '/../helpers/auth_guard.php';
 
 header('Content-Type: application/json; charset=UTF-8');
 

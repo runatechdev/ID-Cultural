@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../backend/helpers/auth_guard.php';
 session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../backend/config/connection.php';

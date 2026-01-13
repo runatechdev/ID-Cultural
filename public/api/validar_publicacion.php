@@ -7,6 +7,7 @@
 session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../backend/config/connection.php';
+require_once __DIR__ . '/../helpers/auth_guard.php';
 
 // Verificar que el usuario sea validador o admin
 if (!isset($_SESSION['user_data']) || !in_array($_SESSION['user_data']['role'], ['validador', 'admin'])) {

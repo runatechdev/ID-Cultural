@@ -1,30 +1,93 @@
 <?php
 // public/api/login.php
+
+// 🔒 Endurecer cookies de sesión (ANTES de session_start)
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => '',
+    'secure' => isset($_SERVER['HTTPS']),
+    'httponly' => true,
+    'samesite' => 'Strict'
+]);
+
 session_start();
 
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../../backend/controllers/verificar_usuario.php';
+require_once __DIR__ . '/../../backend/helpers/security_logger.php';
+require_once __DIR__ . '/../../backend/helpers/security_bruteforce.php';
+
+global $pdo;
 
 $email = strtolower(trim($_POST['email'] ?? ''));
 $password = trim($_POST['password'] ?? '');
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
-$result = checkUserCredentials($email, $password);
+// ---------------------------------------------------------------------------
+// 🔥 1) DETECCIÓN DE FUERZA BRUTA
+// ---------------------------------------------------------------------------
+$failCount = count_recent_failures($pdo, $email, $ip);
 
-if ($result['status'] === 'ok') {
-    // 1. Regenerar el ID de sesión para prevenir ataques de Session Fixation
-    session_regenerate_id(true);
+if ($failCount >= 5) {
 
-    // 2. Guardar los datos del usuario en una sola variable de sesión, como un array.
-    //    Esto mantiene la sesión más limpia y es consistente con nuestro navbar.
-    $_SESSION['user_data'] = [
-        'id' => $result['user_data']['id'],
-        'role' => $result['user_data']['role'],
-        'nombre' => $result['user_data']['nombre'] ?? '',
-        'apellido' => $result['user_data']['apellido'] ?? '',
-        'email' => $result['user_data']['email'] ?? $email
-    ];
+    log_security_event($pdo, 'BRUTE_FORCE_SUSPECTED', 'CRITICAL', [
+        'details' => [
+            'email' => $email,
+            'attempts_last_10m' => $failCount,
+            'ip' => $ip
+        ]
+    ]);
+
+    echo json_encode([
+        "status" => "error",
+        "msg" => "Acceso bloqueado temporalmente por actividad sospechosa. Espere 10 minutos."
+    ]);
+    exit;
 }
 
+// ---------------------------------------------------------------------------
+// 2) VALIDAR CREDENCIALES
+// ---------------------------------------------------------------------------
+$result = checkUserCredentials($email, $password);
+
+// ---------------------------------------------------------------------------
+// ⚠️ 3) LOGIN FALLIDO
+// ---------------------------------------------------------------------------
+if ($result['status'] !== 'ok') {
+
+    log_security_event($pdo, 'LOGIN_FAIL', 'WARNING', [
+        'details' => ['email' => $email]
+    ]);
+
+    echo json_encode($result);
+    exit;
+}
+
+// ---------------------------------------------------------------------------
+// 🟢 4) LOGIN EXITOSO
+// ---------------------------------------------------------------------------
+log_security_event($pdo, 'LOGIN_SUCCESS', 'INFO', [
+    'user_id' => $result['user_data']['id'],
+    'details' => ['email' => $email]
+]);
+
+// ---------------------------------------------------------------------------
+// 5) CREAR SESIÓN SEGURA
+// ---------------------------------------------------------------------------
+session_regenerate_id(true);
+
+$_SESSION['user_data'] = [
+    'id' => $result['user_data']['id'],
+    'role' => $result['user_data']['role'],
+    'nombre' => $result['user_data']['nombre'] ?? '',
+    'apellido' => $result['user_data']['apellido'] ?? '',
+    'email' => $result['user_data']['email'] ?? $email
+];
+
+// ✅ TIMESTAMP DE ACTIVIDAD
+$_SESSION['last_activity'] = time();
+
 echo json_encode($result);
-?>
+exit;

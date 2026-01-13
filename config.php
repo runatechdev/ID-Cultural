@@ -6,8 +6,26 @@
  */
 
 /* ============================================================
+   CONTROL SEGURO DE SESIÓN (SIEMPRE PRIMERO)
+   ============================================================ */
+
+// Evitar errores si ya hay una sesión activa
+if (session_status() === PHP_SESSION_NONE) {
+
+    // Configuración de cookies de sesión seguras
+    session_set_cookie_params([
+        'secure'   => true,     // Solo HTTPS
+        'httponly' => true,     // Evita JS
+        'samesite' => 'Strict'  // Anti-CSRF
+    ]);
+
+    session_start();
+}
+
+/* ============================================================
    HEADERS DE SEGURIDAD
    ============================================================ */
+
 header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
 header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline';");
 header("X-Frame-Options: SAMEORIGIN");
@@ -19,27 +37,15 @@ header("Cross-Origin-Opener-Policy: same-origin");
 header("Cross-Origin-Resource-Policy: same-origin");
 header("Cross-Origin-Embedder-Policy: require-corp");
 
-/* ============================================================
-   CONFIGURACIÓN DE COOKIES DE SESIÓN SEGURAS
-   ============================================================ */
-session_set_cookie_params([
-    'secure' => true,     // Solo por HTTPS
-    'httponly' => true,   // Evita acceso por JavaScript
-    'samesite' => 'Strict'
-]);
-
-session_start();
 
 /* ============================================================
-   DETECCIÓN DE ENTORNO Y CONFIGURACIÓN DE BASE_URL
+   DETECCIÓN DE ENTORNO Y BASE_URL
    ============================================================ */
 
-// Detectar si estamos en desarrollo local o producción
 $is_local = in_array($_SERVER['SERVER_NAME'] ?? '', ['localhost', '127.0.0.1', 'idcultural_web']);
 $is_tailscale = strpos($_SERVER['HTTP_HOST'] ?? '', '.ts.net') !== false;
 $is_ngrok = strpos($_SERVER['HTTP_HOST'] ?? '', '.ngrok') !== false;
 
-// Configurar BASE_URL según el entorno
 if ($is_local && !$is_ngrok) {
     define('BASE_URL', 'http://localhost:8080/');
 } elseif ($is_tailscale) {
@@ -54,18 +60,21 @@ if ($is_local && !$is_ngrok) {
     define('BASE_URL', $protocol . '://' . $server_ip . $port_suffix . '/');
 }
 
+
 /* ============================================================
    CONFIGURACIÓN DE BASE DE DATOS
    ============================================================ */
+
 define('DB_HOST', getenv('DB_HOST') ?: 'db');
 define('DB_USER', getenv('DB_USER') ?: 'runatechdev');
 define('DB_PASS', getenv('DB_PASS') ?: '1234');
 define('DB_NAME', getenv('DB_NAME') ?: 'idcultural');
 
+
 /* ============================================================
    ERRORES
    ============================================================ */
-// Mostrar errores solo en desarrollo
+
 if ($is_local) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
